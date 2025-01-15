@@ -11,7 +11,7 @@ public class DemoApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
 	}
-	MongoClient myClient =
+	/*MongoClient myClient =
 
-			MongoClients.create("mongodb://user:root@localhost:27017");
+			MongoClients.create("mongodb://user:root@localhost:27017");*/
 }
