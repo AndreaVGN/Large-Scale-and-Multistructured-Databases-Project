@@ -1,4 +1,4 @@
 package com.example.WanderHub.demo.service;
 
-public class prova {
+public class BookService {
 }
