@@ -13,6 +13,26 @@ public class Accomodation {
     private double averageRate;
     private String[] photos;
 
+
+    public Accomodation() {
+    }
+
+    public Accomodation(int accomodationId, String description, String type, boolean[] facilities, String place, String address, String[] dates, int maxGuestSize, int costPerNight, double averageRate, String[] photos) {
+        this.accomodationId = accomodationId;
+        this.description = description;
+        this.type = type;
+        this.facilities = facilities;
+        this.place = place;
+        this.address = address;
+        this.dates = dates;
+        this.maxGuestSize = maxGuestSize;
+        this.costPerNight = costPerNight;
+        this.averageRate = averageRate;
+        this.photos = photos;
+    }
+
+
+
     public int getAccomodationId() {return accomodationId;}
     public String getDescription() {return description;}
     public String getType() {return type;}
