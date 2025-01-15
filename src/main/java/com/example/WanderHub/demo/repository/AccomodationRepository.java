@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccomodationRepository extends MongoRepository<Accomodation, Integer> {
     // Metodi per interrogare il database, se necessari
+
 }

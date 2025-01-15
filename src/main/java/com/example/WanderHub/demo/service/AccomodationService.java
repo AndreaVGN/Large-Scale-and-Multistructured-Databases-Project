@@ -17,4 +17,5 @@ public class AccomodationService {
     }
 
     // Altri metodi per gestire le sistemazioni
+
 }
