@@ -16,4 +16,5 @@ public class AccomodationController {
     public Accomodation createAccomodation(@RequestBody Accomodation accomodation) {
         return accomodationService.createAccomodation(accomodation);
     }
+
 }
