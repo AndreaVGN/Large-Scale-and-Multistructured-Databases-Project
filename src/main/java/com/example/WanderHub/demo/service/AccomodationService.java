@@ -16,6 +16,10 @@ public class AccomodationService {
         return accomodationRepository.save(accomodation);
     }
 
+    public Accomodation getAccomodationById(int id) {
+        return accomodationRepository.findById(id).orElse(null);  // oppure lancia un'eccezione se non trovato
+    }
+
     // Altri metodi per gestire le sistemazioni
 
 }

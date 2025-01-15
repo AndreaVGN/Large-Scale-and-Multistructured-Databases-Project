@@ -17,4 +17,9 @@ public class AccomodationController {
         return accomodationService.createAccomodation(accomodation);
     }
 
+    @GetMapping("/{id}")
+    public Accomodation getAccomodation(@PathVariable int id) {
+        return accomodationService.getAccomodationById(id);
+    }
+
 }

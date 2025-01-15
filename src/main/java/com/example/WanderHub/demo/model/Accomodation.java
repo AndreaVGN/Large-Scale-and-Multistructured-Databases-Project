@@ -1,6 +1,9 @@
 package com.example.WanderHub.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Accomodation {
+    @JsonProperty("id")
     private int accomodationId;
     private String description;
     private String type;
