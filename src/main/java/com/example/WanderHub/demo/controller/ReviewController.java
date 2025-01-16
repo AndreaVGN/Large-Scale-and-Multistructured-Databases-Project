@@ -16,17 +16,17 @@ public class ReviewController {
 
     @PostMapping
     public Review createReview(@RequestBody Review review) {
-        return reviewService.createAccommodation(review);
+        return reviewService.createReview(review);
     }
 
     @GetMapping("/{id}")
-    public Accommodation getAccommodation(@PathVariable int id) {
-        return accommodationService.getAccommodationById(id);
+    public Review getReview(@PathVariable int id) {
+        return reviewService.getReviewById(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccommodation(@PathVariable int id) {
-        boolean isDeleted = accommodationService.deleteAccommodationById(id);
+    public ResponseEntity<Void> deleteReview(@PathVariable int id) {
+        boolean isDeleted = reviewService.deleteReviewById(id);
 
         if(isDeleted){
             return new ResponseEntity<>(HttpStatus.OK);
