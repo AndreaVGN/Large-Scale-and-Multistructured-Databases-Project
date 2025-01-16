@@ -15,6 +15,4 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
     boolean existsByAccommodationId(int accommodationId);
     void deleteByAccommodationId(int accommodationId);
-
-
 }
