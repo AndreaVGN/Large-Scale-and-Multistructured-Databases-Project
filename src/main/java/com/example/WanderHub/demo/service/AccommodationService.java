@@ -13,16 +13,16 @@ public class AccommodationService {
     private AccommodationRepository accommodationRepository;
 
     // Creazione di una nuova sistemazione
-    public Accommodation createAccomodation(Accommodation accommodation) {
+    public Accommodation createAccommodation(Accommodation accommodation) {
         return accommodationRepository.save(accommodation);
     }
 
-    public Accommodation getAccomodationById(int accommodationId) {
+    public Accommodation getAccommodationById(int accommodationId) {
         return accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Accomodation not found with id: " + accommodationId));
     }
 
-    public boolean deleteAccomodationById(int accommodationId) {
+    public boolean deleteAccommodationById(int accommodationId) {
         if(accommodationRepository.existsByAccommodationId(accommodationId)) {
             accommodationRepository.deleteByAccommodationId(accommodationId);
             return true;

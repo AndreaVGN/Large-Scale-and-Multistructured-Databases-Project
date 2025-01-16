@@ -15,18 +15,18 @@ public class AccommodationController {
     private AccommodationService accommodationService;
 
     @PostMapping
-    public Accommodation createAccomodation(@RequestBody Accommodation accomodation) {
-        return accommodationService.createAccomodation(accomodation);
+    public Accommodation createAccommodation(@RequestBody Accommodation accommodation) {
+        return accommodationService.createAccommodation(accommodation);
     }
 
     @GetMapping("/{id}")
-    public Accommodation getAccomodation(@PathVariable int id) {
-        return accommodationService.getAccomodationById(id);
+    public Accommodation getAccommodation(@PathVariable int id) {
+        return accommodationService.getAccommodationById(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccomodation(@PathVariable int id) {
-        boolean isDeleted = accommodationService.deleteAccomodationById(id);
+    public ResponseEntity<Void> deleteAccommodation(@PathVariable int id) {
+        boolean isDeleted = accommodationService.deleteAccommodationById(id);
 
         if(isDeleted){
             return new ResponseEntity<>(HttpStatus.OK);
