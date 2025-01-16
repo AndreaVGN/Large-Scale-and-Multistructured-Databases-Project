@@ -2,7 +2,7 @@ package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Review;
-import com.example.WanderHub.demo.repository.BookRepository;
+import com.example.WanderHub.demo.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class ReviewService {
         return ReviewRepository.save(review);
     }
 
-    public Review getREviewById(int reviewId) {
+    public Review getReviewById(int reviewId) {
         return ReviewRepository.findByReviewId(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + reviewId));
     }
