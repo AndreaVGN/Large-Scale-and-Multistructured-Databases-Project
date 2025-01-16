@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.controller;
 
 import com.example.WanderHub.demo.model.Accomodation;
+import com.example.WanderHub.demo.repository.AccomodationRepository;
 import com.example.WanderHub.demo.service.AccomodationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,5 +22,9 @@ public class AccomodationController {
     public Accomodation getAccomodation(@PathVariable int id) {
         return accomodationService.getAccomodationById(id);
     }
+
+
+
+
 
 }
