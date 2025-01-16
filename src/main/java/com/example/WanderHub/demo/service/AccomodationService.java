@@ -24,6 +24,14 @@ public class AccomodationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Accomodation not found with id: " + accomodationId));
     }
 
+    public boolean deleteAccomodationById(int accomodationId) {
+        if(accomodationRepository.existsByAccomodationId(accomodationId)) {
+            accomodationRepository.deleteByAccomodationId(accomodationId);
+            return true;
+        }
+        return false;
+    }
+
     // Altri metodi per gestire le sistemazioni
 
 }

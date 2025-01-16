@@ -13,5 +13,8 @@ public interface AccomodationRepository extends MongoRepository<Accomodation, In
     @Query("{ 'accomodationId': ?0 }")
     Optional<Accomodation> findByAccomodationId(int accomodationId);
 
+    boolean existsByAccomodationId(int accomodationId);
+    void deleteByAccomodationId(int accomodationId);
+
 
 }
