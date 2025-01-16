@@ -2,9 +2,9 @@ package com.example.WanderHub.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Accomodation {
+public class Accommodation {
     @JsonProperty("id")
-    private int accomodationId;
+    private int accommodationId;
     private String description;
     private String type;
     private boolean[] facilities;
@@ -17,11 +17,11 @@ public class Accomodation {
     private String[] photos;
 
 
-    public Accomodation() {
+    public Accommodation() {
     }
 
-    public Accomodation(int accomodationId, String description, String type, boolean[] facilities, String place, String address, String[] dates, int maxGuestSize, int costPerNight, double averageRate, String[] photos) {
-        this.accomodationId = accomodationId;
+    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place, String address, String[] dates, int maxGuestSize, int costPerNight, double averageRate, String[] photos) {
+        this.accommodationId = accommodationId;
         this.description = description;
         this.type = type;
         this.facilities = facilities;
@@ -36,7 +36,7 @@ public class Accomodation {
 
 
 
-    public int getAccomodationId() {return accomodationId;}
+    public int getAccommodationId() {return accommodationId;}
     public String getDescription() {return description;}
     public String getType() {return type;}
     public boolean[] getFacilities() {return facilities;}
@@ -48,7 +48,7 @@ public class Accomodation {
     public double getAverageRate() {return averageRate;}
     public String[] getPhotos() {return photos;}
 
-    public void setAccomodationId(int accomodationId) {this.accomodationId = accomodationId;}
+    public void setAccommodationId(int accomodationId) {this.accommodationId = accommodationId;}
     public void setDescription(String description) {this.description = description;}
     public void setType(String type) {this.type = type;}
     public void setFacilities(boolean[] facilities) {this.facilities = facilities;}
@@ -62,8 +62,8 @@ public class Accomodation {
 
     @Override
     public String toString() {
-        return "Accomodation{" +
-                "accomodationId=" + accomodationId +
+        return "Accommodation{" +
+                "accommodationId=" + accommodationId +
                 ", description='" + description + '\'' +
                 ", type='" + type + '\'' +
                 ", facilities=" + java.util.Arrays.toString(facilities) +
