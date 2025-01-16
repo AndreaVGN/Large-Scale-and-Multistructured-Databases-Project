@@ -19,6 +19,7 @@ public class AccomodationController {
 
     @GetMapping("/{id}")
     public Accomodation getAccomodation(@PathVariable int id) {
+
         return accomodationService.getAccomodationById(id);
     }
 
