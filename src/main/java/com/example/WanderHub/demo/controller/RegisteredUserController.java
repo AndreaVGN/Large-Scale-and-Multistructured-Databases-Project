@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.controller;
 
+import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,35 +9,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/registeredUsers")
+@RequestMapping("/users")
 public class RegisteredUserController {
 
+    // Iniezione del servizio tramite @Autowired
     @Autowired
-    private RegisteredUserService RegisteredUserService;
+    private RegisteredUserService registeredUserService;
 
     @PostMapping
     public RegisteredUser createRegisteredUser(@RequestBody RegisteredUser registeredUser) {
-        return RegisteredUserService.createRegisteredUser(registeredUser);
+        return registeredUserService.createRegisteredUser(registeredUser);
     }
 
-    @GetMapping("/{id}")
-    public RegisteredUser getRegisteredUser(@PathVariable String username) {
-        return RegisteredUserService.getRegisteredUserById(username);
+    @GetMapping("/{user}")
+    public RegisteredUser getRegisteredUser(@PathVariable String user) {
+        return registeredUserService.getRegisteredUserByUsername(user);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRegisteredUser(@PathVariable String username) {
-        boolean isDeleted = RegisteredUserService.deleteRegisteredUserById(username);
-
+    @DeleteMapping("/{user}")
+    public ResponseEntity<Void> deleteRegisteredUser(@PathVariable String user) {
+        boolean isDeleted = registeredUserService.deleteRegisteredUserByUsername(user);
         if(isDeleted){
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-
-
-
-
 }
