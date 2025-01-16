@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.service;
 
+import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accomodation;
 import com.example.WanderHub.demo.repository.AccomodationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,17 @@ public class AccomodationService {
         return accomodationRepository.save(accomodation);
     }
 
-    public Accomodation getAccomodationById(int id) {
-        return accomodationRepository.findById(id).orElse(null);  // oppure lancia un'eccezione se non trovato
+    public Accomodation getAccomodationById(int accomodationId) {
+        return accomodationRepository.findByAccomodationId(accomodationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Accomodation not found with id: " + accomodationId));
     }
-
+    public boolean deleteAccommodationById(int id) {
+        if (accomodationRepository.existsByAccomodationId(id)) {
+            accomodationRepository.deleteByAccomodationId(id);
+            return true;
+        }
+        return false;
+    }
     // Altri metodi per gestire le sistemazioni
 
 }
