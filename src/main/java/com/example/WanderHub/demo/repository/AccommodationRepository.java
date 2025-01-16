@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface AccommodationRepository extends MongoRepository<Accommodation, Integer> {
@@ -15,4 +16,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
     boolean existsByAccommodationId(int accommodationId);
     void deleteByAccommodationId(int accommodationId);
+
+    @Query("{ 'place': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'startDate': { $lte: ?3 }, 'endDate': { $gte: ?2 } } ] } } } }")
+    List<Accommodation> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate);
 }

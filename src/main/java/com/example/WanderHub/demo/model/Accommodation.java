@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import com.example.WanderHub.demo.utility.OccupiedPeriod;
 
 public class Accommodation {
     private int accommodationId;
@@ -9,55 +10,119 @@ public class Accommodation {
     private boolean[] facilities;
     private String place;
     private String address;
-    private String[] dates;
+    private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
     private int maxGuestSize;
     private int costPerNight;
     private double averageRate;
     private String[] photos;
 
-
+    // Costruttore vuoto
     public Accommodation() {
     }
 
-    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place, String address, String[] dates, int maxGuestSize, int costPerNight, double averageRate, String[] photos) {
+    // Costruttore con parametri
+    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place, String address, List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate, String[] photos) {
         this.accommodationId = accommodationId;
         this.description = description;
         this.type = type;
         this.facilities = facilities;
         this.place = place;
         this.address = address;
-        this.dates = dates;
+        this.occupiedDates = occupiedDates;
         this.maxGuestSize = maxGuestSize;
         this.costPerNight = costPerNight;
         this.averageRate = averageRate;
         this.photos = photos;
     }
 
+    // Getter e setter
+    public int getAccommodationId() {
+        return accommodationId;
+    }
 
+    public void setAccommodationId(int accommodationId) {
+        this.accommodationId = accommodationId;
+    }
 
-    public int getAccommodationId() {return accommodationId;}
-    public String getDescription() {return description;}
-    public String getType() {return type;}
-    public boolean[] getFacilities() {return facilities;}
-    public String getPlace() {return place;}
-    public String getAddress() {return address;}
-    public String[] getDates() {return dates;}
-    public int getMaxGuestSize() {return maxGuestSize;}
-    public int getCostPerNight() {return costPerNight;}
-    public double getAverageRate() {return averageRate;}
-    public String[] getPhotos() {return photos;}
+    public String getDescription() {
+        return description;
+    }
 
-    public void setAccommodationId(int accommodationId) {this.accommodationId = accommodationId;}
-    public void setDescription(String description) {this.description = description;}
-    public void setType(String type) {this.type = type;}
-    public void setFacilities(boolean[] facilities) {this.facilities = facilities;}
-    public void setPlace(String place) {this.place = place;}
-    public void setAddress(String address) {this.address = address;}
-    public void setDates(String[] dates) {this.dates = dates;}
-    public void setMaxGuestSize(int maxGuestSize) {this.maxGuestSize = maxGuestSize;}
-    public void setCostPerNight(int costPerNight) {this.costPerNight = costPerNight;}
-    public void setAverageRate(double averageRate) {this.averageRate = averageRate;}
-    public void setPhotos(String[] photos) {this.photos = photos;}
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public boolean[] getFacilities() {
+        return facilities;
+    }
+
+    public void setFacilities(boolean[] facilities) {
+        this.facilities = facilities;
+    }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public List<OccupiedPeriod> getOccupiedDates() {
+        return occupiedDates;
+    }
+
+    public void setOccupiedDates(List<OccupiedPeriod> occupiedDates) {
+        this.occupiedDates = occupiedDates;
+    }
+
+    public int getMaxGuestSize() {
+        return maxGuestSize;
+    }
+
+    public void setMaxGuestSize(int maxGuestSize) {
+        this.maxGuestSize = maxGuestSize;
+    }
+
+    public int getCostPerNight() {
+        return costPerNight;
+    }
+
+    public void setCostPerNight(int costPerNight) {
+        this.costPerNight = costPerNight;
+    }
+
+    public double getAverageRate() {
+        return averageRate;
+    }
+
+    public void setAverageRate(double averageRate) {
+        this.averageRate = averageRate;
+    }
+
+    public String[] getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(String[] photos) {
+        this.photos = photos;
+    }
 
     @Override
     public String toString() {
@@ -68,12 +133,11 @@ public class Accommodation {
                 ", facilities=" + java.util.Arrays.toString(facilities) +
                 ", place='" + place + '\'' +
                 ", address='" + address + '\'' +
-                ", dates=" + java.util.Arrays.toString(dates) +
+                ", occupiedDates=" + occupiedDates +
                 ", maxGuestSize=" + maxGuestSize +
                 ", costPerNight=" + costPerNight +
                 ", averageRate=" + averageRate +
                 ", photos=" + java.util.Arrays.toString(photos) +
                 '}';
     }
-
 }

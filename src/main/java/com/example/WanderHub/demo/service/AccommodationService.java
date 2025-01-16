@@ -6,6 +6,8 @@ import com.example.WanderHub.demo.repository.AccommodationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AccommodationService {
 
@@ -28,6 +30,10 @@ public class AccommodationService {
             return true;
         }
         return false;
+    }
+
+    public List<Accommodation> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate) {
+        return accommodationRepository.findAvailableAccommodations(place, minGuests, startDate, endDate);
     }
 
     // Altri metodi per gestire le sistemazioni
