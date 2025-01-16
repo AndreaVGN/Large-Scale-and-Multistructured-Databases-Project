@@ -19,7 +19,7 @@ public class AccommodationService {
 
     public Accommodation getAccommodationById(int accommodationId) {
         return accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Accomodation not found with id: " + accommodationId));
+                .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
     }
 
     public boolean deleteAccommodationById(int accommodationId) {

@@ -3,7 +3,6 @@ package com.example.WanderHub.demo.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Accommodation {
-    @JsonProperty("id")
     private int accommodationId;
     private String description;
     private String type;
@@ -48,7 +47,7 @@ public class Accommodation {
     public double getAverageRate() {return averageRate;}
     public String[] getPhotos() {return photos;}
 
-    public void setAccommodationId(int accomodationId) {this.accommodationId = accommodationId;}
+    public void setAccommodationId(int accommodationId) {this.accommodationId = accommodationId;}
     public void setDescription(String description) {this.description = description;}
     public void setType(String type) {this.type = type;}
     public void setFacilities(boolean[] facilities) {this.facilities = facilities;}
