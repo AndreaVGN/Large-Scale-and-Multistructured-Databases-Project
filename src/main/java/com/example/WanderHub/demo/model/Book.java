@@ -3,6 +3,7 @@ package com.example.WanderHub.demo.model;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+
 public class Book {
     private Long bookId;
     private int guestNumber;
