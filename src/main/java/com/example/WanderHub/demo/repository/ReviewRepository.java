@@ -1,4 +1,19 @@
 package com.example.WanderHub.demo.repository;
 
-public class ReviewRepository {
+import com.example.WanderHub.demo.model.Review;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface ReviewRepository extends MongoRepository<Review, Integer> {
+    // Metodi per interrogare il database, se necessari
+    @Query("{ 'reviewId': ?0 }")
+    Optional<Review> findByReviewId(int reviewId);
+
+    boolean existsByReviewId(int reviewId);
+    void deleteByReviewId(int reviewId);
 }
+
