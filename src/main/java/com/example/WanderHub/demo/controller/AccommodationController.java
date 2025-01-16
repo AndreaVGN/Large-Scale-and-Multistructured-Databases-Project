@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/accommodations")
 public class AccommodationController {
@@ -35,8 +37,15 @@ public class AccommodationController {
         }
     }
 
+    @GetMapping("/findAccommodations")
+    public List<Accommodation> findAccommodations(
+            @RequestParam("city") String place,
+            @RequestParam("guestSize") int minGuests,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate)
+    {
 
-
-
+        return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate);
+    }
 
 }
