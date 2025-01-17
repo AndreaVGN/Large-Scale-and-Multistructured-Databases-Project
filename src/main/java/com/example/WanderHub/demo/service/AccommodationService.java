@@ -42,21 +42,21 @@ public class AccommodationService {
         return accommodationRepository.findAvailableAccommodations(place, minGuests, startDate, endDate);
     }
 
-    // Aggiunta di un book a una sistemazione
     public Accommodation addBookToAccommodation(int accommodationId, Book newBook) {
-        // Trova l'accommodation esistente per id
+        // Trova la sistemazione esistente
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
 
-        // Aggiungi la nuova book all'array books
-        List<Book> booksList = new ArrayList<>(Arrays.asList(accommodation.getBooks()));  // Copia i libri esistenti
-        booksList.add(newBook);  // Aggiungi la nuova prenotazione
+        // Aggiungi la nuova prenotazione (Book) all'array di books
+        List<Book> booksList = accommodation.getBooks();
 
-        // Riconverti la lista in un array e imposta il campo books
-        accommodation.setBooks(booksList.toArray(new Book[0]));  // Imposta il nuovo array di books
+        booksList.add(newBook);  // Aggiungi il nuovo oggetto Book
 
-        // Salva l'accommodation aggiornata nel database
-        return accommodationRepository.save(accommodation);
+        // Salva la sistemazione aggiornata con la nuova prenotazione
+        accommodation.setBooks(booksList);
+
+        return accommodationRepository.save(accommodation);  // Salva l'accommodation aggiornata
     }
+
 }
 

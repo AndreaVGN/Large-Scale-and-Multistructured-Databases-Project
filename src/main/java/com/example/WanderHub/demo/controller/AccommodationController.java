@@ -51,13 +51,17 @@ public class AccommodationController {
         return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate);
     }
 
-    // Aggiunta di una prenotazione alla sistemazione (con Book embeddata)
-    @PostMapping("/{accommodationId}/addBook")
+    @PutMapping("/{accommodationId}/addBook")
     public ResponseEntity<Accommodation> addBookToAccommodation(
             @PathVariable int accommodationId,
             @RequestBody Book newBook) {
+
+        // Aggiungi la nuova book alla sistemazione
         Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(accommodationId, newBook);
+
+
         return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
     }
+
 }
 

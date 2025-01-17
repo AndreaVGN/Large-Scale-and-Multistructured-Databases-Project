@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -8,7 +9,7 @@ import com.example.WanderHub.demo.utility.OccupiedPeriod;
 
 //@Document(collection = "accommodations")
 public class Accommodation {
-
+    @Id
     private int accommodationId;
     private String description;
     private String type;

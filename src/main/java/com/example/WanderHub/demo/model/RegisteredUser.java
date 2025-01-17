@@ -1,8 +1,11 @@
 package com.example.WanderHub.demo.model;
 
+import org.springframework.data.annotation.Id;
+
 import java.time.LocalDate;
 
 public class RegisteredUser {
+    @Id
     private String username;
     private String password;
     private String birthPlace;
