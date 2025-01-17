@@ -1,5 +1,5 @@
 package com.example.WanderHub.demo.controller;
-
+import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.service.AccommodationService;
@@ -59,6 +59,17 @@ public class AccommodationController {
         // Aggiungi la nuova book alla sistemazione
         Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(accommodationId, newBook);
 
+
+        return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
+    }
+
+    @PutMapping("/{accommodationId}/addReview")
+    public ResponseEntity<Accommodation> addReviewToAccommodation(
+            @PathVariable int accommodationId,
+            @RequestBody Review newReview) {
+
+        // Aggiungi la nuova recensione alla sistemazione
+        Accommodation updatedAccommodation = accommodationService.addReviewToAccommodation(accommodationId, newReview);
 
         return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
     }

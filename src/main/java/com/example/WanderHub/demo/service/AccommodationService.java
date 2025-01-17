@@ -1,5 +1,5 @@
 package com.example.WanderHub.demo.service;
-
+import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
@@ -57,6 +57,28 @@ public class AccommodationService {
 
         return accommodationRepository.save(accommodation);  // Salva l'accommodation aggiornata
     }
+
+    public Accommodation addReviewToAccommodation(int accommodationId, Review newReview) {
+        // Trova la sistemazione esistente
+        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
+
+        // Recupera la lista delle recensioni e aggiungi la nuova recensione
+        List<Review> reviewsList = accommodation.getReviews();
+
+        if (reviewsList == null) {
+            reviewsList = new ArrayList<>();  // Crea una nuova lista se null
+        }
+
+        reviewsList.add(newReview);  // Aggiungi la nuova recensione
+
+        // Imposta la lista aggiornata di recensioni
+        accommodation.setReviews(reviewsList);
+
+        // Salva l'accommodation aggiornata con la nuova recensione
+        return accommodationRepository.save(accommodation);
+    }
+
 
 }
 

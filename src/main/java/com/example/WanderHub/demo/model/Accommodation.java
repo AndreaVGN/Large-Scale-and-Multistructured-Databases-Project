@@ -25,6 +25,9 @@ public class Accommodation {
     @Field("books") // Embedding the books array inside Accommodation
     private List<Book> books;
 
+    @Field("reviews") // Embedding the reviews array inside Accommodation
+    private List<Review> reviews;
+
     // Costruttore vuoto
     public Accommodation() {
     }
@@ -144,6 +147,14 @@ public class Accommodation {
         this.books = books;
     }
 
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     @Override
     public String toString() {
         return "Accommodation{" +
@@ -159,6 +170,7 @@ public class Accommodation {
                 ", averageRate=" + averageRate +
                 ", photos=" + java.util.Arrays.toString(photos) +
                 ", books=" + books +
+                ", reviews=" + reviews +
                 '}';
     }
 }
