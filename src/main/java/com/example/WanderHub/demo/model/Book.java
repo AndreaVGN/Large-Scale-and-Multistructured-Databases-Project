@@ -1,14 +1,16 @@
 package com.example.WanderHub.demo.model;
 
+import com.example.WanderHub.demo.utility.OccupiedPeriod;
+
 import java.time.LocalDate;
 import java.util.Arrays;
-
+import java.util.List;
 
 public class Book {
     private Long bookId;
     private int guestNumber;
-    private String bookPeriod;
-    private String transactionState;
+    private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
+    private boolean transactionState;
     private LocalDate paymentExpiration;
     private String email;
     private String birthPlace;
@@ -29,12 +31,12 @@ public class Book {
     }
 
     // Costruttore completo
-    public Book(Long bookId, int guestNumber, String bookPeriod, String transactionState, LocalDate paymentExpiration,
-                String email, String birthPlace, String address, int addressNumber, LocalDate birthDate,
-                String paymentToken, String[] guestFirstNames, String[] guestLastNames) {
+    public Book(Long bookId, int guestNumber, List<OccupiedPeriod> occupiedDates, boolean transactionState,
+                LocalDate paymentExpiration, String email, String birthPlace, String address, int addressNumber,
+                LocalDate birthDate, String paymentToken, String[] guestFirstNames, String[] guestLastNames) {
         this.bookId = bookId;
         this.guestNumber = guestNumber;
-        this.bookPeriod = bookPeriod;
+        this.occupiedDates = occupiedDates;
         this.transactionState = transactionState;
         this.paymentExpiration = paymentExpiration;
         this.email = email;
@@ -64,19 +66,19 @@ public class Book {
         this.guestNumber = guestNumber;
     }
 
-    public String getBookPeriod() {
-        return bookPeriod;
+    public List<OccupiedPeriod> getOccupiedDates() {
+        return occupiedDates;
     }
 
-    public void setBookPeriod(String bookPeriod) {
-        this.bookPeriod = bookPeriod;
+    public void setOccupiedDates(List<OccupiedPeriod> occupiedDates) {
+        this.occupiedDates = occupiedDates;
     }
 
-    public String getTransactionState() {
+    public boolean getTransactionState() {
         return transactionState;
     }
 
-    public void setTransactionState(String transactionState) {
+    public void setTransactionState(boolean transactionState) {
         this.transactionState = transactionState;
     }
 
@@ -158,7 +160,7 @@ public class Book {
         return "Book{" +
                 "bookId=" + bookId +
                 ", guestNumber=" + guestNumber +
-                ", bookPeriod='" + bookPeriod + '\'' +
+                ", occupiedDates=" + occupiedDates +
                 ", transactionState='" + transactionState + '\'' +
                 ", paymentExpiration=" + paymentExpiration +
                 ", email='" + email + '\'' +
