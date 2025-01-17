@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 public class RegisteredUser {
@@ -16,6 +17,7 @@ public class RegisteredUser {
     private String address;
     private int addressNumber;
     private String paymentToken;
+    private int[] accommodations;
 
     @Field("books") // Embedding the books array inside RegisteredUser
     private List<Book> books;
@@ -31,7 +33,7 @@ public class RegisteredUser {
 
     // Costruttore completo
     public RegisteredUser(String username, String password, String birthPlace, String email, LocalDate birthDate,
-                          String address, int addressNumber, String paymentToken, List<Book> books) {
+                          String address, int addressNumber, String paymentToken, int[] accommodations, List<Book> books) {
         this.username = username;
         this.password = password;
         this.birthPlace = birthPlace;
@@ -40,6 +42,7 @@ public class RegisteredUser {
         this.address = address;
         this.addressNumber = addressNumber;
         this.paymentToken = paymentToken;
+        this.accommodations = accommodations;
         this.books = books;
     }
 
@@ -108,6 +111,14 @@ public class RegisteredUser {
         this.paymentToken = paymentToken;
     }
 
+    public int[] getAccommodations() {
+        return accommodations;
+    }
+
+    public void setAccommodations(int[] accommodations) {
+        this.accommodations = accommodations;
+    }
+
     public List<Book> getBooks() {
         return books;
     }
@@ -128,6 +139,7 @@ public class RegisteredUser {
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
                 ", paymentToken='" + paymentToken + '\'' +
+                ", accommodations=" + Arrays.toString(accommodations) +
                 ", books=" + books +
                 '}';
     }
