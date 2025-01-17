@@ -51,4 +51,20 @@ public class RegisteredUserService {
 
         return registeredUserRepository.save(registeredUser);  // Salva l'accommodation aggiornata
     }
+
+    public RegisteredUser addAccommodationToRegisteredUser(String username, Accommodation accommodation) {
+        // Trova la sistemazione esistente
+        RegisteredUser registeredUser = registeredUserRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with user: " + username));
+
+        // Aggiungi la nuova prenotazione (Book) all'array di books
+        List <Integer> accommodationList = registeredUser.getAccommodations();
+
+        accommodationList.add(accommodation.getAccommodationId());  // Aggiungi il nuovo oggetto Book
+
+        // Salva la sistemazione aggiornata con la nuova prenotazione
+        registeredUser.setAccommodations(accommodationList);
+
+        return registeredUserRepository.save(registeredUser);  // Salva l'accommodation aggiornata
+    }
 }

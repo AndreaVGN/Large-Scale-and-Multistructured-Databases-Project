@@ -17,7 +17,7 @@ public class RegisteredUser {
     private String address;
     private int addressNumber;
     private String paymentToken;
-    private int[] accommodations;
+    private List<Integer> accommodations;
 
     @Field("books") // Embedding the books array inside RegisteredUser
     private List<Book> books;
@@ -33,7 +33,7 @@ public class RegisteredUser {
 
     // Costruttore completo
     public RegisteredUser(String username, String password, String birthPlace, String email, LocalDate birthDate,
-                          String address, int addressNumber, String paymentToken, int[] accommodations, List<Book> books) {
+                          String address, int addressNumber, String paymentToken, List<Integer> accommodations, List<Book> books) {
         this.username = username;
         this.password = password;
         this.birthPlace = birthPlace;
@@ -111,11 +111,11 @@ public class RegisteredUser {
         this.paymentToken = paymentToken;
     }
 
-    public int[] getAccommodations() {
+    public List<Integer> getAccommodations() {
         return accommodations;
     }
 
-    public void setAccommodations(int[] accommodations) {
+    public void setAccommodations(List<Integer> accommodations) {
         this.accommodations = accommodations;
     }
 
@@ -139,7 +139,7 @@ public class RegisteredUser {
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
                 ", paymentToken='" + paymentToken + '\'' +
-                ", accommodations=" + Arrays.toString(accommodations) +
+                ", accommodations=" + accommodations +
                 ", books=" + books +
                 '}';
     }

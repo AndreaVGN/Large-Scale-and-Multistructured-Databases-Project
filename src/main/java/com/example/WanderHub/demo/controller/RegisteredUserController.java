@@ -48,4 +48,18 @@ public class RegisteredUserController {
 
         return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
     }
+
+    @PutMapping("/{username}/addAccommodation")
+    public ResponseEntity<RegisteredUser> addAccommodation(
+            @PathVariable String username,
+            @RequestBody Accommodation accommodation) {
+
+        // Aggiungi la nuova book alla sistemazione
+        RegisteredUser updatedRegisteredUser = registeredUserService.addAccommodationToRegisteredUser(username, accommodation);
+
+
+        return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
+    }
+
+
 }
