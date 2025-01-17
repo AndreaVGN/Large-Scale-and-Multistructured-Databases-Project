@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/users")
 public class RegisteredUserController {
@@ -51,9 +49,17 @@ public class RegisteredUserController {
         return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
     }
 
-    @GetMapping("/{username}/pendingBookings")
-    public ResponseEntity<List<Book>> getPendingBookings(@PathVariable String username) {
-        List<Book> pendingBookings = registeredUserService.getPendingBookings(username);
-        return new ResponseEntity<>(pendingBookings, HttpStatus.OK);
+    @PutMapping("/{username}/addAccommodation")
+    public ResponseEntity<RegisteredUser> addAccommodation(
+            @PathVariable String username,
+            @RequestBody Accommodation accommodation) {
+
+        // Aggiungi la nuova book alla sistemazione
+        RegisteredUser updatedRegisteredUser = registeredUserService.addAccommodationToRegisteredUser(username, accommodation);
+
+
+        return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
     }
+
+
 }
