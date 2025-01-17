@@ -1,8 +1,10 @@
 package com.example.WanderHub.demo.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class RegisteredUser {
     @Id
@@ -15,6 +17,9 @@ public class RegisteredUser {
     private int addressNumber;
     private String paymentToken;
 
+    @Field("books") // Embedding the books array inside RegisteredUser
+    private List<Book> books;
+
     // Costruttore vuoto
     public RegisteredUser() {
     }
@@ -26,7 +31,7 @@ public class RegisteredUser {
 
     // Costruttore completo
     public RegisteredUser(String username, String password, String birthPlace, String email, LocalDate birthDate,
-                          String address, int addressNumber, String paymentToken) {
+                          String address, int addressNumber, String paymentToken, List<Book> books) {
         this.username = username;
         this.password = password;
         this.birthPlace = birthPlace;
@@ -35,6 +40,7 @@ public class RegisteredUser {
         this.address = address;
         this.addressNumber = addressNumber;
         this.paymentToken = paymentToken;
+        this.books = books;
     }
 
     // Getters e Setters
@@ -102,6 +108,14 @@ public class RegisteredUser {
         this.paymentToken = paymentToken;
     }
 
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
     // Override del metodo toString
     @Override
     public String toString() {
@@ -114,6 +128,7 @@ public class RegisteredUser {
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
                 ", paymentToken='" + paymentToken + '\'' +
+                ", books=" + books +
                 '}';
     }
 }

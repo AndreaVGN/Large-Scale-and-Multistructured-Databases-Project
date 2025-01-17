@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.controller;
 
 import com.example.WanderHub.demo.model.Accommodation;
+import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +35,17 @@ public class RegisteredUserController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PutMapping("/{username}/addBook")
+    public ResponseEntity<RegisteredUser> addBookToAccommodation(
+            @PathVariable String username,
+            @RequestBody Book newBook) {
+
+        // Aggiungi la nuova book alla sistemazione
+        RegisteredUser updatedRegisteredUser = registeredUserService.addBookToRegisteredUser(username, newBook);
+
+
+        return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
     }
 }

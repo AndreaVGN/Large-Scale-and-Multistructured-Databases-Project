@@ -2,12 +2,14 @@ package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
+import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import jdk.jfr.Registered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,5 +34,21 @@ public class RegisteredUserService {
             return true;
         }
         return false;
+    }
+
+    public RegisteredUser addBookToRegisteredUser(String username, Book newBook) {
+        // Trova la sistemazione esistente
+        RegisteredUser registeredUser = registeredUserRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with user: " + username));
+
+        // Aggiungi la nuova prenotazione (Book) all'array di books
+        List<Book> booksList = registeredUser.getBooks();
+
+        booksList.add(newBook);  // Aggiungi il nuovo oggetto Book
+
+        // Salva la sistemazione aggiornata con la nuova prenotazione
+        registeredUser.setBooks(booksList);
+
+        return registeredUserRepository.save(registeredUser);  // Salva l'accommodation aggiornata
     }
 }
