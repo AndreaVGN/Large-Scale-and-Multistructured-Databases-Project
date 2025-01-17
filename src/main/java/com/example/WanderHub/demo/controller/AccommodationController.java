@@ -43,6 +43,7 @@ public class AccommodationController {
             @RequestParam("guestSize") int minGuests,
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate)
+            // commento: quando la testi con param usare city, guestSize, startDate, endDate
     {
 
         return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate);
