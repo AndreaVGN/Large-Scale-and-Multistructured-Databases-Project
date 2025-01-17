@@ -51,4 +51,10 @@ public class RegisteredUserService {
 
         return registeredUserRepository.save(registeredUser);  // Salva l'accommodation aggiornata
     }
+
+    public List<Book> getPendingBookings(String username) {
+        // Otteniamo direttamente le prenotazioni pendenti dell'utente
+        return registeredUserRepository.findPendingBookingsByUsername(username);
+    }
+
 }
