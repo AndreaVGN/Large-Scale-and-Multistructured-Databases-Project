@@ -10,13 +10,15 @@ import java.util.List;
 
 @Repository
 public interface AccommodationRepository extends MongoRepository<Accommodation, Integer> {
-    // Metodi per interrogare il database, se necessari
+    // Trova una sistemazione per ID
     @Query("{ 'accommodationId': ?0 }")
     Optional<Accommodation> findByAccommodationId(int accommodationId);
 
     boolean existsByAccommodationId(int accommodationId);
     void deleteByAccommodationId(int accommodationId);
 
+    // Ricerca sistemazioni disponibili in base a parametri
     @Query("{ 'place': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'startDate': { $lte: ?3 }, 'endDate': { $gte: ?2 } } ] } } } }")
     List<Accommodation> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate);
 }
+

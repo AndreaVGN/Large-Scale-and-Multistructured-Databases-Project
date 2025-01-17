@@ -1,9 +1,14 @@
 package com.example.WanderHub.demo.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.util.List;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 
+//@Document(collection = "accommodations")
 public class Accommodation {
+
     private int accommodationId;
     private String description;
     private String type;
@@ -16,12 +21,17 @@ public class Accommodation {
     private double averageRate;
     private String[] photos;
 
+    @Field("books") // Embedding the books array inside Accommodation
+    private List<Book> books;
+
     // Costruttore vuoto
     public Accommodation() {
     }
 
     // Costruttore con parametri
-    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place, String address, List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate, String[] photos) {
+    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place, String address,
+                         List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate,
+                         String[] photos, List<Book> books) {
         this.accommodationId = accommodationId;
         this.description = description;
         this.type = type;
@@ -33,9 +43,10 @@ public class Accommodation {
         this.costPerNight = costPerNight;
         this.averageRate = averageRate;
         this.photos = photos;
+        this.books = books;
     }
 
-    // Getter e setter
+    // Getter e Setter
     public int getAccommodationId() {
         return accommodationId;
     }
@@ -124,6 +135,14 @@ public class Accommodation {
         this.photos = photos;
     }
 
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
     @Override
     public String toString() {
         return "Accommodation{" +
@@ -138,6 +157,8 @@ public class Accommodation {
                 ", costPerNight=" + costPerNight +
                 ", averageRate=" + averageRate +
                 ", photos=" + java.util.Arrays.toString(photos) +
+                ", books=" + books +
                 '}';
     }
 }
+
