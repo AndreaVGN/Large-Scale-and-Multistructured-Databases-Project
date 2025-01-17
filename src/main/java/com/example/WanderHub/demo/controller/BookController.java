@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/books")
@@ -36,7 +38,12 @@ public class BookController {
         }
     }
 
-
+    @GetMapping("/filter")
+    public List<Book> getBooksByCityAndPeriod(
+            @RequestParam String city,
+            @RequestParam String period) {
+        return BookService.getBooksByCityAndPeriod(city, period);
+    }
 
 
 

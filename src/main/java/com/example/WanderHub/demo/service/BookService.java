@@ -6,6 +6,8 @@ import com.example.WanderHub.demo.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class BookService {
@@ -31,6 +33,9 @@ public class BookService {
         return false;
     }
 
+    public List<Book> getBooksByCityAndPeriod(String city, String period) {
+        return BookRepository.findByCityAndPeriod(city, period);
+    }
     // Altri metodi per gestire le sistemazioni
 
 }
