@@ -6,6 +6,7 @@ import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
+import com.example.WanderHub.demo.repository.AccommodationRepository;
 import jdk.jfr.Registered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ public class RegisteredUserService {
 
     @Autowired
     private RegisteredUserRepository registeredUserRepository;
+    @Autowired
+    private AccommodationService accommodationService;
 
     // Creazione di una nuova sistemazione
     public RegisteredUser createRegisteredUser(RegisteredUser registeredUser) {
@@ -77,6 +80,13 @@ public class RegisteredUserService {
         return registeredUserRepository.findAccommodationByUsername(username);
     }
 
+    public boolean deleteAccommodation(String username, Integer accommodationId) {
+        // Rimuovi l'accommodation dalla collezione Accommodation
+        boolean aux = accommodationService.deleteAccommodationById(accommodationId);
 
+        // Rimuovi l'ID dell'accommodation dal campo 'accommodations' del RegisteredUser
+         boolean aux1 = registeredUserRepository.removeAccommodationFromUser(username, accommodationId);
+         return aux & aux1;
+    }
 
 }

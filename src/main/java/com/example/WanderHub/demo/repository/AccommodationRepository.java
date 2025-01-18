@@ -24,5 +24,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     // Recupera tutte le recensioni dell'accommodation dato un accommodationId
     @Query("{ 'accommodationId': ?0 }")
     Accommodation findReviewsByAccommodationId(int accommodationId);
+
+
 }
 

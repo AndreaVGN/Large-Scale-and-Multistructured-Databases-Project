@@ -36,7 +36,7 @@ public class RegisteredUserController {
     @DeleteMapping("/{user}")
     public ResponseEntity<Void> deleteRegisteredUser(@PathVariable String user) {
         boolean isDeleted = registeredUserService.deleteRegisteredUserByUsername(user);
-        if(isDeleted){
+        if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -85,5 +85,16 @@ public class RegisteredUserController {
         return new ResponseEntity<>(accommodations, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{username}/deleteAccommodation/{id}")
+    public ResponseEntity<Void> deleteAccommodationProperty(@PathVariable String username, @PathVariable int id) {
 
+
+        boolean aux = registeredUserService.deleteAccommodation(username, id);
+        if (aux) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
 }
