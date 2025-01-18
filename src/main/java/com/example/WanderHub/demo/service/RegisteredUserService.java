@@ -71,7 +71,10 @@ public class RegisteredUserService {
 
     public List<Book> getPendingBookings(String username) {
         // Otteniamo direttamente le prenotazioni pendenti dell'utente
-        return registeredUserRepository.findPendingBookingsByUsername(username);
+        return registeredUserRepository.findPendingBooksByUsername(username);
+    }
+    public List<Integer> getAccommodationByUsername(String username){
+        return registeredUserRepository.findAccommodationByUsername(username);
     }
 
 

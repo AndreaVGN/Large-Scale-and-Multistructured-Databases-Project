@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -27,9 +28,14 @@ public interface RegisteredUserRepository extends MongoRepository<RegisteredUser
             "{ '$match': { 'books.transactionState': false } }", // Filtra i libri con transactionState: false
             "{ '$replaceRoot': { 'newRoot': '$books' } }" // Ritorna solo il contenuto del libro
     })
-    List<Book> findPendingBookingsByUsername(String username);
+    List<Book> findPendingBooksByUsername(String username);
 
 
 
-
+    @Aggregation(pipeline = {
+            "{ '$match': { 'username': ?0 } }",  // Filtra per username
+            "{ '$unwind': '$accommodations' }",  // Scomponi l'array accommodations
+            "{ '$group': { '_id': null, 'accommodations': { '$push': '$accommodations' } } }"  // Raccogli gli ID in un array
+    })
+    List<Map<String, List<Integer>>> findAccommodationByUsername(String username);
 }

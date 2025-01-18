@@ -79,7 +79,11 @@ public class RegisteredUserController {
         return new ResponseEntity<>(accommodationReviews, HttpStatus.OK);
     }
 
-
+    @GetMapping("/{username}/viewAccommodations")
+    public ResponseEntity<List<Integer>> getAccommodations(@PathVariable String username) {
+        List<Integer> accommodations = registeredUserService.getAccommodationByUsername(username);
+        return new ResponseEntity<>(accommodations, HttpStatus.OK);
+    }
 
 
 }
