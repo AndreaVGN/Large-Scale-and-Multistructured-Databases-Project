@@ -4,6 +4,7 @@ import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
+import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import jdk.jfr.Registered;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,5 +73,7 @@ public class RegisteredUserService {
         // Otteniamo direttamente le prenotazioni pendenti dell'utente
         return registeredUserRepository.findPendingBookingsByUsername(username);
     }
+
+
 
 }

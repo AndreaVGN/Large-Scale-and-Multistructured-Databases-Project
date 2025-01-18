@@ -20,5 +20,9 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     // Ricerca sistemazioni disponibili in base a parametri
     @Query("{ 'place': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'startDate': { $lte: ?3 }, 'endDate': { $gte: ?2 } } ] } } } }")
     List<Accommodation> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate);
+
+    // Recupera tutte le recensioni dell'accommodation dato un accommodationId
+    @Query("{ 'accommodationId': ?0 }")
+    Accommodation findReviewsByAccommodationId(int accommodationId);
 }
 

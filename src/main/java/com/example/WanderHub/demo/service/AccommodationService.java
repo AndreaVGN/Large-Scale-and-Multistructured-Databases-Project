@@ -79,6 +79,16 @@ public class AccommodationService {
         return accommodationRepository.save(accommodation);
     }
 
+    public List<Review> getReviewsByAccommodationId(String username, int accommodationId) {
+        // Trova l'accommodation per ID
+        Accommodation accommodation = accommodationRepository.findReviewsByAccommodationId(accommodationId);
+        System.out.println("Reviews: " + accommodation);
+        // Se l'accommodation esiste, restituisci le recensioni
+        List<Review> reviews = accommodation.getReviews();
+        System.out.println("Reviews: " + reviews); // Stampa le recensioni
+        return reviews;
+    }
+
 
 }
 

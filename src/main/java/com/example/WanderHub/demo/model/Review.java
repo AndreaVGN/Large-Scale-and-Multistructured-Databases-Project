@@ -4,6 +4,7 @@ public class Review {
     private int reviewId;
     private String reviewText;
     private double rating;
+    private String username;
 
     // Getter e Setter
     public int getReviewId() {
@@ -30,6 +31,14 @@ public class Review {
         this.rating = rating;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     // Metodo toString
     @Override
     public String toString() {
@@ -37,7 +46,7 @@ public class Review {
                 "reviewId=" + reviewId +
                 ", reviewText='" + reviewText + '\'' +
                 ", rating=" + rating +
+                ", username='" + username + '\'' +
                 '}';
     }
 }
-

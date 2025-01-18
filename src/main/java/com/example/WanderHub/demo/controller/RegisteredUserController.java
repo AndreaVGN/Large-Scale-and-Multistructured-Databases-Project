@@ -3,6 +3,8 @@ package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
+import com.example.WanderHub.demo.model.Review;
+import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ public class RegisteredUserController {
     // Iniezione del servizio tramite @Autowired
     @Autowired
     private RegisteredUserService registeredUserService;
+    @Autowired
+    private AccommodationService accommodationService;
 
     @PostMapping
     public RegisteredUser createRegisteredUser(@RequestBody RegisteredUser registeredUser) {
@@ -56,7 +60,6 @@ public class RegisteredUserController {
             @PathVariable String username,
             @RequestBody Accommodation accommodation) {
 
-        // Aggiungi la nuova book alla sistemazione
         RegisteredUser updatedRegisteredUser = registeredUserService.addAccommodationToRegisteredUser(username, accommodation);
 
 
@@ -67,6 +70,13 @@ public class RegisteredUserController {
     public ResponseEntity<List<Book>> getPendingBookings(@PathVariable String username) {
         List<Book> pendingBookings = registeredUserService.getPendingBookings(username);
         return new ResponseEntity<>(pendingBookings, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}/reviews")
+    public ResponseEntity<List<Review>> getReviewsByAccommodationId(@PathVariable String username, @RequestParam("accommodationId") int accommodationId) {
+        List<Review> accommodationReviews = accommodationService.getReviewsByAccommodationId(username, accommodationId);
+        System.out.println("ci siamo \n \n \n \n \n");
+        return new ResponseEntity<>(accommodationReviews, HttpStatus.OK);
     }
 
 
