@@ -34,8 +34,10 @@ public interface RegisteredUserRepository extends MongoRepository<RegisteredUser
 
     @Aggregation(pipeline = {
             "{ '$match': { 'username': ?0 } }",  // Filtra per username
-            "{ '$unwind': '$accommodations' }",  // Scomponi l'array accommodations
-            "{ '$group': { '_id': null, 'accommodations': { '$push': '$accommodations' } } }"  // Raccogli gli ID in un array
+            "{ '$unwind': '$accommodations' }",  // Scomponi l'array accommodations in singoli elementi
+            "{ '$project': { 'accommodations': 1, '_id': 0 } }"  // Proietta solo i valori di accommodations
     })
-    List<Map<String, List<Integer>>> findAccommodationByUsername(String username);
+    List<Integer> findAccommodationByUsername(String username);
+
+
 }
