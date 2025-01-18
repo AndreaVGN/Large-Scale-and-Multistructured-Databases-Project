@@ -3,6 +3,7 @@ package com.example.WanderHub.demo.repository;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Book;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,7 +21,13 @@ public interface RegisteredUserRepository extends MongoRepository<RegisteredUser
     boolean existsByUsername(String username);
     void deleteByUsername(String Username);
 
-    @Query("{ 'username': ?0, 'books.transactionState': false }")
+    @Aggregation(pipeline = {
+            "{ '$match': { 'username': ?0 } }", // Filtra per username
+            "{ '$unwind': '$books' }", // Scompatta l'array books
+            "{ '$match': { 'books.transactionState': false } }", // Filtra i libri con transactionState: false
+            "{ '$replaceRoot': { 'newRoot': '$books' } }" // Ritorna solo il contenuto del libro
+    })
     List<Book> findPendingBookingsByUsername(String username);
+
 
 }
