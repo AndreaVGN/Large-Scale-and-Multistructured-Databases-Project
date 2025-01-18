@@ -34,11 +34,10 @@ public interface RegisteredUserRepository extends MongoRepository<RegisteredUser
 
     @Aggregation(pipeline = {
             "{ '$match': { 'username': ?0 } }",  // Filtra per username
-            "{ '$unwind': '$accommodations' }",  // Scomponi l'array accommodations
-            "{ '$project': { 'accommodations': 1 , '_id' : 0} }"
+            "{ '$unwind': '$accommodations' }",  // Scomponi l'array accommodations in singoli elementi
+            "{ '$project': { 'accommodations': 1, '_id': 0 } }"  // Proietta solo i valori di accommodations
     })
     List<Integer> findAccommodationByUsername(String username);
 
-    @Query("{ 'username': ?0 }")
-    boolean removeAccommodationFromUser(String username, int accommodationId);
+
 }
