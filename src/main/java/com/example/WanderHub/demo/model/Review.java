@@ -5,6 +5,7 @@ public class Review {
     private String reviewText;
     private double rating;
     private String username;
+    private int accommodationId;
 
     // Getter e Setter
     public int getReviewId() {

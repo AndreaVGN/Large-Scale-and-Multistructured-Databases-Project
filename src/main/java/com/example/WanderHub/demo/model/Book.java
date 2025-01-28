@@ -8,10 +8,12 @@ import java.util.List;
 
 public class Book {
     private Long bookId;
-    private int guestNumber;
+    //private int guestNumber;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
+    private int accommodationId;
+    private String username;
     private boolean transactionState;
-    private LocalDate paymentExpiration;
+    //private LocalDate paymentExpiration;
     private String email;
     private String birthPlace;
     private String address;
@@ -31,14 +33,16 @@ public class Book {
     }
 
     // Costruttore completo
-    public Book(Long bookId, int guestNumber, List<OccupiedPeriod> occupiedDates, boolean transactionState,
+    public Book(Long bookId, List<OccupiedPeriod> occupiedDates,int accommodationId, String username, boolean transactionState,
                 LocalDate paymentExpiration, String email, String birthPlace, String address, int addressNumber,
                 LocalDate birthDate, String paymentToken, String[] guestFirstNames, String[] guestLastNames) {
         this.bookId = bookId;
-        this.guestNumber = guestNumber;
+        //this.guestNumber = guestNumber;
         this.occupiedDates = occupiedDates;
+        this.accommodationId = accommodationId;
+        this.username = username;
         this.transactionState = transactionState;
-        this.paymentExpiration = paymentExpiration;
+        //this.paymentExpiration = paymentExpiration;
         this.email = email;
         this.birthPlace = birthPlace;
         this.address = address;
@@ -58,13 +62,13 @@ public class Book {
         this.bookId = bookId;
     }
 
-    public int getGuestNumber() {
+    /*public int getGuestNumber() {
         return guestNumber;
     }
 
     public void setGuestNumber(int guestNumber) {
         this.guestNumber = guestNumber;
-    }
+    }*/
 
     public List<OccupiedPeriod> getOccupiedDates() {
         return occupiedDates;
@@ -72,6 +76,18 @@ public class Book {
 
     public void setOccupiedDates(List<OccupiedPeriod> occupiedDates) {
         this.occupiedDates = occupiedDates;
+    }
+    public int getAccommodationId() {
+        return accommodationId;
+    }
+    public void setAccommodationId(int accommodationId) {
+        this.accommodationId = accommodationId;
+    }
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public boolean getTransactionState() {
@@ -82,13 +98,13 @@ public class Book {
         this.transactionState = transactionState;
     }
 
-    public LocalDate getPaymentExpiration() {
+    /*public LocalDate getPaymentExpiration() {
         return paymentExpiration;
     }
 
     public void setPaymentExpiration(LocalDate paymentExpiration) {
         this.paymentExpiration = paymentExpiration;
-    }
+    }*/
 
     public String getEmail() {
         return email;
@@ -159,10 +175,10 @@ public class Book {
     public String toString() {
         return "Book{" +
                 "bookId=" + bookId +
-                ", guestNumber=" + guestNumber +
+                //", guestNumber=" + guestNumber +
                 ", occupiedDates=" + occupiedDates +
                 ", transactionState='" + transactionState + '\'' +
-                ", paymentExpiration=" + paymentExpiration +
+                //", paymentExpiration=" + paymentExpiration +
                 ", email='" + email + '\'' +
                 ", birthPlace='" + birthPlace + '\'' +
                 ", address='" + address + '\'' +

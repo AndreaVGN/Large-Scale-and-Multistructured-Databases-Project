@@ -15,15 +15,19 @@ public class Accommodation {
     private String type;
     private boolean[] facilities;
     private String place;
+    private String city;
     private String address;
+    private String hostEmail;
+    private int latitude;
+    private int longitude;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
     private int maxGuestSize;
     private int costPerNight;
     private double averageRate;
     private String[] photos;
 
-    @Field("books") // Embedding the books array inside Accommodation
-    private List<Book> books;
+    /*@Field("books") // Embedding the books array inside Accommodation
+    private List<Book> books;*/
 
     @Field("reviews") // Embedding the reviews array inside Accommodation
     private List<Review> reviews;
@@ -47,7 +51,7 @@ public class Accommodation {
         this.costPerNight = costPerNight;
         this.averageRate = averageRate;
         this.photos = photos;
-        this.books = books;
+       // this.books = books;
     }
 
     // Getter e Setter
@@ -139,13 +143,13 @@ public class Accommodation {
         this.photos = photos;
     }
 
-    public List<Book> getBooks() {
+    /*public List<Book> getBooks() {
         return books;
     }
 
     public void setBooks(List<Book> books) {
         this.books = books;
-    }
+    }*/
 
     public List<Review> getReviews() {
         return reviews;
@@ -169,7 +173,7 @@ public class Accommodation {
                 ", costPerNight=" + costPerNight +
                 ", averageRate=" + averageRate +
                 ", photos=" + java.util.Arrays.toString(photos) +
-                ", books=" + books +
+                //", books=" + books +
                 ", reviews=" + reviews +
                 '}';
     }
