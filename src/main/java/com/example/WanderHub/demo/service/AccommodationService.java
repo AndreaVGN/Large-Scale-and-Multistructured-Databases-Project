@@ -38,8 +38,8 @@ public class AccommodationService {
     }
 
     // Ricerca sistemazioni disponibili
-    public List<Accommodation> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate) {
-        return accommodationRepository.findAvailableAccommodations(place, minGuests, startDate, endDate);
+    public List<Accommodation> findAvailableAccommodations(String city, int minGuests, String startDate, String endDate) {
+        return accommodationRepository.findAvailableAccommodations(city, minGuests, startDate, endDate);
     }
 
     public Accommodation addBookToAccommodation(int accommodationId, Book newBook) {
@@ -89,6 +89,14 @@ public class AccommodationService {
         return reviews;
     }
 
-
+    public List<Accommodation> findAccommodationsByUsername(String username) {
+        return accommodationRepository.findByHostUsername(username);
+    }
+    public List<Review> getReviewsByUsername(String username){
+        return accommodationRepository.findReviewsByUsername(username);
+    }
+    public List<Book> getPendingBookings(String username) {
+        return accommodationRepository.findPendingBookingsByUsername(username);
+    }
 }
 

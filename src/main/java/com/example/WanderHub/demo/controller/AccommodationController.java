@@ -43,12 +43,12 @@ public class AccommodationController {
     // Ricerca di sistemazioni disponibili con parametri
     @GetMapping("/findAccommodations")
     public List<Accommodation> findAccommodations(
-            @RequestParam("city") String place,
+            @RequestParam("city") String city,
             @RequestParam("guestSize") int minGuests,
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate) {
 
-        return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate);
+        return accommodationService.findAvailableAccommodations(city, minGuests, startDate, endDate);
     }
 
     @PutMapping("/{accommodationId}/addBook")
@@ -73,6 +73,10 @@ public class AccommodationController {
 
         return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
     }
-
+    @GetMapping("/{username}/findPersonalAccommodations")
+    public ResponseEntity<List<Accommodation>> findPersonalAccommodations(@PathVariable String username) {
+        List<Accommodation> personalAccommodations = accommodationService.findAccommodationsByUsername(username);
+        return new ResponseEntity<>(personalAccommodations,HttpStatus.OK);
+    }
 }
 

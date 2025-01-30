@@ -40,7 +40,7 @@ public class RegisteredUserService {
         }
         return false;
     }
-
+/*
     public RegisteredUser addBookToRegisteredUser(String username, Book newBook) {
         // Trova la sistemazione esistente
         RegisteredUser registeredUser = registeredUserRepository.findByUsername(username)
@@ -89,5 +89,5 @@ public class RegisteredUserService {
          boolean aux1 = registeredUserRepository.removeAccommodationFromUser(username, accommodationId);
          return aux & aux1;
     }
-
+*/
 }

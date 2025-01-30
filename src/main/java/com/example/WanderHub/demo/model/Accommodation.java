@@ -17,7 +17,7 @@ public class Accommodation {
     private String place;
     private String city;
     private String address;
-    private String hostEmail;
+    private String hostUsername;
     private int latitude;
     private int longitude;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
@@ -26,8 +26,9 @@ public class Accommodation {
     private double averageRate;
     private String[] photos;
 
-    /*@Field("books") // Embedding the books array inside Accommodation
-    private List<Book> books;*/
+    @Field("books") // Embedding the books array inside Accommodation
+    private List<Book> books;
+
 
     @Field("reviews") // Embedding the reviews array inside Accommodation
     private List<Review> reviews;
@@ -37,21 +38,27 @@ public class Accommodation {
     }
 
     // Costruttore con parametri
-    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place, String address,
+    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place, String city, String address, String hostUsername, int latitude, int longitude,
                          List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate,
-                         String[] photos, List<Book> books) {
+                         String[] photos, List<Book> books, List<Review> reviews) {
         this.accommodationId = accommodationId;
         this.description = description;
         this.type = type;
         this.facilities = facilities;
         this.place = place;
+        this.city = city;
         this.address = address;
+        this.hostUsername = hostUsername;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.occupiedDates = occupiedDates;
         this.maxGuestSize = maxGuestSize;
         this.costPerNight = costPerNight;
         this.averageRate = averageRate;
         this.photos = photos;
-       // this.books = books;
+        this.books = books;
+        this.reviews = reviews;
+
     }
 
     // Getter e Setter
@@ -94,6 +101,12 @@ public class Accommodation {
     public void setPlace(String place) {
         this.place = place;
     }
+    public String getCity() {
+        return city;
+    }
+    public void setCity(String city) {
+        this.city = city;
+    }
 
     public String getAddress() {
         return address;
@@ -101,6 +114,21 @@ public class Accommodation {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+    public String getHostEmail() {
+        return hostUsername;
+    }
+    public void setHostEmail(String hostUsername) {
+        this.hostUsername = hostUsername;
+    }
+    public int getLatitude() {
+        return latitude;
+    }
+    public void setLatitude(int latitude) {
+        this.latitude = latitude;
+    }
+    public int getLongitude() {
+        return longitude;
     }
 
     public List<OccupiedPeriod> getOccupiedDates() {
@@ -143,13 +171,13 @@ public class Accommodation {
         this.photos = photos;
     }
 
-    /*public List<Book> getBooks() {
+    public List<Book> getBooks() {
         return books;
     }
 
     public void setBooks(List<Book> books) {
         this.books = books;
-    }*/
+    }
 
     public List<Review> getReviews() {
         return reviews;
@@ -167,13 +195,17 @@ public class Accommodation {
                 ", type='" + type + '\'' +
                 ", facilities=" + java.util.Arrays.toString(facilities) +
                 ", place='" + place + '\'' +
+                ", city='" + city + '\'' +
                 ", address='" + address + '\'' +
+                ", hostUsername='" + hostUsername + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 ", occupiedDates=" + occupiedDates +
                 ", maxGuestSize=" + maxGuestSize +
                 ", costPerNight=" + costPerNight +
                 ", averageRate=" + averageRate +
                 ", photos=" + java.util.Arrays.toString(photos) +
-                //", books=" + books +
+                ", books=" + books +
                 ", reviews=" + reviews +
                 '}';
     }

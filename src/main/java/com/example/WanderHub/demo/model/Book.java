@@ -10,8 +10,10 @@ public class Book {
     private Long bookId;
     //private int guestNumber;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
-    private int accommodationId;
+    //private int accommodationId;
     private String username;
+    private String name;
+    private String surname;
     private boolean transactionState;
     //private LocalDate paymentExpiration;
     private String email;
@@ -33,14 +35,16 @@ public class Book {
     }
 
     // Costruttore completo
-    public Book(Long bookId, List<OccupiedPeriod> occupiedDates,int accommodationId, String username, boolean transactionState,
+    public Book(Long bookId, List<OccupiedPeriod> occupiedDates, String username, String name, String surname, boolean transactionState,
                 LocalDate paymentExpiration, String email, String birthPlace, String address, int addressNumber,
                 LocalDate birthDate, String paymentToken, String[] guestFirstNames, String[] guestLastNames) {
         this.bookId = bookId;
         //this.guestNumber = guestNumber;
         this.occupiedDates = occupiedDates;
-        this.accommodationId = accommodationId;
+        //this.accommodationId = accommodationId;
         this.username = username;
+        this.name = name;
+        this.surname = surname;
         this.transactionState = transactionState;
         //this.paymentExpiration = paymentExpiration;
         this.email = email;
@@ -77,19 +81,30 @@ public class Book {
     public void setOccupiedDates(List<OccupiedPeriod> occupiedDates) {
         this.occupiedDates = occupiedDates;
     }
-    public int getAccommodationId() {
+    /*public int getAccommodationId() {
         return accommodationId;
     }
     public void setAccommodationId(int accommodationId) {
         this.accommodationId = accommodationId;
-    }
+    }*/
     public String getUsername() {
         return username;
     }
     public void setUsername(String username) {
         this.username = username;
     }
-
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getSurname() {
+        return surname;
+    }
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
     public boolean getTransactionState() {
         return transactionState;
     }
@@ -177,6 +192,7 @@ public class Book {
                 "bookId=" + bookId +
                 //", guestNumber=" + guestNumber +
                 ", occupiedDates=" + occupiedDates +
+                ", username='" + username + '\'' +
                 ", transactionState='" + transactionState + '\'' +
                 //", paymentExpiration=" + paymentExpiration +
                 ", email='" + email + '\'' +

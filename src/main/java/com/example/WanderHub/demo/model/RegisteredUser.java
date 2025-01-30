@@ -11,16 +11,18 @@ public class RegisteredUser {
     @Id
     private String username;
     private String password;
+    private String name;
+    private String surname;
     private String birthPlace;
     private String email;
     private LocalDate birthDate; // Campo per la data di nascita
     private String address;
     private int addressNumber;
     private String paymentToken;
-    private List<Integer> accommodations;
+    /*private List<Integer> accommodations;
 
     @Field("books") // Embedding the books array inside RegisteredUser
-    private List<Book> books;
+    private List<Book> books;*/
 
     // Costruttore vuoto
     public RegisteredUser() {
@@ -32,18 +34,20 @@ public class RegisteredUser {
     }
 
     // Costruttore completo
-    public RegisteredUser(String username, String password, String birthPlace, String email, LocalDate birthDate,
-                          String address, int addressNumber, String paymentToken, List<Integer> accommodations, List<Book> books) {
+    public RegisteredUser(String username, String password,String name, String surname, String birthPlace, String email, LocalDate birthDate,
+                          String address, int addressNumber, String paymentToken) {
         this.username = username;
         this.password = password;
+        this.name = name;
+        this.surname = surname;
         this.birthPlace = birthPlace;
         this.email = email;
         this.birthDate = birthDate;
         this.address = address;
         this.addressNumber = addressNumber;
         this.paymentToken = paymentToken;
-        this.accommodations = accommodations;
-        this.books = books;
+        //this.accommodations = accommodations;
+        //this.books = books;
     }
 
     // Getters e Setters
@@ -61,6 +65,13 @@ public class RegisteredUser {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBirthPlace() {
@@ -111,7 +122,7 @@ public class RegisteredUser {
         this.paymentToken = paymentToken;
     }
 
-    public List<Integer> getAccommodations() {
+    /*public List<Integer> getAccommodations() {
         return accommodations;
     }
 
@@ -125,7 +136,7 @@ public class RegisteredUser {
 
     public void setBooks(List<Book> books) {
         this.books = books;
-    }
+    }*/
 
     // Override del metodo toString
     @Override
@@ -138,9 +149,9 @@ public class RegisteredUser {
                 ", birthDate=" + birthDate +
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
-                ", paymentToken='" + paymentToken + '\'' +
-                ", accommodations=" + accommodations +
-                ", books=" + books +
+                ", paymentToken='" + paymentToken +
+                //", accommodations=" + accommodations +
+                //", books=" + books +
                 '}';
     }
 }

@@ -43,14 +43,14 @@ public class RegisteredUserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
+/*
     @PutMapping("/{username}/addBook")
     public ResponseEntity<RegisteredUser> addBookToAccommodation(
             @PathVariable String username,
             @RequestBody Book newBook) {
 
         // Aggiungi la nuova book alla sistemazione
-        RegisteredUser updatedRegisteredUser = registeredUserService.addBookToRegisteredUser(username, newBook);
+        RegisteredUser updatedRegisteredUser = accommodationService.addBookToRegisteredUser(username, newBook);
 
 
         return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
@@ -61,28 +61,27 @@ public class RegisteredUserController {
             @PathVariable String username,
             @RequestBody Accommodation accommodation) {
 
-        RegisteredUser updatedRegisteredUser = registeredUserService.addAccommodationToRegisteredUser(username, accommodation);
+        RegisteredUser updatedRegisteredUser = accommodationService.addAccommodationToRegisteredUser(username, accommodation);
 
 
         return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
     }
-
+*/
     @GetMapping("/{username}/pendingBookings")
     public ResponseEntity<List<Book>> getPendingBookings(@PathVariable String username) {
-        List<Book> pendingBookings = registeredUserService.getPendingBookings(username);
+        List<Book> pendingBookings = accommodationService.getPendingBookings(username);
         return new ResponseEntity<>(pendingBookings, HttpStatus.OK);
     }
 
     @GetMapping("/{username}/reviews")
-    public ResponseEntity<List<Review>> getReviewsByAccommodationId(@PathVariable String username, @RequestParam("accommodationId") int accommodationId) {
-        List<Review> accommodationReviews = accommodationService.getReviewsByAccommodationId(username, accommodationId);
-        System.out.println("ci siamo \n \n \n \n \n");
+    public ResponseEntity<List<Review>> getReviewsByAccommodationId(@PathVariable String username) {
+        List<Review> accommodationReviews = accommodationService.getReviewsByUsername(username);
         return new ResponseEntity<>(accommodationReviews, HttpStatus.OK);
     }
-
+/*
     @GetMapping("/{username}/viewAccommodations")
     public ResponseEntity<List<Integer>> getAccommodations(@PathVariable String username) {
-        List<Integer> accommodations = registeredUserService.getAccommodationByUsername(username);
+        List<Integer> accommodations = accommodationService.getAccommodationByUsername(username);
         return new ResponseEntity<>(accommodations, HttpStatus.OK);
     }
 
@@ -90,12 +89,12 @@ public class RegisteredUserController {
     public ResponseEntity<Void> deleteAccommodationProperty(@PathVariable String username, @PathVariable int id) {
 
 
-        boolean aux = registeredUserService.deleteAccommodation(username, id);
+        boolean aux = accommodationService.deleteAccommodation(username, id);
         if (aux) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-    }
+    }*/
 }
