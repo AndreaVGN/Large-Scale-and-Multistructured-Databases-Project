@@ -33,7 +33,7 @@ public class DataPopulatorService {
             System.out.println("Dati popolati correiiiiiiiiiiiiiiiiittamente nel database.");
 
             // Carica il file JSON e mappa correttamente in una lista di oggetti Accommodation
-            List<Accommodation> accommodations = objectMapper.readValue(new FileReader("C:/Users/franc/Downloads/popolamentoAccommodationFinale.json"),
+            List<Accommodation> accommodations = objectMapper.readValue(new FileReader("C:/Users/andre/Downloads/popolamentoAccommodationFinale.json"),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, Accommodation.class));
 
             // Salva i dati nel database
@@ -44,4 +44,5 @@ public class DataPopulatorService {
             e.printStackTrace();
         }
     }
-}*/
+}
+*/

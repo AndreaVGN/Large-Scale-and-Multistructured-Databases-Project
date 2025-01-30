@@ -1,13 +1,14 @@
 package com.example.WanderHub.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 
 public class RegisteredUser {
+
     @Id
     private String username;
     private String password;
@@ -15,14 +16,15 @@ public class RegisteredUser {
     private String surname;
     private String birthPlace;
     private String email;
-    private String birthDate; // Campo per la data di nascita
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate birthDate; // Campo per la data di nascita
     private String address;
     private int addressNumber;
+    private String cardNumber; // Campo per il numero della carta
+    @JsonProperty("CVV")
+    private int CVV; // Campo per il CVV della carta
+    private String expiryDate; // Campo per la data di scadenza della carta
     private String paymentToken;
-    /*private List<Integer> accommodations;
-
-    @Field("books") // Embedding the books array inside RegisteredUser
-    private List<Book> books;*/
 
     // Costruttore vuoto
     public RegisteredUser() {
@@ -34,8 +36,8 @@ public class RegisteredUser {
     }
 
     // Costruttore completo
-    public RegisteredUser(String username, String password,String name, String surname, String birthPlace, String email, String birthDate,
-                          String address, int addressNumber, String paymentToken) {
+    public RegisteredUser(String username, String password, String name, String surname, String birthPlace, String email,
+                          LocalDate birthDate, String address, int addressNumber, String cardNumber, int CVV, String expiryDate, String paymentToken) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -45,9 +47,10 @@ public class RegisteredUser {
         this.birthDate = birthDate;
         this.address = address;
         this.addressNumber = addressNumber;
+        this.cardNumber = cardNumber;
+        this.CVV = CVV;
+        this.expiryDate = expiryDate;
         this.paymentToken = paymentToken;
-        //this.accommodations = accommodations;
-        //this.books = books;
     }
 
     // Getters e Setters
@@ -70,8 +73,17 @@ public class RegisteredUser {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public String getBirthPlace() {
@@ -90,11 +102,11 @@ public class RegisteredUser {
         this.email = email;
     }
 
-    public String getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(String birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -114,6 +126,30 @@ public class RegisteredUser {
         this.addressNumber = addressNumber;
     }
 
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public int getCVV() {
+        return CVV;
+    }
+
+    public void setCVV(int CVV) {
+        this.CVV = CVV;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(String expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
     public String getPaymentToken() {
         return paymentToken;
     }
@@ -121,22 +157,6 @@ public class RegisteredUser {
     public void setPaymentToken(String paymentToken) {
         this.paymentToken = paymentToken;
     }
-
-    /*public List<Integer> getAccommodations() {
-        return accommodations;
-    }
-
-    public void setAccommodations(List<Integer> accommodations) {
-        this.accommodations = accommodations;
-    }
-
-    public List<Book> getBooks() {
-        return books;
-    }
-
-    public void setBooks(List<Book> books) {
-        this.books = books;
-    }*/
 
     // Override del metodo toString
     @Override
@@ -151,9 +171,10 @@ public class RegisteredUser {
                 ", birthDate=" + birthDate +
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
-                ", paymentToken='" + paymentToken +
-                //", accommodations=" + accommodations +
-                //", books=" + books +
+                ", cardNumber='" + cardNumber + '\'' +
+                ", CVV=" + CVV +
+                ", expiryDate='" + expiryDate + '\'' +
+                ", paymentToken='" + paymentToken + '\'' +
                 '}';
     }
 }
