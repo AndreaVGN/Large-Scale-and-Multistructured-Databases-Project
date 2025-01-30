@@ -104,8 +104,11 @@ public class AccommodationService {
     public List<Accommodation> findOwnAccommodations(String hostUsername){
         return accommodationRepository.findOwnAccommodations(hostUsername);
     }
-    public List<Accommodation> viewAccommodationDetails(String hostUsername, int id){
-        return accommodationRepository.viewAccommodationDetails(hostUsername,id);
+    public List<Accommodation> viewAccommodationBooks(String hostUsername, int id){
+        return accommodationRepository.viewAccommodationBooks(hostUsername,id);
+    }
+    public List<Accommodation> viewAccommodationReviews(String hostUsername, int id){
+        return accommodationRepository.viewAccommodationReviews(hostUsername,id);
     }
 }
 

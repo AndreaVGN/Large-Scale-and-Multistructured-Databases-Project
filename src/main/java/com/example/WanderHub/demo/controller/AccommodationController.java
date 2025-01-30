@@ -39,9 +39,13 @@ public class AccommodationController {
     public List<Accommodation> viewOwnAccommodations(@PathVariable String hostUsername) {
         return accommodationService.findOwnAccommodations(hostUsername);
     }
-    @GetMapping("/{hostUsername}/viewAccommodationDetails/{id}")
-    public List<Accommodation> viewAccommodationDetails(@PathVariable String hostUsername, @PathVariable int id) {
-        return accommodationService.viewAccommodationDetails(hostUsername,id);
+    @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
+    public List<Accommodation> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id) {
+        return accommodationService.viewAccommodationBooks(hostUsername,id);
+    }
+    @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
+    public List<Accommodation> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id) {
+        return accommodationService.viewAccommodationReviews(hostUsername,id);
     }
 }
 
