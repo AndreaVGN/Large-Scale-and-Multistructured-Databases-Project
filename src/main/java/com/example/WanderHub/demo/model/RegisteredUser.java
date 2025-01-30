@@ -144,6 +144,8 @@ public class RegisteredUser {
         return "RegisteredUser{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
                 ", birthPlace='" + birthPlace + '\'' +
                 ", email='" + email + '\'' +
                 ", birthDate=" + birthDate +

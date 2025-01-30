@@ -10,7 +10,7 @@ import com.example.WanderHub.demo.utility.OccupiedPeriod;
 //@Document(collection = "accommodations")
 public class Accommodation {
     @Id
-    private int accommodationId;
+    private Long accommodationId;
     private String description;
     private String type;
     private boolean[] facilities;
@@ -38,7 +38,7 @@ public class Accommodation {
     }
 
     // Costruttore con parametri
-    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place, String city, String address, String hostUsername, int latitude, int longitude,
+    public Accommodation(Long accommodationId, String description, String type, boolean[] facilities, String place, String city, String address, String hostUsername, int latitude, int longitude,
                          List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate,
                          String[] photos, List<Book> books, List<Review> reviews) {
         this.accommodationId = accommodationId;
@@ -62,11 +62,11 @@ public class Accommodation {
     }
 
     // Getter e Setter
-    public int getAccommodationId() {
+    public Long getAccommodationId() {
         return accommodationId;
     }
 
-    public void setAccommodationId(int accommodationId) {
+    public void setAccommodationId(Long accommodationId) {
         this.accommodationId = accommodationId;
     }
 

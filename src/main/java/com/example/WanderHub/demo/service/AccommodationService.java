@@ -27,6 +27,9 @@ public class AccommodationService {
         return accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
     }
+    public List<Accommodation> getAccommodationsByCity(String city) {
+        return accommodationRepository.findAccommodationsByCity(city);
+    }
 
     // Eliminazione di una sistemazione
     public boolean deleteAccommodationById(int accommodationId) {

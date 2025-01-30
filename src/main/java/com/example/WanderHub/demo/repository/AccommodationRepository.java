@@ -14,7 +14,7 @@ import java.util.List;
 public interface AccommodationRepository extends MongoRepository<Accommodation, Integer> {
     // Trova una sistemazione per ID
     @Query("{ 'accommodationId': ?0 }")
-    Optional<Accommodation> findByAccommodationId(int accommodationId);
+    Optional<Accommodation> findByAccommodationId(int _id);
 
     boolean existsByAccommodationId(int accommodationId);
     void deleteByAccommodationId(int accommodationId);
@@ -26,6 +26,9 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     // Recupera tutte le recensioni dell'accommodation dato un accommodationId
     @Query("{ 'accommodationId': ?0 }")
     Accommodation findReviewsByAccommodationId(int accommodationId);
+
+    @Query("{'city':  ?0}")
+    List<Accommodation> findAccommodationsByCity(String city);
 
     @Query("{'hostUsername':  ?0}")
     List<Accommodation> findByHostUsername(String hostUsername);

@@ -28,6 +28,10 @@ public class AccommodationController {
     public Accommodation getAccommodation(@PathVariable int id) {
         return accommodationService.getAccommodationById(id);
     }
+    @GetMapping("/{city}")
+    public List<Accommodation> getAccommodationsByCity(@PathVariable String city) {
+        return accommodationService.getAccommodationsByCity(city);
+    }
 
     // Eliminazione di una sistemazione per id
     @DeleteMapping("/{id}")
