@@ -4,13 +4,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Arrays;
 import java.util.List;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 
-//@Document(collection = "accommodations")
+@Document(collection = "accommodations")  // La collezione in MongoDB
 public class Accommodation {
     @Id
-    private Long accommodationId;
+    private int accommodationId;
     private String description;
     private String type;
     private boolean[] facilities;
@@ -18,8 +19,8 @@ public class Accommodation {
     private String city;
     private String address;
     private String hostUsername;
-    private int latitude;
-    private int longitude;
+    private double latitude;
+    private double longitude;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
     private int maxGuestSize;
     private int costPerNight;
@@ -29,16 +30,15 @@ public class Accommodation {
     @Field("books") // Embedding the books array inside Accommodation
     private List<Book> books;
 
-
     @Field("reviews") // Embedding the reviews array inside Accommodation
     private List<Review> reviews;
 
-    // Costruttore vuoto
-    public Accommodation() {
-    }
+    // Costruttore senza parametri
+    public Accommodation() {}
 
     // Costruttore con parametri
-    public Accommodation(Long accommodationId, String description, String type, boolean[] facilities, String place, String city, String address, String hostUsername, int latitude, int longitude,
+    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place,
+                         String city, String address, String hostUsername, double latitude, double longitude,
                          List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate,
                          String[] photos, List<Book> books, List<Review> reviews) {
         this.accommodationId = accommodationId;
@@ -58,15 +58,14 @@ public class Accommodation {
         this.photos = photos;
         this.books = books;
         this.reviews = reviews;
-
     }
 
     // Getter e Setter
-    public Long getAccommodationId() {
+    public int getAccommodationId() {
         return accommodationId;
     }
 
-    public void setAccommodationId(Long accommodationId) {
+    public void setAccommodationId(int accommodationId) {
         this.accommodationId = accommodationId;
     }
 
@@ -101,9 +100,11 @@ public class Accommodation {
     public void setPlace(String place) {
         this.place = place;
     }
+
     public String getCity() {
         return city;
     }
+
     public void setCity(String city) {
         this.city = city;
     }
@@ -115,20 +116,29 @@ public class Accommodation {
     public void setAddress(String address) {
         this.address = address;
     }
-    public String getHostEmail() {
+
+    public String getHostUsername() {
         return hostUsername;
     }
-    public void setHostEmail(String hostUsername) {
+
+    public void setHostUsername(String hostUsername) {
         this.hostUsername = hostUsername;
     }
-    public int getLatitude() {
+
+    public double getLatitude() {
         return latitude;
     }
-    public void setLatitude(int latitude) {
+
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
-    public int getLongitude() {
+
+    public double getLongitude() {
         return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public List<OccupiedPeriod> getOccupiedDates() {
@@ -187,13 +197,14 @@ public class Accommodation {
         this.reviews = reviews;
     }
 
+    // Metodo toString
     @Override
     public String toString() {
         return "Accommodation{" +
                 "accommodationId=" + accommodationId +
                 ", description='" + description + '\'' +
                 ", type='" + type + '\'' +
-                ", facilities=" + java.util.Arrays.toString(facilities) +
+                ", facilities=" + Arrays.toString(facilities) +
                 ", place='" + place + '\'' +
                 ", city='" + city + '\'' +
                 ", address='" + address + '\'' +
@@ -204,10 +215,9 @@ public class Accommodation {
                 ", maxGuestSize=" + maxGuestSize +
                 ", costPerNight=" + costPerNight +
                 ", averageRate=" + averageRate +
-                ", photos=" + java.util.Arrays.toString(photos) +
+                ", photos=" + Arrays.toString(photos) +
                 ", books=" + books +
                 ", reviews=" + reviews +
                 '}';
     }
 }
-

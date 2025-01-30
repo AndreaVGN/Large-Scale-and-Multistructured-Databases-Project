@@ -1,39 +1,43 @@
 package com.example.WanderHub.demo.utility;
 
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDate;
+
 public class OccupiedPeriod {
-    private String startDate; // Data di inizio occupazione
-    private String endDate;   // Data di fine occupazione
+    private LocalDate start; // Data di inizio occupazione
+    private LocalDate end;   // Data di fine occupazione
 
     // Costruttori
     public OccupiedPeriod() {}
 
-    public OccupiedPeriod(String startDate, String endDate) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public OccupiedPeriod(LocalDate start, LocalDate end) {
+        this.start = start;
+        this.end = end;
     }
 
     // Getter e Setter
-    public String getStartDate() {
-        return startDate;
+    public LocalDate getStart() {
+        return start;
     }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
+    public void setStart(LocalDate start) {
+        this.start = start;
     }
 
-    public String getEndDate() {
-        return endDate;
+    public LocalDate getEnd() {
+        return end;
     }
 
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
+    public void setEnd(LocalDate end) {
+        this.end = end;
     }
 
     @Override
     public String toString() {
         return "OccupiedPeriod{" +
-                "startDate='" + startDate + '\'' +
-                ", endDate='" + endDate + '\'' +
+                "start='" + start + '\'' +
+                ", end='" + end + '\'' +
                 '}';
     }
 }

@@ -13,14 +13,16 @@ import java.util.List;
 @Repository
 public interface AccommodationRepository extends MongoRepository<Accommodation, Integer> {
     // Trova una sistemazione per ID
-    @Query("{ 'accommodationId': ?0 }")
+    @Query("{ '_id': ?0 }")
     Optional<Accommodation> findByAccommodationId(int _id);
 
     boolean existsByAccommodationId(int accommodationId);
     void deleteByAccommodationId(int accommodationId);
 
     // Ricerca sistemazioni disponibili in base a parametri
-    @Query("{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'startDate': { $lte: ?3 }, 'endDate': { $gte: ?2 } } ] } } } }")
+    //@Query("{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }")
+    @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }", fields = "{ 'books': 0, 'reviews': 0, '_id': 0, 'latitude': 0, 'longitude': 0, 'maxGuestSize': 0, 'occupiedDates':0, 'address': 0,'place': 0, 'facilities': 0,'photos': 0  }")
+
     List<Accommodation> findAvailableAccommodations(String city, int minGuests, String startDate, String endDate);
 
     // Recupera tutte le recensioni dell'accommodation dato un accommodationId
@@ -45,5 +47,10 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     })
     List<Book> findPendingBookingsByUsername(String username);
 
+    @Query(value = "{'hostUsername': ?0}", fields = "{'_id': 1, 'description': 1}")
+    List<Accommodation> findOwnAccommodations(String username);
+
+    @Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'books': 1}")
+    List<Accommodation> viewAccommodationDetails(String username,int id);
 }
 

@@ -5,7 +5,17 @@ public class Review {
     private String reviewText;
     private double rating;
     private String username;
-    //private int accommodationId;
+
+    // Costruttore senza parametri
+    public Review() {}
+
+    // Costruttore con parametri
+    public Review(int reviewId, String reviewText, double rating, String username) {
+        this.reviewId = reviewId;
+        this.reviewText = reviewText;
+        this.rating = rating;
+        this.username = username;
+    }
 
     // Getter e Setter
     public int getReviewId() {
@@ -39,12 +49,6 @@ public class Review {
     public void setUsername(String username) {
         this.username = username;
     }
-    /*public int getAccommodationId() {
-        return accommodationId;
-    }
-    public void setAccommodationId(int accommodationId) {
-        this.accommodationId = accommodationId;
-    }*/
 
     // Metodo toString
     @Override
@@ -53,8 +57,7 @@ public class Review {
                 "reviewId=" + reviewId +
                 ", reviewText='" + reviewText + '\'' +
                 ", rating=" + rating +
-                ", username='" + username +
-                //", accommodationId=" + accommodationId +
+                ", username='" + username + '\'' +
                 '}';
     }
 }

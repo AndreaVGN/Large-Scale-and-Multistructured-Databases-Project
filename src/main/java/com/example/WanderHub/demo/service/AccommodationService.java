@@ -101,5 +101,11 @@ public class AccommodationService {
     public List<Book> getPendingBookings(String username) {
         return accommodationRepository.findPendingBookingsByUsername(username);
     }
+    public List<Accommodation> findOwnAccommodations(String hostUsername){
+        return accommodationRepository.findOwnAccommodations(hostUsername);
+    }
+    public List<Accommodation> viewAccommodationDetails(String hostUsername, int id){
+        return accommodationRepository.viewAccommodationDetails(hostUsername,id);
+    }
 }
 

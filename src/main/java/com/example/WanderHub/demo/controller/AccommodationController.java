@@ -22,65 +22,26 @@ public class AccommodationController {
     public Accommodation createAccommodation(@RequestBody Accommodation accommodation) {
         return accommodationService.createAccommodation(accommodation);
     }
-
-    // Recupero una sistemazione per id
-    @GetMapping("/{id}")
-    public Accommodation getAccommodation(@PathVariable int id) {
+   @GetMapping("/{id}")
+    public Accommodation getAccommodationById(@PathVariable int id) {
         return accommodationService.getAccommodationById(id);
-    }
-    @GetMapping("/{city}")
-    public List<Accommodation> getAccommodationsByCity(@PathVariable String city) {
-        return accommodationService.getAccommodationsByCity(city);
-    }
-
-    // Eliminazione di una sistemazione per id
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccommodation(@PathVariable int id) {
-        boolean isDeleted = accommodationService.deleteAccommodationById(id);
-        if (isDeleted) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    // Ricerca di sistemazioni disponibili con parametri
+   }
     @GetMapping("/findAccommodations")
     public List<Accommodation> findAccommodations(
-            @RequestParam("city") String city,
+            @RequestParam("city") String place,
             @RequestParam("guestSize") int minGuests,
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate) {
 
-        return accommodationService.findAvailableAccommodations(city, minGuests, startDate, endDate);
+        return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate);
     }
-
-    @PutMapping("/{accommodationId}/addBook")
-    public ResponseEntity<Accommodation> addBookToAccommodation(
-            @PathVariable int accommodationId,
-            @RequestBody Book newBook) {
-
-        // Aggiungi la nuova book alla sistemazione
-        Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(accommodationId, newBook);
-
-
-        return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
+    @GetMapping("/{hostUsername}/viewOwnAccommodations")
+    public List<Accommodation> viewOwnAccommodations(@PathVariable String hostUsername) {
+        return accommodationService.findOwnAccommodations(hostUsername);
     }
-
-    @PutMapping("/{accommodationId}/addReview")
-    public ResponseEntity<Accommodation> addReviewToAccommodation(
-            @PathVariable int accommodationId,
-            @RequestBody Review newReview) {
-
-        // Aggiungi la nuova recensione alla sistemazione
-        Accommodation updatedAccommodation = accommodationService.addReviewToAccommodation(accommodationId, newReview);
-
-        return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
-    }
-    @GetMapping("/{username}/findPersonalAccommodations")
-    public ResponseEntity<List<Accommodation>> findPersonalAccommodations(@PathVariable String username) {
-        List<Accommodation> personalAccommodations = accommodationService.findAccommodationsByUsername(username);
-        return new ResponseEntity<>(personalAccommodations,HttpStatus.OK);
+    @GetMapping("/{hostUsername}/viewAccommodationDetails/{id}")
+    public List<Accommodation> viewAccommodationDetails(@PathVariable String hostUsername, @PathVariable int id) {
+        return accommodationService.viewAccommodationDetails(hostUsername,id);
     }
 }
 

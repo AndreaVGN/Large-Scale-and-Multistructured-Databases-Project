@@ -1,78 +1,62 @@
 package com.example.WanderHub.demo.model;
 
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
 public class Book {
-    private Long bookId;
-    //private int guestNumber;
+
+    private int bookId;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
-    //private int accommodationId;
     private String username;
-    private String name;
-    private String surname;
     private boolean transactionState;
-    //private LocalDate paymentExpiration;
     private String email;
     private String birthPlace;
     private String address;
     private int addressNumber;
-    private LocalDate birthDate;
-    private String paymentToken;
+    private String birthDate;
+    private String cardNumber;
+    @JsonProperty("CVV")
+    private int CVV;
+    private String expiryDate;
     private String[] guestFirstNames; // Array dei nomi degli ospiti
-    private String[] guestLastNames;  // Array dei cognomi degli ospiti
+    private String[] guestLastNames; // Array dei cognomi degli ospiti
 
-    // Costruttore vuoto
-    public Book() {
-    }
+    // Costruttore senza parametri
+    public Book() {}
 
-    // Costruttore con un parametro
-    public Book(Long bookId) {
+    // Costruttore con parametri
+    public Book(int bookId, List<OccupiedPeriod> occupiedDates, String username, boolean transactionState, String email,
+                String birthPlace, String address, int addressNumber, String birthDate, String cardNumber,
+                int CVV, String expiryDate, String[] guestFirstNames, String[] guestLastNames) {
         this.bookId = bookId;
-    }
-
-    // Costruttore completo
-    public Book(Long bookId, List<OccupiedPeriod> occupiedDates, String username, String name, String surname, boolean transactionState,
-                LocalDate paymentExpiration, String email, String birthPlace, String address, int addressNumber,
-                LocalDate birthDate, String paymentToken, String[] guestFirstNames, String[] guestLastNames) {
-        this.bookId = bookId;
-        //this.guestNumber = guestNumber;
         this.occupiedDates = occupiedDates;
-        //this.accommodationId = accommodationId;
         this.username = username;
-        this.name = name;
-        this.surname = surname;
         this.transactionState = transactionState;
-        //this.paymentExpiration = paymentExpiration;
         this.email = email;
         this.birthPlace = birthPlace;
         this.address = address;
         this.addressNumber = addressNumber;
         this.birthDate = birthDate;
-        this.paymentToken = paymentToken;
+        this.cardNumber = cardNumber;
+        this.CVV = CVV;
+        this.expiryDate = expiryDate;
         this.guestFirstNames = guestFirstNames;
         this.guestLastNames = guestLastNames;
     }
 
-    // Getters e Setters
-    public Long getBookId() {
+    // Getters and Setters
+
+    public int getBookId() {
         return bookId;
     }
 
-    public void setBookId(Long bookId) {
+    public void setBookId(int bookId) {
         this.bookId = bookId;
     }
-
-    /*public int getGuestNumber() {
-        return guestNumber;
-    }
-
-    public void setGuestNumber(int guestNumber) {
-        this.guestNumber = guestNumber;
-    }*/
 
     public List<OccupiedPeriod> getOccupiedDates() {
         return occupiedDates;
@@ -81,45 +65,22 @@ public class Book {
     public void setOccupiedDates(List<OccupiedPeriod> occupiedDates) {
         this.occupiedDates = occupiedDates;
     }
-    /*public int getAccommodationId() {
-        return accommodationId;
-    }
-    public void setAccommodationId(int accommodationId) {
-        this.accommodationId = accommodationId;
-    }*/
+
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getSurname() {
-        return surname;
-    }
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-    public boolean getTransactionState() {
+
+    public boolean isTransactionState() {
         return transactionState;
     }
 
     public void setTransactionState(boolean transactionState) {
         this.transactionState = transactionState;
     }
-
-    /*public LocalDate getPaymentExpiration() {
-        return paymentExpiration;
-    }
-
-    public void setPaymentExpiration(LocalDate paymentExpiration) {
-        this.paymentExpiration = paymentExpiration;
-    }*/
 
     public String getEmail() {
         return email;
@@ -153,20 +114,36 @@ public class Book {
         this.addressNumber = addressNumber;
     }
 
-    public LocalDate getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 
-    public String getPaymentToken() {
-        return paymentToken;
+    public String getCardNumber() {
+        return cardNumber;
     }
 
-    public void setPaymentToken(String paymentToken) {
-        this.paymentToken = paymentToken;
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public int getCVV() {
+        return CVV;
+    }
+
+    public void setCVV(int CVV) {
+        this.CVV = CVV;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(String expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public String[] getGuestFirstNames() {
@@ -185,22 +162,22 @@ public class Book {
         this.guestLastNames = guestLastNames;
     }
 
-    // Override del metodo toString
+    // Metodo toString
     @Override
     public String toString() {
         return "Book{" +
                 "bookId=" + bookId +
-                //", guestNumber=" + guestNumber +
                 ", occupiedDates=" + occupiedDates +
                 ", username='" + username + '\'' +
-                ", transactionState='" + transactionState + '\'' +
-                //", paymentExpiration=" + paymentExpiration +
+                ", transactionState=" + transactionState +
                 ", email='" + email + '\'' +
                 ", birthPlace='" + birthPlace + '\'' +
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
-                ", birthDate=" + birthDate +
-                ", paymentToken='" + paymentToken + '\'' +
+                ", birthDate='" + birthDate + '\'' +
+                ", cardNumber='" + cardNumber + '\'' +
+                ", CVV=" + CVV +
+                ", expiryDate='" + expiryDate + '\'' +
                 ", guestFirstNames=" + Arrays.toString(guestFirstNames) +
                 ", guestLastNames=" + Arrays.toString(guestLastNames) +
                 '}';

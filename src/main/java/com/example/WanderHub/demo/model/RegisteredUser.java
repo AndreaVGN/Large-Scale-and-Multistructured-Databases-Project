@@ -15,7 +15,7 @@ public class RegisteredUser {
     private String surname;
     private String birthPlace;
     private String email;
-    private LocalDate birthDate; // Campo per la data di nascita
+    private String birthDate; // Campo per la data di nascita
     private String address;
     private int addressNumber;
     private String paymentToken;
@@ -34,7 +34,7 @@ public class RegisteredUser {
     }
 
     // Costruttore completo
-    public RegisteredUser(String username, String password,String name, String surname, String birthPlace, String email, LocalDate birthDate,
+    public RegisteredUser(String username, String password,String name, String surname, String birthPlace, String email, String birthDate,
                           String address, int addressNumber, String paymentToken) {
         this.username = username;
         this.password = password;
@@ -90,11 +90,11 @@ public class RegisteredUser {
         this.email = email;
     }
 
-    public LocalDate getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 
