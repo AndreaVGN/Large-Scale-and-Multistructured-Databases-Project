@@ -58,11 +58,6 @@ public class AccommodationService {
         return false;
     }
 
-    /*
-    // Ricerca sistemazioni disponibili
-    public List<Accommodation> findAvailableAccommodations(String city, int minGuests, String startDate, String endDate) {
-        return accommodationRepository.findAvailableAccommodations(city, minGuests, startDate, endDate);
-    }*/
 
     public List<AccommodationDTO> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate) {
         // Esegui la query che restituisce le Accommodation
@@ -162,9 +157,22 @@ public class AccommodationService {
     public List<Accommodation> viewAccommodationBooks(String hostUsername, int id){
         return accommodationRepository.viewAccommodationBooks(hostUsername,id);
     }
-    public List<Accommodation> viewAccommodationReviews(String hostUsername, int id){
-        return accommodationRepository.viewAccommodationReviews(hostUsername,id);
+
+    public ReviewDTO viewAccommodationReviews(String hostUsername, int id) {
+        // Recupera la lista di Accommodation corrispondente alla query
+        List<Accommodation> accommodations = accommodationRepository.viewAccommodationReviews(hostUsername, id);
+
+        // Estrai tutte le recensioni da ogni Accommodation
+        List<Review> reviews = accommodations.stream()
+                .flatMap(accommodation -> accommodation.getReviews().stream())  // Estrai recensioni da ogni Accommodation
+                .collect(Collectors.toList());
+
+        System.out.println(reviews);
+
+        // Crea e restituisci il ReviewDTO con la lista di recensioni
+        return new ReviewDTO(reviews);
     }
+
 
     // Metodo per aggiungere una prenotazione alla casa scelta dal cliente
     public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {

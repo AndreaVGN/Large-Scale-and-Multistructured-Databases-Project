@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
+import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
@@ -51,8 +52,8 @@ public class AccommodationController {
         return accommodationService.viewAccommodationBooks(hostUsername,id);
     }
     @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
-    public List<Accommodation> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id) {
-        return accommodationService.viewAccommodationReviews(hostUsername,id);
+    public ReviewDTO viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id) {
+        return accommodationService.viewAccommodationReviews(hostUsername, id);
     }
 
     // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
