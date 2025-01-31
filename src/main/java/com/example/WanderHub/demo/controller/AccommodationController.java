@@ -75,8 +75,21 @@ public class AccommodationController {
     }
 
     @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
-    public List<Book> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id) {
-        return accommodationService.viewAccommodationBooks(hostUsername,id);
+    public ResponseEntity<?> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id, HttpSession session) {
+        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+
+
+
+        if (loggedInUser == null || !loggedInUser.getUsername().equals(hostUsername)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
+        List<Book> books = accommodationService.viewAccommodationBooks(hostUsername,id);
+        if (books.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna book trovata per questo host.");
+        }
+
+        return ResponseEntity.ok(books);
     }
 
     @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
