@@ -27,7 +27,7 @@ public class AuthController {
         System.out.println("Ci erhbenjgrkjbgekjrbgkjebkjgrberkbgbgkgeriubiuguerbg");
         if (isAuthenticated) {
             System.out.println("Ci erhbgeriubiuguerbg");
-            return ResponseEntity.ok("Login successful.");
+            return ResponseEntity.status(HttpStatus.OK).body("Forza Siena");
 
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password.");
