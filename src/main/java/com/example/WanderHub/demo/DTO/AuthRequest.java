@@ -1,15 +1,9 @@
 package com.example.WanderHub.demo.DTO;
 
-public class RegisteredUserDTO {
+public class AuthRequest {
 
     private String username;
     private String password;
-
-    // Costruttore per il DTO
-    public RegisteredUserDTO(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
 
     // Getter e Setter
     public String getUsername() {
@@ -28,3 +22,4 @@ public class RegisteredUserDTO {
         this.password = password;
     }
 }
+

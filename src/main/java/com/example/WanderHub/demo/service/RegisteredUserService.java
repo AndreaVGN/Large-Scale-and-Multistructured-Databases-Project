@@ -1,6 +1,6 @@
 package com.example.WanderHub.demo.service;
 
-import com.example.WanderHub.demo.DTO.LoginRequest;
+import com.example.WanderHub.demo.DTO.AuthRequest;
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
@@ -9,6 +9,7 @@ import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 
+import com.example.WanderHub.demo.utility.Password;
 import jdk.jfr.Registered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class RegisteredUserService {
     }
 
     public boolean deleteRegisteredUserByUsername(String username) {
-        if(registeredUserRepository.existsByUsername(username)) {
+        if (registeredUserRepository.existsByUsername(username)) {
             registeredUserRepository.deleteByUsername(username);
             return true;
         }
@@ -46,17 +47,23 @@ public class RegisteredUserService {
     }
 
     // Autenticazione dell'utente (login)
-    public boolean authenticate(LoginRequest loginRequest, HttpSession session) {
+    public boolean authenticate(AuthRequest loginRequest, HttpSession session) {
         Optional<RegisteredUser> userOptional = registeredUserRepository.findByUsername(loginRequest.getUsername());
 
         if (userOptional.isPresent()) {
             RegisteredUser user = userOptional.get();
 
-            if (user.getPassword().equals(loginRequest.getPassword())) {
+            // Hash della password inserita per il confronto
+            String hashedInputPassword = Password.hashPassword(loginRequest.getPassword());
+
+            // Confronta l'hash della password
+            if (user.getPassword().equals(hashedInputPassword)) {
                 session.setAttribute("user", user); // Salva l'utente nella sessione
                 return true;
             }
+            return false;
         }
+
         return false;
     }
 }

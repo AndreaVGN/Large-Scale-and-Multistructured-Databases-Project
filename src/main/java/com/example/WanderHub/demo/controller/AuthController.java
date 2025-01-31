@@ -1,8 +1,6 @@
 package com.example.WanderHub.demo.controller;
 
-import com.example.WanderHub.demo.DTO.LoginRequest;
-import com.example.WanderHub.demo.DTO.RegisteredUserDTO;
-import com.example.WanderHub.demo.model.RegisteredUser;
+import com.example.WanderHub.demo.DTO.AuthRequest;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,13 +19,10 @@ public class AuthController {
 
     // Endpoint per il login
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
-        System.out.println("Ci \n\n\n\n\n\n\nerhbgeriubiuguerbg");
+    public ResponseEntity<?> login(@RequestBody AuthRequest loginRequest, HttpSession session) {
         boolean isAuthenticated = registeredUserService.authenticate(loginRequest, session);
-        System.out.println("Ci erhbenjgrkjbgekjrbgkjebkjgrberkbgbgkgeriubiuguerbg");
         if (isAuthenticated) {
-            System.out.println("Ci erhbgeriubiuguerbg");
-            return ResponseEntity.status(HttpStatus.OK).body("Forza Siena");
+            return ResponseEntity.status(HttpStatus.OK).body("Login successful");
 
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password.");
