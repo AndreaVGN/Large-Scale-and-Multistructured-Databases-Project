@@ -1,21 +1,32 @@
 package com.example.WanderHub.demo.service;
+import com.example.WanderHub.demo.DTO.ReviewDTO;
+import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
+import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccommodationService {
 
     @Autowired
     private AccommodationRepository accommodationRepository;
+
+    private final RegisteredUserRepository registeredUserRepository;
+
+    @Autowired
+    public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
+        this.registeredUserRepository = registeredUserRepository;
+    }
 
     // Creazione di una nuova sistemazione
     public Accommodation createAccommodation(Accommodation accommodation) {
@@ -95,22 +106,16 @@ public class AccommodationService {
     public List<Accommodation> findAccommodationsByUsername(String username) {
         return accommodationRepository.findByHostUsername(username);
     }
-    /*
-    public List<Accommodation> getReviewsByUsername(String username){
-        return accommodationRepository.findReviewsByUsername(username);
-    }*/
 
-    public List<Accommodation> getReviewsByUsername(String username) {
-        try {
-            System.out.println(" Eseguendo query per utente: " + username);
-            List<Accommodation> result = accommodationRepository.findReviewsByUsername(username);
-            System.out.println(" Risultato query: " + result);
-            return result;
-        } catch (Exception e) {
-            System.err.println(" Errore durante la query MongoDB: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Errore nel recupero delle recensioni", e);
-        }
+
+    public List<Review> getReviewsByUsername(String username) {
+        // Ottieni ReviewDTO dal repository
+        List<ReviewDTO> reviewsDTOList = accommodationRepository.findReviewsByUsername(username);
+
+        // Estrai le recensioni da ogni ReviewDTO e restituisci una lista di Review
+        return reviewsDTOList.stream()
+                .flatMap(dto -> dto.getReviews().stream())
+                .collect(Collectors.toList());
     }
     public List<Book> getPendingBookings(String username) {
         return accommodationRepository.findPendingBookingsByUsername(username);
@@ -123,6 +128,27 @@ public class AccommodationService {
     }
     public List<Accommodation> viewAccommodationReviews(String hostUsername, int id){
         return accommodationRepository.viewAccommodationReviews(hostUsername,id);
+    }
+
+    // Metodo per aggiungere una prenotazione alla casa scelta dal cliente
+    public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
+        // Recupera l'accommodation tramite il suo ID
+        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+
+        // Recupera l'utente cliente che sta facendo la prenotazione
+
+        RegisteredUser customer = registeredUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        // Aggiungi il nome dell'utente (cliente) alla prenotazione
+        newBook.setUsername(username);
+
+        // Aggiungi la nuova prenotazione alla lista delle prenotazioni della casa
+        accommodation.getBooks().add(newBook);
+
+        // Salva l'accommodation aggiornata nel database
+        return accommodationRepository.save(accommodation);
     }
 }
 

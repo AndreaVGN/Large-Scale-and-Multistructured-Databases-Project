@@ -1,4 +1,5 @@
 package com.example.WanderHub.demo.repository;
+import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.model.Accommodation;
@@ -39,7 +40,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
             "{ $match: { 'reviews.username': ?0 } }",
             "{ $project: { 'reviews': { $filter: { input: '$reviews', as: 'review', cond: { $eq: ['$$review.username', ?0] } } } } }"
     })
-    List<Accommodation> findReviewsByUsername(String username);
+    List<ReviewDTO> findReviewsByUsername(String username);
 
 
     @Aggregation(pipeline = {
