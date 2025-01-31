@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.service;
 
+import com.example.WanderHub.demo.DTO.LoginRequest;
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
@@ -7,9 +8,12 @@ import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
+
 import jdk.jfr.Registered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.Map;
@@ -40,54 +44,19 @@ public class RegisteredUserService {
         }
         return false;
     }
-/*
-    public RegisteredUser addBookToRegisteredUser(String username, Book newBook) {
-        // Trova la sistemazione esistente
-        RegisteredUser registeredUser = registeredUserRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with user: " + username));
 
-        // Aggiungi la nuova prenotazione (Book) all'array di books
-        List<Book> booksList = registeredUser.getBooks();
+    // Autenticazione dell'utente (login)
+    public boolean authenticate(LoginRequest loginRequest, HttpSession session) {
+        Optional<RegisteredUser> userOptional = registeredUserRepository.findByUsername(loginRequest.getUsername());
 
-        booksList.add(newBook);  // Aggiungi il nuovo oggetto Book
+        if (userOptional.isPresent()) {
+            RegisteredUser user = userOptional.get();
 
-        // Salva la sistemazione aggiornata con la nuova prenotazione
-        registeredUser.setBooks(booksList);
-
-        return registeredUserRepository.save(registeredUser);  // Salva l'accommodation aggiornata
+            if (user.getPassword().equals(loginRequest.getPassword())) {
+                session.setAttribute("user", user); // Salva l'utente nella sessione
+                return true;
+            }
+        }
+        return false;
     }
-
-    public RegisteredUser addAccommodationToRegisteredUser(String username, Accommodation accommodation) {
-        // Trova la sistemazione esistente
-        RegisteredUser registeredUser = registeredUserRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with user: " + username));
-
-        // Aggiungi la nuova prenotazione (Book) all'array di books
-        List <Integer> accommodationList = registeredUser.getAccommodations();
-
-        accommodationList.add(accommodation.getAccommodationId());  // Aggiungi il nuovo oggetto Book
-
-        // Salva la sistemazione aggiornata con la nuova prenotazione
-        registeredUser.setAccommodations(accommodationList);
-
-        return registeredUserRepository.save(registeredUser);  // Salva l'accommodation aggiornata
-    }
-
-    public List<Book> getPendingBookings(String username) {
-        // Otteniamo direttamente le prenotazioni pendenti dell'utente
-        return registeredUserRepository.findPendingBooksByUsername(username);
-    }
-    public List<Integer> getAccommodationByUsername(String username){
-        return registeredUserRepository.findAccommodationByUsername(username);
-    }
-
-    public boolean deleteAccommodation(String username, Integer accommodationId) {
-        // Rimuovi l'accommodation dalla collezione Accommodation
-        boolean aux = accommodationService.deleteAccommodationById(accommodationId);
-
-        // Rimuovi l'ID dell'accommodation dal campo 'accommodations' del RegisteredUser
-         boolean aux1 = registeredUserRepository.removeAccommodationFromUser(username, accommodationId);
-         return aux & aux1;
-    }
-*/
 }

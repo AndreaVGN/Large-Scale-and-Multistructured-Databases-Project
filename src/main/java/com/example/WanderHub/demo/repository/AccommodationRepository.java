@@ -22,18 +22,10 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     boolean existsByAccommodationId(int accommodationId);
     void deleteByAccommodationId(int accommodationId);
 
-    // Ricerca sistemazioni disponibili in base a parametri
-   /* @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }", fields = "{ 'books': 0, 'reviews': 0, '_id': 0, 'latitude': 0, 'longitude': 0, 'maxGuestSize': 0, 'occupiedDates':0, 'address': 0,'place': 0, 'facilities': 0,'photos': 0  }")
-
-    List<Accommodation> findAvailableAccommodations(String city, int minGuests, String startDate, String endDate);*/
 
     @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
             fields = "{ 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] }, '_id': 0 }")
     List<Accommodation> findAvailableAccommodations(String city, int minGuests, String startDate, String endDate);
-
-
-
-
 
 
     // Recupera tutte le recensioni dell'accommodation dato un accommodationId
