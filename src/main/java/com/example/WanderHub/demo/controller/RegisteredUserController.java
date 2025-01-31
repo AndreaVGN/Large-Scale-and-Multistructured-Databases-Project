@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.controller;
 
+import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
@@ -58,7 +59,6 @@ public class RegisteredUserController {
         return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
     }
 
-
     @PutMapping("/{username}/addAccommodation")
     public ResponseEntity<RegisteredUser> addAccommodation(
             @PathVariable String username,
@@ -81,5 +81,15 @@ public class RegisteredUserController {
         List<Review> reviews = accommodationService.getReviewsByUsername(username);
         return ResponseEntity.ok(reviews);
     }
+
+    @GetMapping("/{username}/accommodations")
+    public ResponseEntity<List<Accommodation>> getAccommodationsByHost(@PathVariable String username) {
+        List<Accommodation> accommodations = accommodationService.findAccommodationsByHost(username);
+        return new ResponseEntity<>(accommodations, HttpStatus.OK);
+    }
+
+
+
+
 
 }

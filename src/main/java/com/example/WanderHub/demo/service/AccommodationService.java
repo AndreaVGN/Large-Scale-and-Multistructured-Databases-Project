@@ -10,9 +10,7 @@ import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -165,5 +163,11 @@ public class AccommodationService {
         // Ritorna l'utente aggiornato (o altre informazioni se necessario)
         return registeredUser;
     }
+
+    public List<Accommodation> findAccommodationsByHost(String hostUsername) {
+        // Esegui la query per trovare tutte le case del proprietario
+        return accommodationRepository.findByHostUsername(hostUsername);
+    }
+
 }
 

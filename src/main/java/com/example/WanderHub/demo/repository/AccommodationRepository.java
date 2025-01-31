@@ -57,5 +57,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
     @Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'reviews': 1}")
     List<Accommodation> viewAccommodationReviews(String username,int id);
+
+
 }
 
