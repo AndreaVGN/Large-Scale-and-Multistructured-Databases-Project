@@ -74,8 +74,8 @@ public class RegisteredUserController {
     }
 
     @GetMapping("/{username}/reviews")
-    public ResponseEntity<List<Review>> getReviewsByAccommodationId(@PathVariable String username) {
-        List<Review> accommodationReviews = accommodationService.getReviewsByUsername(username);
+    public ResponseEntity<List<Accommodation>> getReviewsByUsername(@PathVariable String username) {
+        List<Accommodation> accommodationReviews = accommodationService.getReviewsByUsername(username);
         return new ResponseEntity<>(accommodationReviews, HttpStatus.OK);
     }
 /*

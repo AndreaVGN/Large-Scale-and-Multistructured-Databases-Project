@@ -95,8 +95,22 @@ public class AccommodationService {
     public List<Accommodation> findAccommodationsByUsername(String username) {
         return accommodationRepository.findByHostUsername(username);
     }
-    public List<Review> getReviewsByUsername(String username){
+    /*
+    public List<Accommodation> getReviewsByUsername(String username){
         return accommodationRepository.findReviewsByUsername(username);
+    }*/
+
+    public List<Accommodation> getReviewsByUsername(String username) {
+        try {
+            System.out.println(" Eseguendo query per utente: " + username);
+            List<Accommodation> result = accommodationRepository.findReviewsByUsername(username);
+            System.out.println(" Risultato query: " + result);
+            return result;
+        } catch (Exception e) {
+            System.err.println(" Errore durante la query MongoDB: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Errore nel recupero delle recensioni", e);
+        }
     }
     public List<Book> getPendingBookings(String username) {
         return accommodationRepository.findPendingBookingsByUsername(username);

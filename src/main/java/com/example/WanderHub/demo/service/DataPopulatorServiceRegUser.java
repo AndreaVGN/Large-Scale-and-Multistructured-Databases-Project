@@ -1,3 +1,4 @@
+/*
 package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.RegisteredUser;  // Modifica il nome del modello
@@ -11,40 +12,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;  // Importa il modulo per il supporto delle date Java 8
-/*
-@Service
-public class DataPopulatorServiceRegUser {
 
-    @Autowired
-    private RegisteredUserRepository registeredUserRepository;  // Usa il repository giusto per RegisteredUser
-
-    @PostConstruct
-    public void populateData() {
-        try {
-            // Crea l'ObjectMapper
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            // Registrazione del modulo per il supporto delle date Java 8
-            objectMapper.registerModule(new JavaTimeModule());
-
-            // Abilita il supporto per numeri come NaN
-            objectMapper.enable(DeserializationFeature.ACCEPT_FLOAT_AS_INT);
-
-            System.out.println("Dati popolati correttamentejhvvghgvhvhgvhvgh nella collection RegisteredUser.");
-
-            // Carica il file JSON e mappa correttamente in una lista di oggetti RegisteredUser
-            List<RegisteredUser> users = objectMapper.readValue(new FileReader("C:/Users/andre/Downloads/popolamentoUsernamesFinale.json"),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, RegisteredUser.class));
-
-            // Salva i dati nel database
-            registeredUserRepository.saveAll(users);
-
-            System.out.println("Dati popolati correttamente nella collection RegisteredUser.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}*/
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -124,3 +92,4 @@ public class DataPopulatorServiceRegUser {
     }
 }
 
+*/

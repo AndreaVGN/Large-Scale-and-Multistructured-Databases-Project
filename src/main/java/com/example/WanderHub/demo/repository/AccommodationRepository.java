@@ -37,9 +37,10 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
     @Aggregation(pipeline = {
             "{ $match: { 'reviews.username': ?0 } }",
-            "{ $project: { _id: 0, accommodationId: 0, type:0,description:0,facilities:0,place:0,city:0,address:0,hostUsername:0,latidude:0,longitude:0,occupiedDates:0,maxGuestsSize:0,costPerNight:0,averageRate:0,photos:0,books:0, reviews: { $filter: { input: '$reviews', as: 'review', cond: { $eq: ['$$review.username', ?0] } } } } }"
+            "{ $project: { 'reviews': { $filter: { input: '$reviews', as: 'review', cond: { $eq: ['$$review.username', ?0] } } } } }"
     })
-    List<Review> findReviewsByUsername(String username);
+    List<Accommodation> findReviewsByUsername(String username);
+
 
     @Aggregation(pipeline = {
             "{ $project: { _id:0, accommodationId:0, description:0, facilities:0,place:0,city:0,address:0,hostUsername:0,latitude:0,longitude:0,occupiedDates:0,maxGuestsSize:0,costPerNight:0,averageRate:0,photos:0,reviews:0,books:{$filter: { input:'$books', as: 'book', cond: { $gt: [ { $toDate: { $arrayElemAt: ['$$book.occupiedDates.start', 0] } },new Date() ] } } } } }{ $match: { 'books': { $ne: [] } } }"
