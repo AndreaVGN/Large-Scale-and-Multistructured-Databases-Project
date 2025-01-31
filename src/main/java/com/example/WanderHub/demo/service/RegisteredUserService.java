@@ -59,6 +59,7 @@ public class RegisteredUserService {
             // Confronta l'hash della password
             if (user.getPassword().equals(hashedInputPassword)) {
                 session.setAttribute("user", user); // Salva l'utente nella sessione
+                System.out.println(session.getAttribute("user"));
                 return true;
             }
             return false;

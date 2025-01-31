@@ -1,10 +1,13 @@
 package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
+import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.service.AccommodationService;
+import com.example.WanderHub.demo.utility.SessionUtils;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +22,29 @@ public class AccommodationController {
     @Autowired
     private AccommodationService accommodationService;
 
-    // Creazione di una nuova sistemazione con books embeddata
-    @PostMapping
-    public Accommodation createAccommodation(@RequestBody Accommodation accommodation) {
-        return accommodationService.createAccommodation(accommodation);
+    @PostMapping("/{username}")
+    public ResponseEntity<?> createAccommodation(@PathVariable String username, @RequestBody Accommodation accommodation, HttpSession session) {
+        // Controlla se l'utente nella sessione è lo stesso che è nel path
+        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+        if (loggedInUser == null) {
+            System.out.println("No user in session");
+        } else {
+            System.out.println("User in session: " + loggedInUser.getUsername());
+        }
+        System.out.println(loggedInUser + "\n\n\n\n\n\n\n");
+
+        if (loggedInUser == null || !loggedInUser.getUsername().equals(username)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
+
+        // Logica per creare l'accommodation
+        accommodationService.createAccommodation(accommodation);
+        return ResponseEntity.ok("Accommodation creata con successo");
     }
 
-   @GetMapping("/{id}")
+
+    @GetMapping("/{id}")
     public AccommodationDTO getAccommodationById(@PathVariable int id) {
         return accommodationService.getAccommodationById(id);
    }
