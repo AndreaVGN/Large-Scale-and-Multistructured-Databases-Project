@@ -62,8 +62,6 @@ public class AccommodationController {
 
         RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
 
-
-
         if (loggedInUser == null || !loggedInUser.getUsername().equals(hostUsername)) {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
@@ -80,9 +78,22 @@ public class AccommodationController {
     public List<Book> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id) {
         return accommodationService.viewAccommodationBooks(hostUsername,id);
     }
+
     @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
-    public List<ReviewDTO> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id) {
-        return accommodationService.viewAccommodationReviews(hostUsername, id);
+    public ResponseEntity<?> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id, HttpSession session) {
+        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+
+
+        if (loggedInUser == null || !loggedInUser.getUsername().equals(hostUsername)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
+
+        List<ReviewDTO> reviews = accommodationService.viewAccommodationReviews(hostUsername, id);
+        if (reviews.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna reviews trovata per questo host.");
+        }
+        return ResponseEntity.ok(reviews);
     }
 
     // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
