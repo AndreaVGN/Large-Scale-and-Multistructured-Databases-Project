@@ -150,5 +150,20 @@ public class AccommodationService {
         // Salva l'accommodation aggiornata nel database
         return accommodationRepository.save(accommodation);
     }
+
+    public RegisteredUser addAccommodationToRegisteredUser(String username, Accommodation accommodation) {
+        // Trova l'utente per username
+        RegisteredUser registeredUser = registeredUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Imposta l'host dell'accommodation come l'utente
+        accommodation.setHostUsername(registeredUser.getUsername());
+
+        // Salva la nuova accommodation nella collection Accommodation
+        accommodationRepository.save(accommodation);
+
+        // Ritorna l'utente aggiornato (o altre informazioni se necessario)
+        return registeredUser;
+    }
 }
 

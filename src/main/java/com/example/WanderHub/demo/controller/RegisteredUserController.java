@@ -58,7 +58,6 @@ public class RegisteredUserController {
         return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
     }
 
-    /*
 
     @PutMapping("/{username}/addAccommodation")
     public ResponseEntity<RegisteredUser> addAccommodation(
@@ -70,7 +69,7 @@ public class RegisteredUserController {
 
         return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
     }
-*/
+
     @GetMapping("/{username}/pendingBookings")
     public ResponseEntity<List<Book>> getPendingBookings(@PathVariable String username) {
         List<Book> pendingBookings = accommodationService.getPendingBookings(username);
