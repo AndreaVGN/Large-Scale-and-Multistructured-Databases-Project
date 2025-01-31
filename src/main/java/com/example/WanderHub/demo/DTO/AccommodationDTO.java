@@ -23,7 +23,7 @@ public class AccommodationDTO {
     private List<Review> reviews;  // Aggiunto campo reviews
 
     // Costruttore privato per forzare l'uso dei metodi factory
-    public AccommodationDTO(int accommodationId, String description, String type, String city, String hostUsername,
+    private AccommodationDTO(int accommodationId, String description, String type, String city, String hostUsername,
                             int costPerNight, double averageRate, List<String> photos, List<Review> reviews) {
         this.accommodationId = accommodationId;
         this.description = description;

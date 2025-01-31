@@ -154,8 +154,11 @@ public class AccommodationService {
     }
 
 
-    public List<Accommodation> viewAccommodationBooks(String hostUsername, int id){
-        return accommodationRepository.viewAccommodationBooks(hostUsername,id);
+    public List<Book> viewAccommodationBooks(String hostUsername, int id){
+        List<BookDTO> booksDTOList = accommodationRepository.viewAccommodationBooks(hostUsername,id);
+        return booksDTOList.stream()
+                .flatMap(dto -> dto.getBooks().stream())
+                .collect(Collectors.toList());
     }
 
     public ReviewDTO viewAccommodationReviews(String hostUsername, int id) {

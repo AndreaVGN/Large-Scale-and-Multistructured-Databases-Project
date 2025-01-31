@@ -48,7 +48,7 @@ public class AccommodationController {
     }
 
     @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
-    public List<Accommodation> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id) {
+    public List<Book> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id) {
         return accommodationService.viewAccommodationBooks(hostUsername,id);
     }
     @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
