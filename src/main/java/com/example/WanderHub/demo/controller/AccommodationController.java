@@ -26,12 +26,8 @@ public class AccommodationController {
     public ResponseEntity<?> createAccommodation(@PathVariable String username, @RequestBody Accommodation accommodation, HttpSession session) {
         // Controlla se l'utente nella sessione è lo stesso che è nel path
         RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
-        if (loggedInUser == null) {
-            System.out.println("No user in session");
-        } else {
-            System.out.println("User in session: " + loggedInUser.getUsername());
-        }
-        System.out.println(loggedInUser + "\n\n\n\n\n\n\n");
+
+
 
         if (loggedInUser == null || !loggedInUser.getUsername().equals(username)) {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
@@ -62,8 +58,22 @@ public class AccommodationController {
 
 
     @GetMapping("/{hostUsername}/viewOwnAccommodations")
-    public List<AccommodationDTO> viewOwnAccommodations(@PathVariable String hostUsername) {
-        return accommodationService.findOwnAccommodations(hostUsername);
+    public ResponseEntity<?> viewOwnAccommodations(@PathVariable String hostUsername, HttpSession session) {
+
+        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+
+
+
+        if (loggedInUser == null || !loggedInUser.getUsername().equals(hostUsername)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
+        List<AccommodationDTO> accommodations = accommodationService.findOwnAccommodations(hostUsername);
+        if (accommodations.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna accommodation trovata per questo host.");
+        }
+
+        return ResponseEntity.ok(accommodations);
     }
 
     @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
