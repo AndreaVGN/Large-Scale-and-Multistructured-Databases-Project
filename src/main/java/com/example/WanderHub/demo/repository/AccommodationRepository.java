@@ -69,7 +69,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<BookDTO> viewAccommodationBooks(String username,int id);
 
     @Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'reviews': 1}")
-    List<Accommodation> viewAccommodationReviews(String username,int id);
+    List<ReviewDTO> viewAccommodationReviews(String username,int id);
 
 
 }

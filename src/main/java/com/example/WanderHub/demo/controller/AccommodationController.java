@@ -52,7 +52,7 @@ public class AccommodationController {
         return accommodationService.viewAccommodationBooks(hostUsername,id);
     }
     @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
-    public ReviewDTO viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id) {
+    public List<ReviewDTO> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id) {
         return accommodationService.viewAccommodationReviews(hostUsername, id);
     }
 

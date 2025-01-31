@@ -161,19 +161,9 @@ public class AccommodationService {
                 .collect(Collectors.toList());
     }
 
-    public ReviewDTO viewAccommodationReviews(String hostUsername, int id) {
+    public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
         // Recupera la lista di Accommodation corrispondente alla query
-        List<Accommodation> accommodations = accommodationRepository.viewAccommodationReviews(hostUsername, id);
-
-        // Estrai tutte le recensioni da ogni Accommodation
-        List<Review> reviews = accommodations.stream()
-                .flatMap(accommodation -> accommodation.getReviews().stream())  // Estrai recensioni da ogni Accommodation
-                .collect(Collectors.toList());
-
-        System.out.println(reviews);
-
-        // Crea e restituisci il ReviewDTO con la lista di recensioni
-        return new ReviewDTO(reviews);
+        return accommodationRepository.viewAccommodationReviews(hostUsername, id);
     }
 
 
