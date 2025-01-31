@@ -1,4 +1,5 @@
 package com.example.WanderHub.demo.repository;
+import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.Review;
@@ -50,10 +51,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
                     "{ $gt: [ { $toDate: { $arrayElemAt: ['$$book.occupiedDates.start', 0] } }, new Date() ] } " +
                     "] } } } } }"
     })
-
-
-
-    List<Accommodation> findPendingBookingsByUsername(String username);
+    List<BookDTO> findPendingBookingsByUsername(String username);
 
     @Query(value = "{'hostUsername': ?0}", fields = "{'_id': 1, 'description': 1}")
     List<Accommodation> findOwnAccommodations(String username);

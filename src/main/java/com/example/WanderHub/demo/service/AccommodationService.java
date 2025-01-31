@@ -1,4 +1,5 @@
 package com.example.WanderHub.demo.service;
+import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
@@ -117,8 +118,14 @@ public class AccommodationService {
                 .flatMap(dto -> dto.getReviews().stream())
                 .collect(Collectors.toList());
     }
-    public List<Accommodation> getPendingBookings(String username) {
-        return accommodationRepository.findPendingBookingsByUsername(username);
+    public List<Book> getPendingBookings(String username) {
+        // Ottieni ReviewDTO dal repository
+        List<BookDTO> booksDTOList = accommodationRepository.findPendingBookingsByUsername(username);
+
+        // Estrai le recensioni da ogni ReviewDTO e restituisci una lista di Review
+        return booksDTOList.stream()
+                .flatMap(dto -> dto.getBooks().stream())
+                .collect(Collectors.toList());
     }
     public List<Accommodation> findOwnAccommodations(String hostUsername){
         return accommodationRepository.findOwnAccommodations(hostUsername);
