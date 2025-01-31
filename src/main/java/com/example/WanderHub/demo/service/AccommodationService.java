@@ -115,7 +115,7 @@ public class AccommodationService {
                 .flatMap(dto -> dto.getReviews().stream())
                 .collect(Collectors.toList());
     }
-    public List<Book> getPendingBookings(String username) {
+    public List<Accommodation> getPendingBookings(String username) {
         return accommodationRepository.findPendingBookingsByUsername(username);
     }
     public List<Accommodation> findOwnAccommodations(String hostUsername){

@@ -44,10 +44,16 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
 
     @Aggregation(pipeline = {
-            "{ $project: { _id:0, accommodationId:0, description:0, facilities:0,place:0,city:0,address:0,hostUsername:0,latitude:0,longitude:0,occupiedDates:0,maxGuestsSize:0,costPerNight:0,averageRate:0,photos:0,reviews:0,books:{$filter: { input:'$books', as: 'book', cond: { $gt: [ { $toDate: { $arrayElemAt: ['$$book.occupiedDates.start', 0] } },new Date() ] } } } } }{ $match: { 'books': { $ne: [] } } }"
-
+            "{ $match: { 'books': { $elemMatch: { 'username': ?0, 'occupiedDates.start': { $exists: true, $not: { $size: 0 }, $gt: new Date() } } } } }",
+            "{ $project: { books: { $filter: { input: '$books', as: 'book', cond: { $and: [ " +
+                    "{ $eq: ['$$book.username', ?0] }, " +
+                    "{ $gt: [ { $toDate: { $arrayElemAt: ['$$book.occupiedDates.start', 0] } }, new Date() ] } " +
+                    "] } } } } }"
     })
-    List<Book> findPendingBookingsByUsername(String username);
+
+
+
+    List<Accommodation> findPendingBookingsByUsername(String username);
 
     @Query(value = "{'hostUsername': ?0}", fields = "{'_id': 1, 'description': 1}")
     List<Accommodation> findOwnAccommodations(String username);
