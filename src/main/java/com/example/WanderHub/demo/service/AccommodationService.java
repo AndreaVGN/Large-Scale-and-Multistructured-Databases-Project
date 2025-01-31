@@ -1,4 +1,5 @@
 package com.example.WanderHub.demo.service;
+import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.RegisteredUser;
@@ -52,9 +53,28 @@ public class AccommodationService {
         return false;
     }
 
+    /*
     // Ricerca sistemazioni disponibili
     public List<Accommodation> findAvailableAccommodations(String city, int minGuests, String startDate, String endDate) {
         return accommodationRepository.findAvailableAccommodations(city, minGuests, startDate, endDate);
+    }*/
+
+    public List<AccommodationDTO> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate) {
+        // Esegui la query che restituisce le Accommodation
+        List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, startDate, endDate);
+
+        // Mappa le Accommodation in DTO
+        return accommodations.stream()
+                .map(accommodation -> new AccommodationDTO(
+                        accommodation.getDescription(),
+                        accommodation.getType(),
+                        accommodation.getCity(),
+                        accommodation.getHostUsername(),
+                        accommodation.getCostPerNight(),
+                        accommodation.getAverageRate(),
+                        accommodation.getPhotos() != null && accommodation.getPhotos().length > 0 ? accommodation.getPhotos()[0] : null
+                ))
+                .collect(Collectors.toList());
     }
 
     public Accommodation addBookToAccommodation(int accommodationId, Book newBook) {

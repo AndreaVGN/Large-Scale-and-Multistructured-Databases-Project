@@ -1,4 +1,5 @@
 package com.example.WanderHub.demo.controller;
+import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
@@ -22,12 +23,15 @@ public class AccommodationController {
     public Accommodation createAccommodation(@RequestBody Accommodation accommodation) {
         return accommodationService.createAccommodation(accommodation);
     }
+
    @GetMapping("/{id}")
     public Accommodation getAccommodationById(@PathVariable int id) {
         return accommodationService.getAccommodationById(id);
    }
+
+
     @GetMapping("/findAccommodations")
-    public List<Accommodation> findAccommodations(
+    public List<AccommodationDTO> findAccommodations(
             @RequestParam("city") String place,
             @RequestParam("guestSize") int minGuests,
             @RequestParam("startDate") String startDate,
@@ -35,6 +39,8 @@ public class AccommodationController {
 
         return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate);
     }
+
+
     @GetMapping("/{hostUsername}/viewOwnAccommodations")
     public List<Accommodation> viewOwnAccommodations(@PathVariable String hostUsername) {
         return accommodationService.findOwnAccommodations(hostUsername);
@@ -46,6 +52,20 @@ public class AccommodationController {
     @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
     public List<Accommodation> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id) {
         return accommodationService.viewAccommodationReviews(hostUsername,id);
+    }
+
+    // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
+    @PutMapping("/{accommodationId}/addBook")
+    public ResponseEntity<Accommodation> addBookToAccommodation(
+            @PathVariable int accommodationId,
+            @RequestBody Book newBook) {
+
+        String username = "Unregistered User";
+        // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
+        Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(username, accommodationId, newBook);
+
+        // Restituisci l'accommodation aggiornata
+        return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
     }
 }
 
