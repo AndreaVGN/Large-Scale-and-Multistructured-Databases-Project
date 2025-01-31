@@ -35,11 +35,16 @@ public class AccommodationService {
         return accommodationRepository.save(accommodation);
     }
 
-    // Recupero sistemazione per id
-    public Accommodation getAccommodationById(int accommodationId) {
-        return accommodationRepository.findByAccommodationId(accommodationId)
+    public AccommodationDTO getAccommodationById(int accommodationId) {
+        // Recupera l'accommodation dal repository
+        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
+
+        // Usa il factory method per ottenere un DTO con i dati completi (tranne books)
+        return AccommodationDTO.fromFullDetails(accommodation);
     }
+
+
     public List<Accommodation> getAccommodationsByCity(String city) {
         return accommodationRepository.findAccommodationsByCity(city);
     }

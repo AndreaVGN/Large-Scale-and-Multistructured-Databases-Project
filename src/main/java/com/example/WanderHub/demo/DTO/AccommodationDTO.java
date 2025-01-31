@@ -3,6 +3,8 @@ package com.example.WanderHub.demo.DTO;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.example.WanderHub.demo.model.Review;
+
+import java.util.Arrays;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)  // Include solo campi non nulli
@@ -17,12 +19,12 @@ public class AccommodationDTO {
     private int costPerNight;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) // Esclude numeri se valgono 0 o 0.0
     private double averageRate;
-    private String photo;
+    private List<String> photos;  // Cambiato per supportare sia una singola foto che una lista di foto
     private List<Review> reviews;  // Aggiunto campo reviews
 
     // Costruttore privato per forzare l'uso dei metodi factory
     public AccommodationDTO(int accommodationId, String description, String type, String city, String hostUsername,
-                             int costPerNight, double averageRate, String photo, List<Review> reviews) {
+                            int costPerNight, double averageRate, List<String> photos, List<Review> reviews) {
         this.accommodationId = accommodationId;
         this.description = description;
         this.type = type;
@@ -30,37 +32,39 @@ public class AccommodationDTO {
         this.hostUsername = hostUsername;
         this.costPerNight = costPerNight;
         this.averageRate = averageRate;
-        this.photo = photo;
+        this.photos = photos;
         this.reviews = reviews;
     }
 
-    private AccommodationDTO(int accommodationId, String description) {
-        this.accommodationId = accommodationId;
-        this.description = description;
-    }
-
     // Costruttore per il caso con informazioni limitate (senza ID e reviews)
-    private AccommodationDTO(String description, String type, String city, String hostUsername, int costPerNight, double averageRate, String photo) {
+    private AccommodationDTO(String description, String type, String city, String hostUsername, int costPerNight, double averageRate, List<String> photos) {
         this.description = description;
         this.type = type;
         this.city = city;
         this.hostUsername = hostUsername;
         this.costPerNight = costPerNight;
         this.averageRate = averageRate;
-        this.photo = photo;
+        this.photos = photos;
     }
 
     public static AccommodationDTO fromBasicInfo(Accommodation accommodation) {
-        AccommodationDTO prova =  new AccommodationDTO(
+        return new AccommodationDTO(
                 accommodation.getAccommodationId(),
-                accommodation.getDescription()
+                accommodation.getDescription(),
+                null, // Non necessario per il caso basic
+                null, // Non necessario per il caso basic
+                null, // Non necessario per il caso basic
+                0,   // Non necessario per il caso basic
+                0.0, // Non necessario per il caso basic
+                null, // Non necessario per il caso basic
+                null  // Non necessario per il caso basic
         );
-        System.out.println(prova.averageRate);
-        return prova;
     }
 
     // 🔹 Factory method per dati completi (tranne books)
     public static AccommodationDTO fromFullDetails(Accommodation accommodation) {
+        List<String> allPhotos = (accommodation.getPhotos() != null && accommodation.getPhotos().length > 0) ?
+                Arrays.asList(accommodation.getPhotos()) : null;  // Restituisce tutte le foto come lista
         return new AccommodationDTO(
                 accommodation.getAccommodationId(),
                 accommodation.getDescription(),
@@ -69,13 +73,15 @@ public class AccommodationDTO {
                 accommodation.getHostUsername(),
                 accommodation.getCostPerNight(),
                 accommodation.getAverageRate(),
-                (accommodation.getPhotos() != null && accommodation.getPhotos().length > 0) ? accommodation.getPhotos()[0] : null,
+                allPhotos,
                 accommodation.getReviews()
         );
     }
 
     // 🔹 Factory method per il caso con solo alcuni dati
     public static AccommodationDTO fromLimitedInfo(Accommodation accommodation) {
+        String firstPhoto = (accommodation.getPhotos() != null && accommodation.getPhotos().length > 0) ?
+                accommodation.getPhotos()[0] : null; // Restituisce la prima foto o null
         return new AccommodationDTO(
                 accommodation.getDescription(),
                 accommodation.getType(),
@@ -83,7 +89,7 @@ public class AccommodationDTO {
                 accommodation.getHostUsername(),
                 accommodation.getCostPerNight(),
                 accommodation.getAverageRate(),
-                (accommodation.getPhotos() != null && accommodation.getPhotos().length > 0) ? accommodation.getPhotos()[0] : null
+                firstPhoto != null ? Arrays.asList(firstPhoto) : null  // Converte la singola foto in lista
         );
     }
 
@@ -109,8 +115,8 @@ public class AccommodationDTO {
     public double getAverageRate() { return averageRate; }
     public void setAverageRate(double averageRate) { this.averageRate = averageRate; }
 
-    public String getPhoto() { return photo; }
-    public void setPhoto(String photo) { this.photo = photo; }
+    public List<String> getPhotos() { return photos; }
+    public void setPhotos(List<String> photos) { this.photos = photos; }
 
     public List<Review> getReviews() { return reviews; }
     public void setReviews(List<Review> reviews) { this.reviews = reviews; }
