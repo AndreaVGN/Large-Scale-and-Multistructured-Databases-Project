@@ -63,19 +63,12 @@ public class AccommodationService {
         // Esegui la query che restituisce le Accommodation
         List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, startDate, endDate);
 
-        // Mappa le Accommodation in DTO
+        // Mappa le Accommodation in DTO utilizzando il factory method
         return accommodations.stream()
-                .map(accommodation -> new AccommodationDTO(
-                        accommodation.getDescription(),
-                        accommodation.getType(),
-                        accommodation.getCity(),
-                        accommodation.getHostUsername(),
-                        accommodation.getCostPerNight(),
-                        accommodation.getAverageRate(),
-                        accommodation.getPhotos() != null && accommodation.getPhotos().length > 0 ? accommodation.getPhotos()[0] : null
-                ))
+                .map(AccommodationDTO::fromLimitedInfo)
                 .collect(Collectors.toList());
     }
+
 
     public Accommodation addBookToAccommodation(int accommodationId, Book newBook) {
         // Trova la sistemazione esistente
@@ -137,6 +130,8 @@ public class AccommodationService {
         return reviewsDTOList.stream()
                 .flatMap(dto -> dto.getReviews().stream())
                 .collect(Collectors.toList());
+
+
     }
     public List<Book> getPendingBookings(String username) {
         // Ottieni ReviewDTO dal repository
@@ -147,9 +142,18 @@ public class AccommodationService {
                 .flatMap(dto -> dto.getBooks().stream())
                 .collect(Collectors.toList());
     }
-    public List<Accommodation> findOwnAccommodations(String hostUsername){
-        return accommodationRepository.findOwnAccommodations(hostUsername);
+
+    public List<AccommodationDTO> findOwnAccommodations(String hostUsername) {
+        // Esegui la query per ottenere le accommodations del proprietario
+        List<Accommodation> accommodations = accommodationRepository.findOwnAccommodations(hostUsername);
+
+        // Mappa le accommodations in DTO utilizzando il factory method
+        return accommodations.stream()
+                .map(AccommodationDTO::fromBasicInfo)
+                .collect(Collectors.toList());
     }
+
+
     public List<Accommodation> viewAccommodationBooks(String hostUsername, int id){
         return accommodationRepository.viewAccommodationBooks(hostUsername,id);
     }

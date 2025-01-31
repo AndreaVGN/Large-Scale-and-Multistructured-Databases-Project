@@ -42,9 +42,10 @@ public class AccommodationController {
 
 
     @GetMapping("/{hostUsername}/viewOwnAccommodations")
-    public List<Accommodation> viewOwnAccommodations(@PathVariable String hostUsername) {
+    public List<AccommodationDTO> viewOwnAccommodations(@PathVariable String hostUsername) {
         return accommodationService.findOwnAccommodations(hostUsername);
     }
+
     @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
     public List<Accommodation> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id) {
         return accommodationService.viewAccommodationBooks(hostUsername,id);
