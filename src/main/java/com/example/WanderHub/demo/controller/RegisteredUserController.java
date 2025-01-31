@@ -7,6 +7,7 @@ import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.RegisteredUserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,34 +60,41 @@ public class RegisteredUserController {
         return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
     }
 
-    @PutMapping("/{username}/addAccommodation")
-    public ResponseEntity<RegisteredUser> addAccommodation(
-            @PathVariable String username,
-            @RequestBody Accommodation accommodation) {
 
-        RegisteredUser updatedRegisteredUser = accommodationService.addAccommodationToRegisteredUser(username, accommodation);
-
-
-        return new ResponseEntity<>(updatedRegisteredUser, HttpStatus.OK);
-    }
 
     @GetMapping("/{username}/pendingBookings")
-    public ResponseEntity<List<Book>> getPendingBookings(@PathVariable String username) {
+    public ResponseEntity<?> getPendingBookings(@PathVariable String username, HttpSession session) {
+
+        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+
+        if (loggedInUser == null || !loggedInUser.getUsername().equals(username)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
         List<Book> pendingBookings = accommodationService.getPendingBookings(username);
-        return new ResponseEntity<>(pendingBookings, HttpStatus.OK);
+        if (pendingBookings.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna accommodation trovata per questo host.");
+        }
+        return ResponseEntity.ok(pendingBookings);
     }
 
     @GetMapping("/{username}/reviews")
-    public ResponseEntity<List<Review>> getReviewsByUsername(@PathVariable String username) {
+    public ResponseEntity<?> getReviewsByUsername(@PathVariable String username, HttpSession session) {
+
+        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+
+        if (loggedInUser == null || !loggedInUser.getUsername().equals(username)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
         List<Review> reviews = accommodationService.getReviewsByUsername(username);
+        if (reviews.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna accommodation trovata per questo host.");
+        }
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/{username}/accommodations")
-    public ResponseEntity<List<Accommodation>> getAccommodationsByHost(@PathVariable String username) {
-        List<Accommodation> accommodations = accommodationService.findAccommodationsByHost(username);
-        return new ResponseEntity<>(accommodations, HttpStatus.OK);
-    }
+
 
     @DeleteMapping("/{username}/accommodation/{accommodationId}/book/{bookId}")
     public ResponseEntity<String> deleteBook(
