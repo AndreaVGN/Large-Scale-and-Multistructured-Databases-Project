@@ -48,16 +48,25 @@ public class RegisteredUserController {
 
     // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
     @PutMapping("/{accommodationId}/addBook/{username}")
-    public ResponseEntity<Accommodation> addBookToAccommodation(
+    public ResponseEntity<?> addBookToAccommodation(
             @PathVariable String username,
             @PathVariable int accommodationId,
-            @RequestBody Book newBook) {
+            @RequestBody Book newBook,
+            HttpSession session) {
+
+        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+
+
+        if (loggedInUser == null || !loggedInUser.getUsername().equals(username)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
 
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
         Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(username, accommodationId, newBook);
 
-        // Restituisci l'accommodation aggiornata
-        return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
+        return new ResponseEntity<>("Prenotazione avvenuta con successo!", HttpStatus.OK);
+
     }
 
 
