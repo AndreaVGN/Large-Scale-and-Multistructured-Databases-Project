@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class Book {
@@ -160,6 +161,13 @@ public class Book {
 
     public void setGuestLastNames(String[] guestLastNames) {
         this.guestLastNames = guestLastNames;
+    }
+
+    public LocalDate getStartDate() {
+        if (occupiedDates != null && !occupiedDates.isEmpty()) {
+            return occupiedDates.get(0).getStart(); // Restituisce la data di inizio del primo periodo
+        }
+        return null; // Se non ci sono periodi, restituisci null
     }
 
     // Metodo toString

@@ -10,6 +10,8 @@ import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -167,6 +169,39 @@ public class AccommodationService {
     public List<Accommodation> findAccommodationsByHost(String hostUsername) {
         // Esegui la query per trovare tutte le case del proprietario
         return accommodationRepository.findByHostUsername(hostUsername);
+    }
+
+    public boolean deleteBook(String username, int accommodationId, int bookId) {
+        // Trova l'accommodation per id e host
+        Optional<Accommodation> accommodationOptional = accommodationRepository.findById(accommodationId);
+
+        if (accommodationOptional.isPresent()) {
+            Accommodation accommodation = accommodationOptional.get();
+
+            // Trova la prenotazione da eliminare
+            Optional<Book> bookOptional = accommodation.getBooks().stream()
+                    .filter(book -> book.getBookId() == bookId && book.getUsername().equals(username))
+                    .findFirst();
+
+            if (bookOptional.isPresent()) {
+                Book book = bookOptional.get();
+
+                // Calcola la differenza in giorni tra la data di inizio della prenotazione e la data odierna
+                long daysUntilStart = ChronoUnit.DAYS.between(LocalDate.now(), book.getStartDate());
+
+                if (daysUntilStart > 2) {
+                    // Se sono passati più di 2 giorni, la prenotazione non può essere cancellata
+                    return false;
+                }
+
+                // Rimuovi la prenotazione dalla lista e aggiorna la sistemazione
+                accommodation.getBooks().remove(book);
+                accommodationRepository.save(accommodation);
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
