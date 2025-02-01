@@ -70,7 +70,6 @@ public class RegisteredUserController {
     }
 
 
-
     @GetMapping("/{username}/pendingBookings")
     public ResponseEntity<?> getPendingBookings(@PathVariable String username, HttpSession session) {
 
@@ -102,7 +101,6 @@ public class RegisteredUserController {
         }
         return ResponseEntity.ok(reviews);
     }
-
 
 
     @DeleteMapping("/{username}/accommodation/{accommodationId}/book/{bookId}")

@@ -173,114 +173,6 @@ public class AccommodationService {
         }
     }
 
-    /*
-    public Accommodation addBookToAccommodation(int accommodationId, Book newBook) {
-        try {
-            // Validate the fields of the Book
-            if (newBook.getBookId() == 0) {
-                throw new IllegalArgumentException("Book ID cannot be zero.");
-            }
-
-            // Check if the occupiedDates is null
-            if (newBook.getOccupiedDates() == null) {
-                throw new IllegalArgumentException("Start and end dates cannot be null.");
-            }
-
-            // Validate that the required fields are not empty
-            if (newBook.getUsername() == null || newBook.getUsername().isEmpty()) {
-                throw new IllegalArgumentException("Username cannot be empty.");
-            }
-            if (newBook.getEmail() == null || newBook.getEmail().isEmpty()) {
-                throw new IllegalArgumentException("Email cannot be empty.");
-            }
-            if (newBook.getBirthPlace() == null || newBook.getBirthPlace().isEmpty()) {
-                throw new IllegalArgumentException("Birthplace cannot be empty.");
-            }
-            if (newBook.getAddress() == null || newBook.getAddress().isEmpty()) {
-                throw new IllegalArgumentException("Address cannot be empty.");
-            }
-            if (newBook.getCardNumber() == null || newBook.getCardNumber().isEmpty()) {
-                throw new IllegalArgumentException("Card number cannot be empty.");
-            }
-            if (newBook.getExpiryDate() == null || newBook.getExpiryDate().isEmpty()) {
-                throw new IllegalArgumentException("Expiry date cannot be empty.");
-            }
-            if (newBook.getCVV() == 0) {
-                throw new IllegalArgumentException("CVV cannot be zero.");
-            }
-
-            // Check if guestFirstNames and guestLastNames arrays have the same length
-            if (newBook.getGuestFirstNames() != null && newBook.getGuestLastNames() != null) {
-                if (newBook.getGuestFirstNames().length != newBook.getGuestLastNames().length) {
-                    throw new IllegalArgumentException("The number of guest first names and last names must be the same.");
-                }
-            }
-
-            // Find the existing accommodation by its ID
-            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
-
-            // Add the new booking (Book) to the accommodation's list of books
-            List<Book> booksList = accommodation.getBooks();
-            booksList.add(newBook);  // Add the new Book object
-
-            // Save the updated accommodation with the new booking
-            accommodation.setBooks(booksList);
-
-            return accommodationRepository.save(accommodation);  // Save the updated accommodation
-
-        } catch (DataAccessException e) {
-            // Handle database errors (connection, query, etc.)
-            throw new RuntimeException("Error occurred while saving the booking to the database: " + e.getMessage(), e);
-        } catch (IllegalArgumentException e) {
-            // Handle validation errors for fields
-            throw new IllegalArgumentException("Validation error: " + e.getMessage(), e);
-        } catch (Exception e) {
-            // Handle any other general errors
-            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
-        }
-    }*/
-
-    /*
-    public Accommodation addReviewToAccommodation(int accommodationId, Review newReview) {
-        // Trova la sistemazione esistente
-        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
-
-        // Recupera la lista delle recensioni e aggiungi la nuova recensione
-        List<Review> reviewsList = accommodation.getReviews();
-
-        if (reviewsList == null) {
-            reviewsList = new ArrayList<>();  // Crea una nuova lista se null
-        }
-
-        reviewsList.add(newReview);  // Aggiungi la nuova recensione
-
-        // Imposta la lista aggiornata di recensioni
-        accommodation.setReviews(reviewsList);
-
-        // Salva l'accommodation aggiornata con la nuova recensione
-        return accommodationRepository.save(accommodation);
-    }*/
-
-    /*
-    public List<Review> getReviewsByAccommodationId(String username, int accommodationId) {
-        // Trova l'accommodation per ID
-        Accommodation accommodation = accommodationRepository.findReviewsByAccommodationId(accommodationId);
-        System.out.println("Reviews: " + accommodation);
-        // Se l'accommodation esiste, restituisci le recensioni
-        List<Review> reviews = accommodation.getReviews();
-        System.out.println("Reviews: " + reviews); // Stampa le recensioni
-        return reviews;
-    }*/
-
-    /*
-
-    public List<Accommodation> findAccommodationsByUsername(String username) {
-        return accommodationRepository.findByHostUsername(username);
-    }*/
-
-
     public List<Review> getReviewsByUsername(String username) {
         try {
             // Ottieni ReviewDTO dal repository
@@ -447,58 +339,42 @@ public class AccommodationService {
         }
     }
 
-    public RegisteredUser addAccommodationToRegisteredUser(String username, Accommodation accommodation) {
-        // Trova l'utente per username
-        RegisteredUser registeredUser = registeredUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Imposta l'host dell'accommodation come l'utente
-        accommodation.setHostUsername(registeredUser.getUsername());
-
-        // Salva la nuova accommodation nella collection Accommodation
-        accommodationRepository.save(accommodation);
-
-        // Ritorna l'utente aggiornato (o altre informazioni se necessario)
-        return registeredUser;
-    }
-
-    public List<Accommodation> findAccommodationsByHost(String hostUsername) {
-        // Esegui la query per trovare tutte le case del proprietario
-        return accommodationRepository.findByHostUsername(hostUsername);
-    }
-
     public boolean deleteBook(String username, int accommodationId, int bookId) {
-        // Trova l'accommodation per id e host
-        Optional<Accommodation> accommodationOptional = accommodationRepository.findById(accommodationId);
+        try {
+            // Retrieve the accommodation by its ID
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-        if (accommodationOptional.isPresent()) {
-            Accommodation accommodation = accommodationOptional.get();
+            // Retrieve the customer user who is performing the cancellation
+            RegisteredUser customer = registeredUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-            // Trova la prenotazione da eliminare
-            Optional<Book> bookOptional = accommodation.getBooks().stream()
+            // Find the booking to be deleted
+            Book bookToDelete = accommodation.getBooks().stream()
                     .filter(book -> book.getBookId() == bookId && book.getUsername().equals(username))
-                    .findFirst();
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-            if (bookOptional.isPresent()) {
-                Book book = bookOptional.get();
+            // Calculate the difference in days between the booking start date and today
+            long daysUntilStart = ChronoUnit.DAYS.between(LocalDate.now(), bookToDelete.getStartDate());
 
-                // Calcola la differenza in giorni tra la data di inizio della prenotazione e la data odierna
-                long daysUntilStart = ChronoUnit.DAYS.between(LocalDate.now(), book.getStartDate());
-
-                if (daysUntilStart > 2) {
-                    // Se sono passati più di 2 giorni, la prenotazione non può essere cancellata
-                    return false;
-                }
-
-                // Rimuovi la prenotazione dalla lista e aggiorna la sistemazione
-                accommodation.getBooks().remove(book);
+            if (daysUntilStart <= 2) {
+                // Remove the booking from the list and update the accommodation
+                accommodation.getBooks().remove(bookToDelete);
                 accommodationRepository.save(accommodation);
                 return true;
+            } else {
+                throw new IllegalArgumentException("Booking cannot be canceled as it exceeds the allowed cancellation period.");
             }
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Database error occurred while deleting the booking: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Validation error: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
         }
-
-        return false;
     }
+
 
 }
 
