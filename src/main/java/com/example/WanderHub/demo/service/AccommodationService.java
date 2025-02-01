@@ -9,6 +9,7 @@ import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
+import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -102,19 +103,21 @@ public class AccommodationService {
         }
     }
 
-
     public AccommodationDTO getAccommodationById(int accommodationId) {
-        // Recupera l'accommodation dal repository
-        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
+        try {
+            // Trova la sistemazione esistente
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
 
-        // Usa il factory method per ottenere un DTO con i dati completi (tranne books)
-        return AccommodationDTO.fromFullDetails(accommodation);
-    }
-
-
-    public List<Accommodation> getAccommodationsByCity(String city) {
-        return accommodationRepository.findAccommodationsByCity(city);
+            // Use the factory method to create a DTO with complete data (excluding books)
+            return AccommodationDTO.fromFullDetails(accommodation);
+        } catch (DataAccessException e) {
+            // Handles database-related errors (connection, query, etc.)
+            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Handles other generic errors
+            throw new RuntimeException("Error while retrieving accommodation: " + e.getMessage(), e);
+        }
     }
 
     // Eliminazione di una sistemazione
@@ -137,23 +140,75 @@ public class AccommodationService {
                 .collect(Collectors.toList());
     }
 
-
+    /*
     public Accommodation addBookToAccommodation(int accommodationId, Book newBook) {
-        // Trova la sistemazione esistente
-        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
+        try {
+            // Validate the fields of the Book
+            if (newBook.getBookId() == 0) {
+                throw new IllegalArgumentException("Book ID cannot be zero.");
+            }
 
-        // Aggiungi la nuova prenotazione (Book) all'array di books
-        List<Book> booksList = accommodation.getBooks();
+            // Check if the occupiedDates is null
+            if (newBook.getOccupiedDates() == null) {
+                throw new IllegalArgumentException("Start and end dates cannot be null.");
+            }
 
-        booksList.add(newBook);  // Aggiungi il nuovo oggetto Book
+            // Validate that the required fields are not empty
+            if (newBook.getUsername() == null || newBook.getUsername().isEmpty()) {
+                throw new IllegalArgumentException("Username cannot be empty.");
+            }
+            if (newBook.getEmail() == null || newBook.getEmail().isEmpty()) {
+                throw new IllegalArgumentException("Email cannot be empty.");
+            }
+            if (newBook.getBirthPlace() == null || newBook.getBirthPlace().isEmpty()) {
+                throw new IllegalArgumentException("Birthplace cannot be empty.");
+            }
+            if (newBook.getAddress() == null || newBook.getAddress().isEmpty()) {
+                throw new IllegalArgumentException("Address cannot be empty.");
+            }
+            if (newBook.getCardNumber() == null || newBook.getCardNumber().isEmpty()) {
+                throw new IllegalArgumentException("Card number cannot be empty.");
+            }
+            if (newBook.getExpiryDate() == null || newBook.getExpiryDate().isEmpty()) {
+                throw new IllegalArgumentException("Expiry date cannot be empty.");
+            }
+            if (newBook.getCVV() == 0) {
+                throw new IllegalArgumentException("CVV cannot be zero.");
+            }
 
-        // Salva la sistemazione aggiornata con la nuova prenotazione
-        accommodation.setBooks(booksList);
+            // Check if guestFirstNames and guestLastNames arrays have the same length
+            if (newBook.getGuestFirstNames() != null && newBook.getGuestLastNames() != null) {
+                if (newBook.getGuestFirstNames().length != newBook.getGuestLastNames().length) {
+                    throw new IllegalArgumentException("The number of guest first names and last names must be the same.");
+                }
+            }
 
-        return accommodationRepository.save(accommodation);  // Salva l'accommodation aggiornata
-    }
+            // Find the existing accommodation by its ID
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
 
+            // Add the new booking (Book) to the accommodation's list of books
+            List<Book> booksList = accommodation.getBooks();
+            booksList.add(newBook);  // Add the new Book object
+
+            // Save the updated accommodation with the new booking
+            accommodation.setBooks(booksList);
+
+            return accommodationRepository.save(accommodation);  // Save the updated accommodation
+
+        } catch (DataAccessException e) {
+            // Handle database errors (connection, query, etc.)
+            throw new RuntimeException("Error occurred while saving the booking to the database: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            // Handle validation errors for fields
+            throw new IllegalArgumentException("Validation error: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Handle any other general errors
+            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
+        }
+    }*/
+
+    /*
     public Accommodation addReviewToAccommodation(int accommodationId, Review newReview) {
         // Trova la sistemazione esistente
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
@@ -173,8 +228,9 @@ public class AccommodationService {
 
         // Salva l'accommodation aggiornata con la nuova recensione
         return accommodationRepository.save(accommodation);
-    }
+    }*/
 
+    /*
     public List<Review> getReviewsByAccommodationId(String username, int accommodationId) {
         // Trova l'accommodation per ID
         Accommodation accommodation = accommodationRepository.findReviewsByAccommodationId(accommodationId);
@@ -183,11 +239,13 @@ public class AccommodationService {
         List<Review> reviews = accommodation.getReviews();
         System.out.println("Reviews: " + reviews); // Stampa le recensioni
         return reviews;
-    }
+    }*/
+
+    /*
 
     public List<Accommodation> findAccommodationsByUsername(String username) {
         return accommodationRepository.findByHostUsername(username);
-    }
+    }*/
 
 
     public List<Review> getReviewsByUsername(String username) {
@@ -237,6 +295,56 @@ public class AccommodationService {
 
     // Metodo per aggiungere una prenotazione alla casa scelta dal cliente
     public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
+        try {
+            // Validate the fields of the Book
+            if (newBook.getBookId() == 0) {
+                throw new IllegalArgumentException("Book ID cannot be zero.");
+            }
+
+            // Check if the occupiedDates is null
+            if (newBook.getOccupiedDates() == null) {
+                throw new IllegalArgumentException("Start and end dates cannot be null.");
+            }
+
+            // Check that the start date is before the end date
+            OccupiedPeriod period = newBook.getOccupiedDates().get(0);; // Assuming there’s only one period
+            if (period.getStart() == null || period.getEnd() == null) {
+                throw new IllegalArgumentException("Start and end dates cannot be null.");
+            }
+            if (!period.getStart().isBefore(period.getEnd())) {
+                throw new IllegalArgumentException("Start date must be before the end date.");
+            }
+
+            // Validate that the required fields are not empty
+            if (newBook.getUsername() == null || newBook.getUsername().isEmpty()) {
+                throw new IllegalArgumentException("Username cannot be empty.");
+            }
+            if (newBook.getEmail() == null || newBook.getEmail().isEmpty()) {
+                throw new IllegalArgumentException("Email cannot be empty.");
+            }
+            if (newBook.getBirthPlace() == null || newBook.getBirthPlace().isEmpty()) {
+                throw new IllegalArgumentException("Birthplace cannot be empty.");
+            }
+            if (newBook.getAddress() == null || newBook.getAddress().isEmpty()) {
+                throw new IllegalArgumentException("Address cannot be empty.");
+            }
+            if (newBook.getCardNumber() == null || newBook.getCardNumber().isEmpty()) {
+                throw new IllegalArgumentException("Card number cannot be empty.");
+            }
+            if (newBook.getExpiryDate() == null || newBook.getExpiryDate().isEmpty()) {
+                throw new IllegalArgumentException("Expiry date cannot be empty.");
+            }
+            if (newBook.getCVV() == 0) {
+                throw new IllegalArgumentException("CVV cannot be zero.");
+            }
+
+            // Check if guestFirstNames and guestLastNames arrays have the same length
+            if (newBook.getGuestFirstNames() != null && newBook.getGuestLastNames() != null) {
+                if (newBook.getGuestFirstNames().length != newBook.getGuestLastNames().length) {
+                    throw new IllegalArgumentException("The number of guest first names and last names must be the same.");
+                }
+            }
+
         // Recupera l'accommodation tramite il suo ID
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new RuntimeException("Accommodation not found"));
@@ -254,6 +362,16 @@ public class AccommodationService {
 
         // Salva l'accommodation aggiornata nel database
         return accommodationRepository.save(accommodation);
+        } catch (DataAccessException e) {
+            // Handle database errors (connection, query, etc.)
+            throw new RuntimeException("Error occurred while saving the booking to the database: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            // Handle validation errors for fields
+            throw new IllegalArgumentException("Validation error: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Handle any other general errors
+            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
+        }
     }
 
     public RegisteredUser addAccommodationToRegisteredUser(String username, Accommodation accommodation) {

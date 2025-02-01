@@ -77,7 +77,6 @@ public class AccommodationController {
         RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
 
 
-
         if (loggedInUser == null || !loggedInUser.getUsername().equals(hostUsername)) {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
