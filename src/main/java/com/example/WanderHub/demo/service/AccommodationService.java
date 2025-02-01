@@ -10,6 +10,7 @@ import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,10 +31,77 @@ public class AccommodationService {
         this.registeredUserRepository = registeredUserRepository;
     }
 
-    // Creazione di una nuova sistemazione
     public Accommodation createAccommodation(Accommodation accommodation) {
-        return accommodationRepository.save(accommodation);
+        try {
+            // Check if description is not empty
+            if (accommodation.getDescription() == null || accommodation.getDescription().trim().isEmpty()) {
+                throw new IllegalArgumentException("Description cannot be empty.");
+            }
+
+            // Check if type is not empty
+            if (accommodation.getType() == null || accommodation.getType().trim().isEmpty()) {
+                throw new IllegalArgumentException("Accommodation type cannot be empty.");
+            }
+
+            // Check if facilities are not empty
+            if (accommodation.getFacilities() == null) {
+                throw new IllegalArgumentException("At least one facility must be selected.");
+            }
+
+            // Check if place, city, and address are not empty
+            if (accommodation.getPlace() == null || accommodation.getPlace().trim().isEmpty() ||
+                    accommodation.getCity() == null || accommodation.getCity().trim().isEmpty() ||
+                    accommodation.getAddress() == null || accommodation.getAddress().trim().isEmpty()) {
+                throw new IllegalArgumentException("Place, city, and address cannot be empty.");
+            }
+
+            // Check if host username is not empty
+            if (accommodation.getHostUsername() == null || accommodation.getHostUsername().trim().isEmpty()) {
+                throw new IllegalArgumentException("Host username cannot be empty.");
+            }
+
+            // Check if latitude and longitude are not empty
+            if (accommodation.getLatitude() < -90 || accommodation.getLatitude() > 90 ||
+                    accommodation.getLongitude() < -180 || accommodation.getLongitude() > 180
+            ) {
+                throw new IllegalArgumentException("Latitude and longitude out of range");
+            }
+
+            // Check if occupied dates are not empty
+            if (!accommodation.getOccupiedDates().isEmpty()) {
+                throw new IllegalArgumentException("Occupied date must be empty.");
+            }
+
+            // Check if max guest size is not empty or zero
+            if (accommodation.getMaxGuestSize() <= 0) {
+                throw new IllegalArgumentException("Max guest size must be greater than zero.");
+            }
+
+            // Check if cost per night is not empty or zero
+            if (accommodation.getCostPerNight() <= 0) {
+                throw new IllegalArgumentException("Cost per night must be greater than zero.");
+            }
+
+            // Check if photos are not empty and at least one is in a valid format
+            if (accommodation.getPhotos() == null || accommodation.getPhotos().length == 0) {
+                throw new IllegalArgumentException("At least one valid photo must be provided.");
+            }
+
+            // If all checks pass, save the accommodation in the database
+            return accommodationRepository.save(accommodation);
+
+        } catch (IllegalArgumentException e) {
+            // Re-throw the exception to notify the controller
+            throw e;
+        } catch (DataAccessException e) {
+            // Handle database-related errors (connection, query, etc.)
+            throw new RuntimeException("Error while saving accommodation to the database: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Handle other generic errors
+            throw new RuntimeException("Error while creating accommodation: " + e.getMessage(), e);
+        }
     }
+
 
     public AccommodationDTO getAccommodationById(int accommodationId) {
         // Recupera l'accommodation dal repository

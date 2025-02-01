@@ -27,16 +27,14 @@ public class AccommodationController {
         // Controlla se l'utente nella sessione è lo stesso che è nel path
         RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
 
-
-
         if (loggedInUser == null || !loggedInUser.getUsername().equals(username)) {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
         // Logica per creare l'accommodation
         accommodationService.createAccommodation(accommodation);
-        return ResponseEntity.ok("Accommodation creata con successo");
+        return ResponseEntity.ok("Accommodation created successfully");
     }
 
 
