@@ -15,6 +15,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -131,13 +132,45 @@ public class AccommodationService {
 
 
     public List<AccommodationDTO> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate) {
-        // Esegui la query che restituisce le Accommodation
-        List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, startDate, endDate);
+        try {
+            // Validazione dei parametri
+            if (minGuests <= 0) {
+                throw new IllegalArgumentException("guestSize must be greater than zero.");
+            }
+            if(place==null || place.trim().isEmpty()){
+                throw new IllegalArgumentException("place cannot be null.");
+            }
+            if (startDate == null || startDate.trim().isEmpty()) {
+                throw new IllegalArgumentException("startDate cannot be empty.");
+            }
+            if (endDate == null || endDate.trim().isEmpty()) {
+                throw new IllegalArgumentException("endDate cannot be empty.");
+            }
 
-        // Mappa le Accommodation in DTO utilizzando il factory method
-        return accommodations.stream()
-                .map(AccommodationDTO::fromLimitedInfo)
-                .collect(Collectors.toList());
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+
+            if (end.isBefore(start)) {
+                throw new IllegalArgumentException("endDate cannot be before startDate.");
+            }
+
+            // Esegui la query che restituisce le Accommodation
+            List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, startDate, endDate);
+
+            // Mappa le Accommodation in DTO utilizzando il factory method
+            return accommodations.stream()
+                    .map(AccommodationDTO::fromLimitedInfo)
+                    .collect(Collectors.toList());
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Use YYYY-MM-DD format", e);
+        }catch (DataAccessException e) {
+            // Handle database-related errors (connection, query, etc.)
+            throw new RuntimeException("Error while getting available accommodations from database: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while searching for available accommodations.", e);
+        }
     }
 
     /*
@@ -249,47 +282,87 @@ public class AccommodationService {
 
 
     public List<Review> getReviewsByUsername(String username) {
-        // Ottieni ReviewDTO dal repository
-        List<ReviewDTO> reviewsDTOList = accommodationRepository.findReviewsByUsername(username);
+        try {
+            // Ottieni ReviewDTO dal repository
+            List<ReviewDTO> reviewsDTOList = accommodationRepository.findReviewsByUsername(username);
 
-        // Estrai le recensioni da ogni ReviewDTO e restituisci una lista di Review
-        return reviewsDTOList.stream()
-                .flatMap(dto -> dto.getReviews().stream())
-                .collect(Collectors.toList());
+            // Estrai le recensioni da ogni ReviewDTO e restituisci una lista di Review
+            return reviewsDTOList.stream()
+                    .flatMap(dto -> dto.getReviews().stream())
+                    .collect(Collectors.toList());
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException("Error while retrieving reviews from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving reviews from the database: ", e);
+        }
 
 
     }
     public List<Book> getPendingBookings(String username) {
-        // Ottieni ReviewDTO dal repository
-        List<BookDTO> booksDTOList = accommodationRepository.findPendingBookingsByUsername(username);
+        try {
+            // Ottieni ReviewDTO dal repository
+            List<BookDTO> booksDTOList = accommodationRepository.findPendingBookingsByUsername(username);
 
-        // Estrai le recensioni da ogni ReviewDTO e restituisci una lista di Review
-        return booksDTOList.stream()
-                .flatMap(dto -> dto.getBooks().stream())
-                .collect(Collectors.toList());
+            // Estrai le recensioni da ogni ReviewDTO e restituisci una lista di Review
+            return booksDTOList.stream()
+                    .flatMap(dto -> dto.getBooks().stream())
+                    .collect(Collectors.toList());
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException("Error while retrieving pending bookings from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
+        }
     }
 
     public List<AccommodationDTO> findOwnAccommodations(String hostUsername) {
-        // Esegui la query per ottenere le accommodations del proprietario
-        List<Accommodation> accommodations = accommodationRepository.findOwnAccommodations(hostUsername);
+        try {
+            // Esegui la query per ottenere le accommodations del proprietario
+            List<Accommodation> accommodations = accommodationRepository.findOwnAccommodations(hostUsername);
 
-        // Mappa le accommodations in DTO utilizzando il factory method
-        return accommodations.stream()
-                .map(AccommodationDTO::fromBasicInfo)
-                .collect(Collectors.toList());
+            // Mappa le accommodations in DTO utilizzando il factory method
+            return accommodations.stream()
+                    .map(AccommodationDTO::fromBasicInfo)
+                    .collect(Collectors.toList());
+        }
+        catch(DataAccessException e){
+            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving accommodation: ", e);
+        }
     }
 
 
     public List<Book> viewAccommodationBooks(String hostUsername, int id){
-        List<BookDTO> booksDTOList = accommodationRepository.viewAccommodationBooks(hostUsername,id);
-        return booksDTOList.stream()
-                .flatMap(dto -> dto.getBooks().stream())
-                .collect(Collectors.toList());
+        try {
+            List<BookDTO> booksDTOList = accommodationRepository.viewAccommodationBooks(hostUsername, id);
+            return booksDTOList.stream()
+                    .flatMap(dto -> dto.getBooks().stream())
+                    .collect(Collectors.toList());
+        }
+        catch(DataAccessException e){
+            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving accommodation: ", e);
+        }
     }
 
     public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
-        // Recupera la lista di Accommodation corrispondente alla query
-        return accommodationRepository.viewAccommodationReviews(hostUsername, id);
+        try {
+            // Recupera la lista di Accommodation corrispondente alla query
+            return accommodationRepository.viewAccommodationReviews(hostUsername, id);
+        }
+        catch(DataAccessException e){
+            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving accommodation: ", e);
+        }
     }
 
 
