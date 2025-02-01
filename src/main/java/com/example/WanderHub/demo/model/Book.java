@@ -13,16 +13,11 @@ public class Book {
     private int bookId;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
     private String username;
-    private boolean transactionState;
     private String email;
     private String birthPlace;
     private String address;
     private int addressNumber;
     private String birthDate;
-    private String cardNumber;
-    @JsonProperty("CVV")
-    private int CVV;
-    private String expiryDate;
     private String[] guestFirstNames; // Array dei nomi degli ospiti
     private String[] guestLastNames; // Array dei cognomi degli ospiti
 
@@ -30,21 +25,16 @@ public class Book {
     public Book() {}
 
     // Costruttore con parametri
-    public Book(int bookId, List<OccupiedPeriod> occupiedDates, String username, boolean transactionState, String email,
-                String birthPlace, String address, int addressNumber, String birthDate, String cardNumber,
-                int CVV, String expiryDate, String[] guestFirstNames, String[] guestLastNames) {
+    public Book(int bookId, List<OccupiedPeriod> occupiedDates, String username, String email,
+                String birthPlace, String address, int addressNumber, String birthDate, String[] guestFirstNames, String[] guestLastNames) {
         this.bookId = bookId;
         this.occupiedDates = occupiedDates;
         this.username = username;
-        this.transactionState = transactionState;
         this.email = email;
         this.birthPlace = birthPlace;
         this.address = address;
         this.addressNumber = addressNumber;
         this.birthDate = birthDate;
-        this.cardNumber = cardNumber;
-        this.CVV = CVV;
-        this.expiryDate = expiryDate;
         this.guestFirstNames = guestFirstNames;
         this.guestLastNames = guestLastNames;
     }
@@ -73,16 +63,6 @@ public class Book {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-
-
-    public boolean getTransactionState() {
-        return transactionState;
-    }
-
-    public void setTransactionState(boolean transactionState) {
-        this.transactionState = transactionState;
     }
 
     public String getEmail() {
@@ -125,30 +105,6 @@ public class Book {
         this.birthDate = birthDate;
     }
 
-    public String getCardNumber() {
-        return cardNumber;
-    }
-
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
-    }
-
-    public int getCVV() {
-        return CVV;
-    }
-
-    public void setCVV(int CVV) {
-        this.CVV = CVV;
-    }
-
-    public String getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(String expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
     public String[] getGuestFirstNames() {
         return guestFirstNames;
     }
@@ -179,15 +135,11 @@ public class Book {
                 "bookId=" + bookId +
                 ", occupiedDates=" + occupiedDates +
                 ", username='" + username + '\'' +
-                ", transactionState=" + transactionState +
                 ", email='" + email + '\'' +
                 ", birthPlace='" + birthPlace + '\'' +
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
                 ", birthDate='" + birthDate + '\'' +
-                ", cardNumber='" + cardNumber + '\'' +
-                ", CVV=" + CVV +
-                ", expiryDate='" + expiryDate + '\'' +
                 ", guestFirstNames=" + Arrays.toString(guestFirstNames) +
                 ", guestLastNames=" + Arrays.toString(guestLastNames) +
                 '}';

@@ -1,11 +1,14 @@
 package com.example.WanderHub.demo.utility;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 
 public class OccupiedPeriod {
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate start; // Data di inizio occupazione
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate end;   // Data di fine occupazione
 
     // Costruttori

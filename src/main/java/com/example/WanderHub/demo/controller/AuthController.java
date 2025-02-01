@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.controller;
 
 import com.example.WanderHub.demo.DTO.AuthRequest;
+import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,18 +30,19 @@ public class AuthController {
         }
     }
 
-    /*
-    // Endpoint per la registrazione (Signup)
-    @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody RegisterRequest registerRequest) {
-        boolean isUserCreated = registeredUserService.register(registerRequest);
 
-        if (isUserCreated) {
+    // Endpoint for user signup
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody RegisteredUser registerUser) {
+        try {
+            registeredUserService.createRegisteredUser(registerUser);
             return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
-    }*/
+    }
 
     // Endpoint per il logout
     @PostMapping("/logout")

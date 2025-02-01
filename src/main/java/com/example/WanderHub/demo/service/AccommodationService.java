@@ -10,6 +10,7 @@ import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
+import com.example.WanderHub.demo.utility.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -35,59 +36,8 @@ public class AccommodationService {
 
     public Accommodation createAccommodation(Accommodation accommodation) {
         try {
-            // Check if description is not empty
-            if (accommodation.getDescription() == null || accommodation.getDescription().trim().isEmpty()) {
-                throw new IllegalArgumentException("Description cannot be empty.");
-            }
 
-            // Check if type is not empty
-            if (accommodation.getType() == null || accommodation.getType().trim().isEmpty()) {
-                throw new IllegalArgumentException("Accommodation type cannot be empty.");
-            }
-
-            // Check if facilities are not empty
-            if (accommodation.getFacilities() == null) {
-                throw new IllegalArgumentException("At least one facility must be selected.");
-            }
-
-            // Check if place, city, and address are not empty
-            if (accommodation.getPlace() == null || accommodation.getPlace().trim().isEmpty() ||
-                    accommodation.getCity() == null || accommodation.getCity().trim().isEmpty() ||
-                    accommodation.getAddress() == null || accommodation.getAddress().trim().isEmpty()) {
-                throw new IllegalArgumentException("Place, city, and address cannot be empty.");
-            }
-
-            // Check if host username is not empty
-            if (accommodation.getHostUsername() == null || accommodation.getHostUsername().trim().isEmpty()) {
-                throw new IllegalArgumentException("Host username cannot be empty.");
-            }
-
-            // Check if latitude and longitude are not empty
-            if (accommodation.getLatitude() < -90 || accommodation.getLatitude() > 90 ||
-                    accommodation.getLongitude() < -180 || accommodation.getLongitude() > 180
-            ) {
-                throw new IllegalArgumentException("Latitude and longitude out of range");
-            }
-
-            // Check if occupied dates are not empty
-            if (!accommodation.getOccupiedDates().isEmpty()) {
-                throw new IllegalArgumentException("Occupied date must be empty.");
-            }
-
-            // Check if max guest size is not empty or zero
-            if (accommodation.getMaxGuestSize() <= 0) {
-                throw new IllegalArgumentException("Max guest size must be greater than zero.");
-            }
-
-            // Check if cost per night is not empty or zero
-            if (accommodation.getCostPerNight() <= 0) {
-                throw new IllegalArgumentException("Cost per night must be greater than zero.");
-            }
-
-            // Check if photos are not empty and at least one is in a valid format
-            if (accommodation.getPhotos() == null || accommodation.getPhotos().length == 0) {
-                throw new IllegalArgumentException("At least one valid photo must be provided.");
-            }
+            Validator.validateAccommodation(accommodation);
 
             // If all checks pass, save the accommodation in the database
             return accommodationRepository.save(accommodation);
@@ -245,6 +195,7 @@ public class AccommodationService {
     public List<Book> viewAccommodationBooks(String hostUsername, int id){
         try {
             List<BookDTO> booksDTOList = accommodationRepository.viewAccommodationBooks(hostUsername, id);
+
             return booksDTOList.stream()
                     .flatMap(dto -> dto.getBooks().stream())
                     .collect(Collectors.toList());
@@ -290,6 +241,8 @@ public class AccommodationService {
     // Metodo per aggiungere una prenotazione alla casa scelta dal cliente
     public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
         try {
+            Validator.validateBook(newBook);
+            /*
             // Validate the fields of the Book
             if (newBook.getBookId() == 0) {
                 throw new IllegalArgumentException("Book ID cannot be zero.");
@@ -322,25 +275,15 @@ public class AccommodationService {
             if (newBook.getAddress() == null || newBook.getAddress().isEmpty()) {
                 throw new IllegalArgumentException("Address cannot be empty.");
             }
-            if (newBook.getCardNumber() == null || newBook.getCardNumber().isEmpty()) {
-                throw new IllegalArgumentException("Card number cannot be empty.");
-            }
-            if (newBook.getExpiryDate() == null || newBook.getExpiryDate().isEmpty()) {
-                throw new IllegalArgumentException("Expiry date cannot be empty.");
-            }
-            if (newBook.getCVV() == 0) {
-                throw new IllegalArgumentException("CVV cannot be zero.");
-            }
 
             // Check if guestFirstNames and guestLastNames arrays have the same length
             if (newBook.getGuestFirstNames() != null && newBook.getGuestLastNames() != null) {
                 if (newBook.getGuestFirstNames().length != newBook.getGuestLastNames().length) {
                     throw new IllegalArgumentException("The number of guest first names and last names must be the same.");
-                }
-            }
+                }*/
 
         // Recupera l'accommodation tramite il suo ID
-        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
         // Recupera l'utente cliente che sta facendo la prenotazione

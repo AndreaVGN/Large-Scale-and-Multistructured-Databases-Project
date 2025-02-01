@@ -10,6 +10,7 @@ import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 
 import com.example.WanderHub.demo.utility.Password;
+import com.example.WanderHub.demo.utility.Validator;
 import jdk.jfr.Registered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,23 @@ public class RegisteredUserService {
     @Autowired
     private AccommodationService accommodationService;
 
-    // Creazione di una nuova sistemazione
-    public RegisteredUser createRegisteredUser(RegisteredUser registeredUser) {
-        return registeredUserRepository.save(registeredUser);
+    @Autowired
+    public RegisteredUserService(RegisteredUserRepository registeredUserRepository) {
+        this.registeredUserRepository = registeredUserRepository;
+    }
+
+    public RegisteredUser createRegisteredUser(RegisteredUser registerUser) {
+        if (registeredUserRepository.findByUsername(registerUser.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        Validator.validateUser(registerUser);
+
+        String hashedPassword = Password.hashPassword(registerUser.getPassword());
+
+        registerUser.setPassword(hashedPassword);
+
+        return registeredUserRepository.save(registerUser);
     }
 
     public RegisteredUser getRegisteredUserByUsername(String username) {

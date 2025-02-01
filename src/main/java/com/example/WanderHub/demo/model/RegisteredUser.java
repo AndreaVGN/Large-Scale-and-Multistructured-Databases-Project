@@ -16,15 +16,10 @@ public class RegisteredUser {
     private String surname;
     private String birthPlace;
     private String email;
-    @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private String birthDate; // Campo per la data di nascita
     private String address;
     private int addressNumber;
-    private String cardNumber; // Campo per il numero della carta
-    @JsonProperty("CVV")
-    private int CVV; // Campo per il CVV della carta
-    private String expiryDate; // Campo per la data di scadenza della carta
-    private String paymentToken;
 
     // Costruttore vuoto
     public RegisteredUser() {
@@ -37,7 +32,7 @@ public class RegisteredUser {
 
     // Costruttore completo
     public RegisteredUser(String username, String password, String name, String surname, String birthPlace, String email,
-                          String birthDate, String address, int addressNumber, String cardNumber, int CVV, String expiryDate, String paymentToken) {
+                          String birthDate, String address, int addressNumber) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -47,10 +42,6 @@ public class RegisteredUser {
         this.birthDate = birthDate;
         this.address = address;
         this.addressNumber = addressNumber;
-        this.cardNumber = cardNumber;
-        this.CVV = CVV;
-        this.expiryDate = expiryDate;
-        this.paymentToken = paymentToken;
     }
 
     // Getters e Setters
@@ -126,38 +117,6 @@ public class RegisteredUser {
         this.addressNumber = addressNumber;
     }
 
-    public String getCardNumber() {
-        return cardNumber;
-    }
-
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
-    }
-
-    public int getCVV() {
-        return CVV;
-    }
-
-    public void setCVV(int CVV) {
-        this.CVV = CVV;
-    }
-
-    public String getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(String expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
-    public String getPaymentToken() {
-        return paymentToken;
-    }
-
-    public void setPaymentToken(String paymentToken) {
-        this.paymentToken = paymentToken;
-    }
-
     // Override del metodo toString
     @Override
     public String toString() {
@@ -171,10 +130,6 @@ public class RegisteredUser {
                 ", birthDate=" + birthDate +
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
-                ", cardNumber='" + cardNumber + '\'' +
-                ", CVV=" + CVV +
-                ", expiryDate='" + expiryDate + '\'' +
-                ", paymentToken='" + paymentToken + '\'' +
                 '}';
     }
 }

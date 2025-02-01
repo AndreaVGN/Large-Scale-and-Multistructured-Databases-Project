@@ -62,17 +62,14 @@ public class RegisteredUserController {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
         }
+
         newBook.setUsername(loggedInUser.getUsername());
         newBook.setEmail(loggedInUser.getEmail());
         newBook.setBirthPlace(loggedInUser.getBirthPlace());
         newBook.setAddress(loggedInUser.getAddress());
         newBook.setAddressNumber(loggedInUser.getAddressNumber());
 
-        // Recupera i dati della carta di pagamento
         newBook.setBirthDate(loggedInUser.getBirthDate());
-        newBook.setCardNumber(loggedInUser.getCardNumber());
-        newBook.setCVV(loggedInUser.getCVV());
-        newBook.setExpiryDate(loggedInUser.getExpiryDate());
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
         Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(username, accommodationId, newBook);
 
