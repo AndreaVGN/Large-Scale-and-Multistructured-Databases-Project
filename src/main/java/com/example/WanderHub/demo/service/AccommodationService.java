@@ -192,7 +192,7 @@ public class AccommodationService {
 
 
     }
-    public List<Book> getPendingBookings(String username) {
+    /*public List<Book> getPendingBookings(String username) {
         try {
             // Ottieni ReviewDTO dal repository
             List<BookDTO> booksDTOList = accommodationRepository.findPendingBookingsByUsername(username);
@@ -208,7 +208,20 @@ public class AccommodationService {
         catch (Exception e) {
             throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
         }
+    }*/
+    public List<BookDTO> getPendingBookings(String username) {
+        try {
+            // Ottieni BookDTO dal repository
+            return accommodationRepository.findPendingBookingsByUsername(username);
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException("Error while retrieving pending bookings from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
+        }
     }
+
 
     public List<AccommodationDTO> findOwnAccommodations(String hostUsername) {
         try {
@@ -243,6 +256,22 @@ public class AccommodationService {
             throw new RuntimeException("Error while retrieving accommodation: ", e);
         }
     }
+    /*public List<BookDTO> viewAccommodationBooks(String hostUsername, int id) {
+        try {
+            List<Book> books = accommodationRepository.viewAccommodationBooks(hostUsername, id);
+            System.out.println(books);
+            return books.stream()
+                    .map(BookDTO::fromFullDetails)
+                    .collect(Collectors.toList());
+             // Ora restituiamo direttamente BookDTO senza conversioni aggiuntive
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving accommodation: ", e);
+        }
+    }*/
 
     public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
         try {

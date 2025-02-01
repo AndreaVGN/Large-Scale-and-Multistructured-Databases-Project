@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
+import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;

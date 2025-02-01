@@ -57,8 +57,10 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     @Query(value = "{'hostUsername': ?0}", fields = "{'_id': 1, 'description': 1}")
     List<Accommodation> findOwnAccommodations(String username);
 
+    /*@Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'books.bookId': 1,'books.occupiedDates': 1,'books.username': 1,'books.email': 1,'books.birthPlace': 1,'books.address': 1,'books.addressNumber': 1,'books.birthDate': 1,'books.guestFirstNames': 1, 'books.guestLastNames': 1}")
+    List<BookDTO> viewAccommodationBooks(String username,int id);*/
     @Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'books': 1}")
-    List<BookDTO> viewAccommodationBooks(String username,int id);
+    List<BookDTO> viewAccommodationBooks(String username, int id);
 
     @Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'reviews': 1}")
     List<ReviewDTO> viewAccommodationReviews(String username,int id);

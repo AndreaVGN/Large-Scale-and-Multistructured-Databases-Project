@@ -17,7 +17,7 @@ public class RegisteredUser {
     private String birthPlace;
     private String email;
     @JsonFormat(pattern = "dd/MM/yyyy")
-    private LocalDate birthDate; // Campo per la data di nascita
+    private String birthDate; // Campo per la data di nascita
     private String address;
     private int addressNumber;
     private String cardNumber; // Campo per il numero della carta
@@ -37,7 +37,7 @@ public class RegisteredUser {
 
     // Costruttore completo
     public RegisteredUser(String username, String password, String name, String surname, String birthPlace, String email,
-                          LocalDate birthDate, String address, int addressNumber, String cardNumber, int CVV, String expiryDate, String paymentToken) {
+                          String birthDate, String address, int addressNumber, String cardNumber, int CVV, String expiryDate, String paymentToken) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -102,11 +102,11 @@ public class RegisteredUser {
         this.email = email;
     }
 
-    public LocalDate getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 

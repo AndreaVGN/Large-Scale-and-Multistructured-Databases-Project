@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.controller;
 
+import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
@@ -61,7 +62,17 @@ public class RegisteredUserController {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
         }
+        newBook.setUsername(loggedInUser.getUsername());
+        newBook.setEmail(loggedInUser.getEmail());
+        newBook.setBirthPlace(loggedInUser.getBirthPlace());
+        newBook.setAddress(loggedInUser.getAddress());
+        newBook.setAddressNumber(loggedInUser.getAddressNumber());
 
+        // Recupera i dati della carta di pagamento
+        newBook.setBirthDate(loggedInUser.getBirthDate());
+        newBook.setCardNumber(loggedInUser.getCardNumber());
+        newBook.setCVV(loggedInUser.getCVV());
+        newBook.setExpiryDate(loggedInUser.getExpiryDate());
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
         Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(username, accommodationId, newBook);
 
@@ -79,7 +90,7 @@ public class RegisteredUserController {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
         }
-        List<Book> pendingBookings = accommodationService.getPendingBookings(username);
+        List<BookDTO> pendingBookings = accommodationService.getPendingBookings(username);
         if (pendingBookings.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna accommodation trovata per questo host.");
         }

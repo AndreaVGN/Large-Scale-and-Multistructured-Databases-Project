@@ -75,7 +75,9 @@ public class Book {
         this.username = username;
     }
 
-    public boolean isTransactionState() {
+
+
+    public boolean getTransactionState() {
         return transactionState;
     }
 
