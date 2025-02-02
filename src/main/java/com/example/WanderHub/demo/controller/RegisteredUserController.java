@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -56,21 +57,29 @@ public class RegisteredUserController {
             @RequestBody Book newBook,
             HttpSession session) {
 
-        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+
+        String usernam = (String) session.getAttribute("user");
+        String email = (String) session.getAttribute("email");
+        String birthPlace = (String) session.getAttribute("birthPlace");
+        String address = (String) session.getAttribute("address");
+        int addressNumber = (int) session.getAttribute("addressNumber");
+        String birthDate = (String) session.getAttribute("birthDate");
+/*
+        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");*/
 
 
-        if (loggedInUser == null || !loggedInUser.getUsername().equals(username)) {
+        if (usernam == null || !usernam.equals(username)) {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
         }
 
-        newBook.setUsername(loggedInUser.getUsername());
-        newBook.setEmail(loggedInUser.getEmail());
-        newBook.setBirthPlace(loggedInUser.getBirthPlace());
-        newBook.setAddress(loggedInUser.getAddress());
-        newBook.setAddressNumber(loggedInUser.getAddressNumber());
+        newBook.setUsername(usernam);
+        newBook.setEmail(email);
+        newBook.setBirthPlace(birthPlace);
+        newBook.setAddress(address);
+        newBook.setAddressNumber(addressNumber);
 
-        newBook.setBirthDate(loggedInUser.getBirthDate());
+        newBook.setBirthDate(birthDate);
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
         Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(username, accommodationId, newBook);
 

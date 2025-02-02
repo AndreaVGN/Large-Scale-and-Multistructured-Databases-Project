@@ -73,7 +73,13 @@ public class RegisteredUserService {
 
             // Confronta l'hash della password
             if (user.getPassword().equals(hashedInputPassword)) {
-                session.setAttribute("user", user.getUsername()); // Salva l'utente nella sessione
+                // Salva l'utente nella sessione
+                session.setAttribute("user", user.getUsername());
+                session.setAttribute("email",user.getEmail());
+                session.setAttribute("birthDate",user.getBirthDate());
+                session.setAttribute("birthPlace",user.getBirthPlace());
+                session.setAttribute("address",user.getAddress());
+                session.setAttribute("addressNumber",user.getAddressNumber());
                 System.out.println(session.getAttribute("user"));
                 return true;
             }
