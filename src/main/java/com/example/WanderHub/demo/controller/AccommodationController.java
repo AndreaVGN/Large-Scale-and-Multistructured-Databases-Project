@@ -101,6 +101,7 @@ public class AccommodationController {
         }
 
         List<ReviewDTO> reviews = accommodationService.viewAccommodationReviews(hostUsername, id);
+        System.out.println(reviews);
         if (reviews.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna reviews trovata per questo host.");
         }

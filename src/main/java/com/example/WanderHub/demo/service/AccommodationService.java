@@ -123,14 +123,11 @@ public class AccommodationService {
         }
     }
 
-    public List<Review> getReviewsByUsername(String username) {
+    public List<AccommodationDTO> getReviewsByUsername(String username) {
         try {
-            // Ottieni ReviewDTO dal repository
-            List<ReviewDTO> reviewsDTOList = accommodationRepository.findReviewsByUsername(username);
-
-            // Estrai le recensioni da ogni ReviewDTO e restituisci una lista di Review
-            return reviewsDTOList.stream()
-                    .flatMap(dto -> dto.getReviews().stream())
+            List<Accommodation> reviews = accommodationRepository.findReviewsByUsername(username);
+            return reviews.stream()
+                    .map(AccommodationDTO::withReviews)
                     .collect(Collectors.toList());
         }
         catch (DataAccessException e) {

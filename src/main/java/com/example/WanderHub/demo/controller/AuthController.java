@@ -30,7 +30,6 @@ public class AuthController {
         }
     }
 
-
     // Endpoint for user signup
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody RegisteredUser registerUser) {

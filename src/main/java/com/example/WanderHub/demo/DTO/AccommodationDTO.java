@@ -48,10 +48,12 @@ public class AccommodationDTO {
         this.averageRate = averageRate;
         this.photos = photos;
     }
-    private AccommodationDTO(int accommodationId, String description, List<Book> books){
+
+    private AccommodationDTO(int accommodationId, String description, List<Book> books, List<Review> reviews){
         this.accommodationId = accommodationId;
         this.description = description;
         this.books = books;
+        this.reviews = reviews;
     }
 
     public static AccommodationDTO fromBasicInfo(Accommodation accommodation) {
@@ -103,7 +105,17 @@ public class AccommodationDTO {
         return new AccommodationDTO(
                 accommodation.getAccommodationId(),
                 accommodation.getDescription(),
-                accommodation.getBooks()
+                accommodation.getBooks(),
+                null
+        );
+    }
+
+    public static AccommodationDTO withReviews(Accommodation accommodation) {
+        return new AccommodationDTO(
+                accommodation.getAccommodationId(),
+                accommodation.getDescription(),
+                null,
+                accommodation.getReviews()
         );
     }
 

@@ -104,7 +104,7 @@ public class RegisteredUserController {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
         }
-        List<Review> reviews = accommodationService.getReviewsByUsername(username);
+        List<AccommodationDTO> reviews = accommodationService.getReviewsByUsername(username);
         if (reviews.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna accommodation trovata per questo host.");
         }
