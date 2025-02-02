@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.repository;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
+import com.example.WanderHub.demo.DTO.AverageCostDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
@@ -99,8 +100,11 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     })
     List<FacilityRatingDTO> getAverageRatingByFacilityInCity(String city);
 
-
-
-
+    @Aggregation(pipeline = {
+            "{ $match: { 'city': ?0 } }",
+            "{ $group: { _id: '$maxGuestSize', prezzoMedio: { $avg: '$costPerNight' } } }",
+            "{ $project: { _id: 0, numeroOspiti: '$_id', prezzoMedio: 1, citta: ?0 } }"
+    })
+    List<AverageCostDTO> findAverageCostPerNightByCityAndGuests(String city);
 }
 

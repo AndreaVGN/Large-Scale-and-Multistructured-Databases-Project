@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.service;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
+import com.example.WanderHub.demo.DTO.AverageCostDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
@@ -284,6 +285,9 @@ public class AccommodationService {
         return accommodationRepository.getAverageRatingByFacilityInCity(city);
     }
 
+    public List<AverageCostDTO> viewAvgCostPerNight(String city) {
+           return accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
+    }
 
 }
 

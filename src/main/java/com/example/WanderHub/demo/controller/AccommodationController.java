@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
+import com.example.WanderHub.demo.DTO.AverageCostDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
@@ -126,6 +127,10 @@ public class AccommodationController {
     @GetMapping("/average-rating/{city}")
     public List<FacilityRatingDTO> getAverageRatingByFacility(@PathVariable String city) {
         return accommodationService.getAverageRatingByFacility(city);
+    }
+    @GetMapping("/{city}/viewAvgCostPerNight")
+    public ResponseEntity<List<AverageCostDTO>> viewAvgCostPerNight(@PathVariable String city){
+        return new ResponseEntity<>(accommodationService.viewAvgCostPerNight(city),HttpStatus.OK);
     }
 }
 
