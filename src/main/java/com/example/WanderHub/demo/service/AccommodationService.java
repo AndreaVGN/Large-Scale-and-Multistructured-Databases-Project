@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.service;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
+import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
@@ -277,6 +278,10 @@ public class AccommodationService {
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
         }
+    }
+
+    public List<FacilityRatingDTO> getAverageRatingByFacility(String city) {
+        return accommodationRepository.getAverageRatingByFacilityInCity(city);
     }
 
 

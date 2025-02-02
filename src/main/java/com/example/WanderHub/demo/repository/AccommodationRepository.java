@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.repository;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
+import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.Review;
@@ -81,6 +82,24 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
     @Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'reviews': 1}")
     List<ReviewDTO> viewAccommodationReviews(String username,int id);
+
+    @Aggregation(pipeline = {
+            "{ $match: { 'city': ?0, 'averageRate': { $gt: 0 } } }", // Filtra per città
+            "{ $unwind: '$facilities' }",  // Scompone l'array facilities
+            "{ $group: { " +
+                    "_id: { 'facility': '$facilities', 'city': '$city' }, " + // Raggruppa per facility e città
+                    "averageRating: { $avg: '$averageRate' } " + // Calcola il rating medio
+                    "} }",
+            "{ $project: { " +
+                    "'facility': '$_id.facility', " +
+                    "'city': '$_id.city', " +
+                    "'averageRating': 1, " +
+                    "_id: 0 " + // Rimuove il campo _id
+                    "} }"
+    })
+    List<FacilityRatingDTO> getAverageRatingByFacilityInCity(String city);
+
+
 
 
 }
