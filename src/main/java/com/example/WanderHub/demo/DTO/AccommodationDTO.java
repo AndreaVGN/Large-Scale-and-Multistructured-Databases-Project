@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.DTO;
 
 import com.example.WanderHub.demo.model.Accommodation;
+import com.example.WanderHub.demo.model.Book;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.example.WanderHub.demo.model.Review;
 
@@ -20,6 +21,7 @@ public class AccommodationDTO {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT) // Esclude numeri se valgono 0 o 0.0
     private double averageRate;
     private List<String> photos;  // Cambiato per supportare sia una singola foto che una lista di foto
+    private List<Book> books;
     private List<Review> reviews;  // Aggiunto campo reviews
 
     // Costruttore privato per forzare l'uso dei metodi factory
@@ -45,6 +47,11 @@ public class AccommodationDTO {
         this.costPerNight = costPerNight;
         this.averageRate = averageRate;
         this.photos = photos;
+    }
+    private AccommodationDTO(int accommodationId, String description, List<Book> books){
+        this.accommodationId = accommodationId;
+        this.description = description;
+        this.books = books;
     }
 
     public static AccommodationDTO fromBasicInfo(Accommodation accommodation) {
@@ -92,6 +99,13 @@ public class AccommodationDTO {
                 firstPhoto != null ? Arrays.asList(firstPhoto) : null  // Converte la singola foto in lista
         );
     }
+    public static AccommodationDTO fromSomeInfo(Accommodation accommodation){
+        return new AccommodationDTO(
+                accommodation.getAccommodationId(),
+                accommodation.getDescription(),
+                accommodation.getBooks()
+        );
+    }
 
     // Getter e Setter
     public int getAccommodationId() { return accommodationId; }
@@ -117,6 +131,9 @@ public class AccommodationDTO {
 
     public List<String> getPhotos() { return photos; }
     public void setPhotos(List<String> photos) { this.photos = photos; }
+
+    public List<Book> getBooks() { return books; }
+    public void setBooks(List<Book> books) { this.books = books; }
 
     public List<Review> getReviews() { return reviews; }
     public void setReviews(List<Review> reviews) { this.reviews = reviews; }

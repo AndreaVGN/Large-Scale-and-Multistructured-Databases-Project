@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.controller;
 
+import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.Accommodation;
@@ -87,7 +88,7 @@ public class RegisteredUserController {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
         }
-        List<BookDTO> pendingBookings = accommodationService.getPendingBookings(username);
+        List<AccommodationDTO> pendingBookings = accommodationService.getPendingBookings(username);
         if (pendingBookings.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna accommodation trovata per questo host.");
         }

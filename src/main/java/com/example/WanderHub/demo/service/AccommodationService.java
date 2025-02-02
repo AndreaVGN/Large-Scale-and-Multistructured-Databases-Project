@@ -142,27 +142,15 @@ public class AccommodationService {
 
 
     }
-    /*public List<Book> getPendingBookings(String username) {
-        try {
-            // Ottieni ReviewDTO dal repository
-            List<BookDTO> booksDTOList = accommodationRepository.findPendingBookingsByUsername(username);
-
-            // Estrai le recensioni da ogni ReviewDTO e restituisci una lista di Review
-            return booksDTOList.stream()
-                    .flatMap(dto -> dto.getBooks().stream())
-                    .collect(Collectors.toList());
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException("Error while retrieving pending bookings from the database: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
-        }
-    }*/
-    public List<BookDTO> getPendingBookings(String username) {
+    
+    public List<AccommodationDTO> getPendingBookings(String username) {
         try {
             // Ottieni BookDTO dal repository
-            return accommodationRepository.findPendingBookingsByUsername(username);
+            //return accommodationRepository.findPendingBookingsByUsername(username);
+            List<Accommodation> books = accommodationRepository.findPendingBookingsByUsername(username);
+            return books.stream()
+                    .map(AccommodationDTO::fromSomeInfo)
+                    .collect(Collectors.toList());
         }
         catch (DataAccessException e) {
             throw new RuntimeException("Error while retrieving pending bookings from the database: " + e.getMessage(), e);
@@ -207,22 +195,7 @@ public class AccommodationService {
             throw new RuntimeException("Error while retrieving accommodation: ", e);
         }
     }
-    /*public List<BookDTO> viewAccommodationBooks(String hostUsername, int id) {
-        try {
-            List<Book> books = accommodationRepository.viewAccommodationBooks(hostUsername, id);
-            System.out.println(books);
-            return books.stream()
-                    .map(BookDTO::fromFullDetails)
-                    .collect(Collectors.toList());
-             // Ora restituiamo direttamente BookDTO senza conversioni aggiuntive
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Error while retrieving accommodation: ", e);
-        }
-    }*/
+
 
     public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
         try {
@@ -242,45 +215,7 @@ public class AccommodationService {
     public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
         try {
             Validator.validateBook(newBook);
-            /*
-            // Validate the fields of the Book
-            if (newBook.getBookId() == 0) {
-                throw new IllegalArgumentException("Book ID cannot be zero.");
-            }
 
-            // Check if the occupiedDates is null
-            if (newBook.getOccupiedDates() == null) {
-                throw new IllegalArgumentException("Start and end dates cannot be null.");
-            }
-
-            // Check that the start date is before the end date
-            OccupiedPeriod period = newBook.getOccupiedDates().get(0);; // Assuming there’s only one period
-            if (period.getStart() == null || period.getEnd() == null) {
-                throw new IllegalArgumentException("Start and end dates cannot be null.");
-            }
-            if (!period.getStart().isBefore(period.getEnd())) {
-                throw new IllegalArgumentException("Start date must be before the end date.");
-            }
-
-            // Validate that the required fields are not empty
-            if (newBook.getUsername() == null || newBook.getUsername().isEmpty()) {
-                throw new IllegalArgumentException("Username cannot be empty.");
-            }
-            if (newBook.getEmail() == null || newBook.getEmail().isEmpty()) {
-                throw new IllegalArgumentException("Email cannot be empty.");
-            }
-            if (newBook.getBirthPlace() == null || newBook.getBirthPlace().isEmpty()) {
-                throw new IllegalArgumentException("Birthplace cannot be empty.");
-            }
-            if (newBook.getAddress() == null || newBook.getAddress().isEmpty()) {
-                throw new IllegalArgumentException("Address cannot be empty.");
-            }
-
-            // Check if guestFirstNames and guestLastNames arrays have the same length
-            if (newBook.getGuestFirstNames() != null && newBook.getGuestLastNames() != null) {
-                if (newBook.getGuestFirstNames().length != newBook.getGuestLastNames().length) {
-                    throw new IllegalArgumentException("The number of guest first names and last names must be the same.");
-                }*/
 
         // Recupera l'accommodation tramite il suo ID
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)

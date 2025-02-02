@@ -45,14 +45,30 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<ReviewDTO> findReviewsByUsername(String username);
 
 
-    @Aggregation(pipeline = {
+    /*@Aggregation(pipeline = {
             "{ $match: { 'books': { $elemMatch: { 'username': ?0, 'occupiedDates.start': { $exists: true, $not: { $size: 0 }, $gt: new Date() } } } } }",
             "{ $project: { books: { $filter: { input: '$books', as: 'book', cond: { $and: [ " +
                     "{ $eq: ['$$book.username', ?0] }, " +
                     "{ $gt: [ { $toDate: { $arrayElemAt: ['$$book.occupiedDates.start', 0] } }, new Date() ] } " +
                     "] } } } } }"
     })
-    List<BookDTO> findPendingBookingsByUsername(String username);
+    List<BookDTO> findPendingBookingsByUsername(String username);*/
+    @Aggregation(pipeline = {
+            "{ $match: { 'books': { $elemMatch: { 'username': ?0, 'occupiedDates.start': { $exists: true, $not: { $size: 0 }, $gt: new Date() } } } } }",
+            "{ $project: { " +
+                    "'accommodationId': 1, " +  // Includi accommodationId
+                    "'description': 1, " +      // Includi description
+                    "'books': { $filter: { " +
+                    "input: '$books', " +
+                    "as: 'book', " +
+                    "cond: { $and: [ " +
+                    "{ $eq: ['$$book.username', ?0] }, " +
+                    "{ $gt: [ { $toDate: { $arrayElemAt: ['$$book.occupiedDates.start', 0] } }, new Date() ] } " +
+                    "] } " +
+                    "} } " +
+                    "} }"
+    })
+    List<Accommodation> findPendingBookingsByUsername(String username);
 
     @Query(value = "{'hostUsername': ?0}", fields = "{'_id': 1, 'description': 1}")
     List<Accommodation> findOwnAccommodations(String username);
