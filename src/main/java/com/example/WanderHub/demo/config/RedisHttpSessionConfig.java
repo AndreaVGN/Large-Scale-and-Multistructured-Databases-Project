@@ -1,4 +1,4 @@
-package com.example.WanderHub.demo.config;
+/*package com.example.WanderHub.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,3 +16,4 @@ public class RedisHttpSessionConfig {
         return new JedisConnectionFactory();
     }
 }
+*/
