@@ -286,9 +286,7 @@ public class AccommodationService {
     }
 
     public List<AverageCostDTO> viewAvgCostPerNight(String city) {
-           List<AverageCostDTO> prova =  accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
-           System.out.println(prova);
-           return prova;
+           return  accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
     }
 
 }
