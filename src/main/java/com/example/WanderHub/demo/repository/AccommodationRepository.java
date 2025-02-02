@@ -102,9 +102,10 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
     @Aggregation(pipeline = {
             "{ $match: { 'city': ?0 } }",
-            "{ $group: { _id: '$maxGuestSize', prezzoMedio: { $avg: '$costPerNight' } } }",
-            "{ $project: { _id: 0, numeroOspiti: '$_id', prezzoMedio: 1, citta: ?0 } }"
+            "{ $group: { _id: '$maxGuestSize', averageCostPerNight: { $avg: '$costPerNight' }, city: { $first: '$city' } } }",
+            "{ $project: { _id: 0, guestCount: '$_id', averageCostPerNight: 1, city: 1 } }"
     })
     List<AverageCostDTO> findAverageCostPerNightByCityAndGuests(String city);
+
 }
 
