@@ -13,6 +13,8 @@ import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import com.example.WanderHub.demo.utility.Validator;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +33,8 @@ public class AccommodationService {
     private AccommodationRepository accommodationRepository;
 
     private final RegisteredUserRepository registeredUserRepository;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Autowired
     public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
@@ -215,32 +220,44 @@ public class AccommodationService {
         try {
             Validator.validateBook(newBook);
 
-
-        // Recupera l'accommodation tramite il suo ID
+            // Recupera l'accommodation tramite il suo ID
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-        // Recupera l'utente cliente che sta facendo la prenotazione
+            // Recupera l'utente cliente che sta facendo la prenotazione
+            RegisteredUser customer = registeredUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        RegisteredUser customer = registeredUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+            // Definisci la chiave per il lock in Redis
+            String lockKey = "booking_lock:" + accommodationId + ":" + newBook.getStartDate();  // Usa una chiave univoca (per esempio in base all'accommodationId e alla data di inizio)
 
-        // Aggiungi il nome dell'utente (cliente) alla prenotazione
-        newBook.setUsername(username);
+            // Ottieni il lock distribuito con Redisson
+            RLock lock = redissonClient.getLock(lockKey);
 
-        // Aggiungi la nuova prenotazione alla lista delle prenotazioni della casa
-        accommodation.getBooks().add(newBook);
+            // Prova ad acquisire il lock (per esempio per 30 secondi con una scadenza di 10 secondi)
+            boolean isLockAcquired = lock.tryLock(30, 10, TimeUnit.SECONDS);
 
-        // Salva l'accommodation aggiornata nel database
-        return accommodationRepository.save(accommodation);
-        } catch (DataAccessException e) {
-            // Handle database errors (connection, query, etc.)
-            throw new RuntimeException("Error occurred while saving the booking to the database: " + e.getMessage(), e);
-        } catch (IllegalArgumentException e) {
-            // Handle validation errors for fields
-            throw new IllegalArgumentException("Validation error: " + e.getMessage(), e);
+            if (!isLockAcquired) {
+                throw new RuntimeException("The accommodation is already locked by another user or is in the process of booking.");
+            }
+
+            // Se il lock è acquisito, procedi con la prenotazione
+            try {
+                // Aggiungi il nome dell'utente (cliente) alla prenotazione
+                newBook.setUsername(username);
+
+                // Aggiungi la nuova prenotazione alla lista delle prenotazioni della casa
+                accommodation.getBooks().add(newBook);
+
+                // Salva l'accommodation aggiornata nel database
+                return accommodationRepository.save(accommodation);
+            } finally {
+                // Rilascia il lock una volta completata l'operazione
+                lock.unlock();
+            }
+
         } catch (Exception e) {
-            // Handle any other general errors
+            // Gestisci qualsiasi errore, inclusi lock non acquisiti e altre eccezioni
             throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
         }
     }
