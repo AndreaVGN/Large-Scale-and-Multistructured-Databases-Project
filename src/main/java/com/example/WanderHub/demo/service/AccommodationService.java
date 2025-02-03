@@ -5,6 +5,7 @@ import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.RegisteredUser;
+import org.springframework.data.redis.core.RedisTemplate;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
@@ -35,6 +36,8 @@ public class AccommodationService {
     private final RegisteredUserRepository registeredUserRepository;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
@@ -216,7 +219,7 @@ public class AccommodationService {
 
 
     // Metodo per aggiungere una prenotazione alla casa scelta dal cliente
-    public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
+    /*public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
         try {
             Validator.validateBook(newBook);
 
@@ -260,7 +263,48 @@ public class AccommodationService {
             // Gestisci qualsiasi errore, inclusi lock non acquisiti e altre eccezioni
             throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
         }
+    }*/
+
+    public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
+        try {
+            Validator.validateBook(newBook);
+
+            // Recupera l'accommodation tramite il suo ID
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+
+            // Recupera l'utente cliente che sta facendo la prenotazione
+            RegisteredUser customer = registeredUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            // Definisci la chiave di prenotazione in Redis
+            String bookingKey = "booking:" + accommodationId + ":" + newBook.getStartDate() + ":" + newBook.getEndDate();
+
+            // Controlla se esiste già una prenotazione con lo stesso periodo e username
+            String existingBooking = (String) redisTemplate.opsForValue().get(bookingKey);
+            System.out.println(existingBooking);
+            if (!username.equals(existingBooking)) {
+                throw new RuntimeException("User already has a booking for this accommodation in the selected period.");
+            }
+
+            // Aggiungi il nome dell'utente alla prenotazione
+            newBook.setUsername(username);
+
+            // Aggiungi la prenotazione alla lista delle prenotazioni dell'alloggio
+            accommodation.getBooks().add(newBook);
+
+            // Salva l'accommodation aggiornata nel database
+            Accommodation savedAccommodation = accommodationRepository.save(accommodation);
+
+
+            return savedAccommodation;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
+        }
     }
+
+
 
     public boolean deleteBook(String username, int accommodationId, int bookId) {
         try {

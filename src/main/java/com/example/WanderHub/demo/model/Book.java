@@ -127,6 +127,12 @@ public class Book {
         }
         return null; // Se non ci sono periodi, restituisci null
     }
+    public LocalDate getEndDate() {
+        if (occupiedDates != null && !occupiedDates.isEmpty()) {
+            return occupiedDates.get(0).getEnd(); // Restituisce la data di inizio del primo periodo
+        }
+        return null; // Se non ci sono periodi, restituisci null
+    }
 
     // Metodo toString
     @Override
