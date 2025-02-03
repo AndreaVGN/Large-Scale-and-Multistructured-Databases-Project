@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @Repository
 public class BookingRepository {
 
-    private static final long TTL = 300; // 300 secondi (5 minuti)
+    private static final long TTL = 600; // 300 secondi (5 minuti)
     private static final String LOCK_KEY = "booking_lock:"; // Prefix per il lock
 
     @Autowired
@@ -43,7 +43,7 @@ public class BookingRepository {
 
             // Verifica se la casa è già prenotata
             if (Boolean.TRUE.equals(redisTemplate.hasKey(keyEnd)) && Boolean.TRUE.equals(redisTemplate.hasKey(keyStart))
-                    && Boolean.TRUE.equals(redisTemplate.hasKey(accommodation)) && Boolean.TRUE.equals(redisTemplate.hasKey(timeStamp))) {
+                    && Boolean.TRUE.equals(redisTemplate.hasKey(accommodation)) /*&& Boolean.TRUE.equals(redisTemplate.hasKey(timeStamp))*/) {
                 return false; // Casa già prenotata temporaneamente
             }
 
@@ -88,8 +88,8 @@ public class BookingRepository {
             String timeStamp = "booking_timestamp";
 
             if (Boolean.TRUE.equals(redisTemplate.hasKey(keyEnd)) && Boolean.TRUE.equals(redisTemplate.hasKey(keyStart))
-                    && Boolean.TRUE.equals(redisTemplate.hasKey(accommodation)) && Boolean.TRUE.equals(redisTemplate.hasKey(timeStamp))
-                    && Boolean.TRUE.equals(redisTemplate.hasKey(utente))) {
+                    && Boolean.TRUE.equals(redisTemplate.hasKey(accommodation))/* && Boolean.TRUE.equals(redisTemplate.hasKey(timeStamp))
+                    && Boolean.TRUE.equals(redisTemplate.hasKey(utente))*/) {
                 return false; // Casa già prenotata temporaneamente
             }
 
