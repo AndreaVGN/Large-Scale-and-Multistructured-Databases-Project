@@ -9,6 +9,7 @@ import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.service.AccommodationService;
+import com.example.WanderHub.demo.service.BookingService;
 import com.example.WanderHub.demo.utility.SessionUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class AccommodationController {
 
     @Autowired
     private AccommodationService accommodationService;
+    @Autowired
+    private BookingService bookingService;
 
     @PostMapping("/{username}")
     public ResponseEntity<?> createAccommodation(@PathVariable String username, @RequestBody Accommodation accommodation, HttpSession session) {
@@ -131,6 +134,15 @@ public class AccommodationController {
     @GetMapping("/{city}/viewAvgCostPerNight")
     public ResponseEntity<List<AverageCostDTO>> viewAvgCostPerNight(@PathVariable String city){
         return new ResponseEntity<>(accommodationService.viewAvgCostPerNight(city),HttpStatus.OK);
+    }
+    @PostMapping("/{accommodationId}/lock")
+    public ResponseEntity<String> lockHouse(@PathVariable int accommodationId, @RequestParam String startDate, @RequestParam String endDate) {
+        boolean success = bookingService.bookHouse(accommodationId, startDate,endDate);
+        if (success) {
+            return ResponseEntity.ok("Casa prenotata temporaneamente!");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente.");
+        }
     }
 }
 

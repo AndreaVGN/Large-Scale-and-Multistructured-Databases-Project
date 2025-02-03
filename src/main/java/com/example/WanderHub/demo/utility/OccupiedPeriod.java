@@ -6,9 +6,9 @@ import org.springframework.cglib.core.Local;
 import java.time.LocalDate;
 
 public class OccupiedPeriod {
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate start; // Data di inizio occupazione
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate end;   // Data di fine occupazione
 
     // Costruttori
