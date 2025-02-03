@@ -151,6 +151,7 @@ public class AccommodationController {
                 }
             }
         }
+        System.out.println(bookingTimestamp);
 
         // Verifica se il cookie è stato trovato
         if (bookingTimestamp == null) {

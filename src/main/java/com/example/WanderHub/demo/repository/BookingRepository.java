@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Repository
 public class BookingRepository {
 
-    private static final long TTL = 600; // 300 secondi (5 minuti)
+    private static final long TTL = 1200; // 300 secondi (5 minuti)
     private static final String LOCK_KEY = "booking_lock:"; // Prefix per il lock
 
     @Autowired

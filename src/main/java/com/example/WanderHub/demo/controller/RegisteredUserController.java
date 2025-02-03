@@ -67,6 +67,7 @@ public class RegisteredUserController {
         String address = (String) session.getAttribute("address");
         int addressNumber = (int) session.getAttribute("addressNumber");
         String birthDate = (String) session.getAttribute("birthDate");
+
 /*
         RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");*/
 
@@ -81,6 +82,7 @@ public class RegisteredUserController {
         newBook.setBirthPlace(birthPlace);
         newBook.setAddress(address);
         newBook.setAddressNumber(addressNumber);
+
 
         newBook.setBirthDate(birthDate);
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente

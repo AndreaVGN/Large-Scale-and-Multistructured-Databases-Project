@@ -267,6 +267,8 @@ public class AccommodationService {
 
     public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
         try {
+
+
             Validator.validateBook(newBook);
 
             // Recupera l'accommodation tramite il suo ID
@@ -280,6 +282,7 @@ public class AccommodationService {
             // Definisci la chiave di prenotazione in Redis
             String bookingKey = "booking:" + accommodationId + ":" + newBook.getStartDate() + ":" + newBook.getEndDate();
 
+            System.out.println(username);
             // Controlla se esiste già una prenotazione con lo stesso periodo e username
             String existingBooking = (String) redisTemplate.opsForValue().get(bookingKey);
             System.out.println(existingBooking);

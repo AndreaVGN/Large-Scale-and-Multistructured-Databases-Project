@@ -133,6 +133,18 @@ public class Book {
         }
         return null; // Se non ci sono periodi, restituisci null
     }
+    public void setStartDate(LocalDate startDate) {
+        if (occupiedDates != null && !occupiedDates.isEmpty()) {
+            occupiedDates.get(0).setStart(startDate); // Imposta la data di inizio del primo periodo
+        }
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        if (occupiedDates != null && !occupiedDates.isEmpty()) {
+            occupiedDates.get(0).setEnd(endDate); // Imposta la data di fine del primo periodo
+        }
+    }
+
 
     // Metodo toString
     @Override
