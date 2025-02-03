@@ -8,6 +8,7 @@ import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.service.AccommodationService;
+import com.example.WanderHub.demo.service.BookingService;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class RegisteredUserController {
     private RegisteredUserService registeredUserService;
     @Autowired
     private AccommodationService accommodationService;
+    @Autowired
+    private BookingService bookingService;
 
     @PostMapping
     public RegisteredUser createRegisteredUser(@RequestBody RegisteredUser registeredUser) {
@@ -136,5 +139,13 @@ public class RegisteredUserController {
                     .body("Non è possibile cancellare la prenotazione. Verifica che la prenotazione esista e che sia più vicina di due giorni alla data di inizio.");
         }
     }
-
+    @PostMapping("/{username}/{accommodationId}/lock")
+    public ResponseEntity<String> lockHouse(@PathVariable int accommodationId,@PathVariable String username, @RequestParam String startDate, @RequestParam String endDate) {
+        boolean success = bookingService.bookHouseReg(accommodationId, username, startDate,endDate);
+        if (success) {
+            return ResponseEntity.ok("Casa prenotata temporaneamente!");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente.");
+        }
+    }
 }

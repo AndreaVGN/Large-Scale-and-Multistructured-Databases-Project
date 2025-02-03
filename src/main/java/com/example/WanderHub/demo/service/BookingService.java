@@ -14,4 +14,8 @@ public class BookingService {
     public boolean bookHouse(int houseId, String start, String end) {
         return bookingRepository.lockHouse(houseId, start, end);
     }
+
+    public boolean bookHouseReg(int houseId,String username, String start, String end) {
+        return bookingRepository.lockHouseReg(houseId,username, start, end);
+    }
 }
