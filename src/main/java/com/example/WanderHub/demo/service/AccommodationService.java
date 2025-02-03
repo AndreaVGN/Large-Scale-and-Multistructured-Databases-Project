@@ -274,8 +274,8 @@ public class AccommodationService {
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
             // Recupera l'utente cliente che sta facendo la prenotazione
-            RegisteredUser customer = registeredUserRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+           /* RegisteredUser customer = registeredUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));*/
 
             // Definisci la chiave di prenotazione in Redis
             String bookingKey = "booking:" + accommodationId + ":" + newBook.getStartDate() + ":" + newBook.getEndDate();

@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.repository;
 
 import com.example.WanderHub.demo.model.Book;
+import jakarta.servlet.http.Cookie;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.RedisConnectionException;
@@ -247,6 +248,7 @@ public class BookingRepository {
         return false;
     }
 
+    /*
     public boolean lockHouse(int houseId, String start, String end) {
         String lockKey = "lock:house:" + houseId;
         RLock lock = redissonClient.getLock(lockKey);
@@ -260,6 +262,7 @@ public class BookingRepository {
             String timestamp = String.valueOf(System.currentTimeMillis());
             String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
 
+
             redisTemplate.opsForValue().set(bookingKey, timestamp, TTL, TimeUnit.SECONDS);
             return true;
 
@@ -269,7 +272,34 @@ public class BookingRepository {
         } finally {
             if (lock.isHeldByCurrentThread()) lock.unlock();
         }
+    }*/
+
+    public String lockHouse(int houseId, String start, String end) {
+        String lockKey = "lock:house:" + houseId;
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            boolean isLocked = lock.tryLock(100, 10, TimeUnit.SECONDS);
+            if (!isLocked) return null; // Indica che non è stato possibile acquisire il lock
+
+            if (isOverlappingBooking(houseId, start, end)) return null;  // Controlla sovrapposizioni
+
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
+
+            // Imposta il timestamp in Redis
+            redisTemplate.opsForValue().set(bookingKey, timestamp, TTL, TimeUnit.SECONDS);
+
+            return timestamp; // Restituisce il timestamp generato
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return null; // Indica errore
+        } finally {
+            if (lock.isHeldByCurrentThread()) lock.unlock();
+        }
     }
+
 
     public boolean lockHouseReg(int houseId, String username, String start, String end) {
         String lockKey = "lock:house:" + houseId + ":" + username;

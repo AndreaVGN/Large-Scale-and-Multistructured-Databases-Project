@@ -11,6 +11,9 @@ import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.BookingService;
 import com.example.WanderHub.demo.utility.SessionUtils;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -113,6 +116,7 @@ public class AccommodationController {
         return ResponseEntity.ok(reviews);
     }
 
+    /*
     // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
     @PutMapping("/{accommodationId}/addBook")
     public ResponseEntity<Accommodation> addBookToAccommodation(
@@ -125,7 +129,41 @@ public class AccommodationController {
 
         // Restituisci l'accommodation aggiornata
         return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
+    }*/
+
+
+    @PutMapping("/{accommodationId}/addBook")
+    public ResponseEntity<?> addBookToAccommodation(
+            @PathVariable int accommodationId,
+            @RequestBody Book newBook,
+            HttpServletRequest request) {
+
+        // Recupera i cookie dalla richiesta
+        Cookie[] cookies = request.getCookies();
+        String bookingTimestamp = null;
+
+        // Cerca il cookie con il nome "bookingTimestamp"
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("bookingTimestamp".equals(cookie.getName())) {
+                    bookingTimestamp = cookie.getValue(); // Ottieni il valore del bookingTimestamp dal cookie
+                    break;
+                }
+            }
+        }
+
+        // Verifica se il cookie è stato trovato
+        if (bookingTimestamp == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Se non trovato, restituisci un errore
+        }
+
+        // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
+        Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook);
+
+
+        return new ResponseEntity<>("Prenotazione avvenuta con successo!", HttpStatus.OK);
     }
+
 
     @GetMapping("/average-rating/{city}")
     public List<FacilityRatingDTO> getAverageRatingByFacility(@PathVariable String city) {
@@ -135,6 +173,8 @@ public class AccommodationController {
     public ResponseEntity<List<AverageCostDTO>> viewAvgCostPerNight(@PathVariable String city){
         return new ResponseEntity<>(accommodationService.viewAvgCostPerNight(city),HttpStatus.OK);
     }
+
+    /*
     @PostMapping("/{accommodationId}/lock")
     public ResponseEntity<String> lockHouse(@PathVariable int accommodationId, @RequestParam String startDate, @RequestParam String endDate) {
         boolean success = bookingService.bookHouse(accommodationId, startDate,endDate);
@@ -143,6 +183,27 @@ public class AccommodationController {
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente.");
         }
+    }*/
+
+    @PostMapping("/{accommodationId}/lock")
+    public ResponseEntity<String> lockHouse(@PathVariable int accommodationId, @RequestParam String startDate, @RequestParam String endDate, HttpServletResponse response) {
+        String timestamp = bookingService.getBookingTimestamp(accommodationId, startDate, endDate);
+
+        if (timestamp != null) {
+            // Crea il cookie con il timestamp
+            Cookie timestampCookie = new Cookie("bookingTimestamp", timestamp);
+            timestampCookie.setMaxAge(3600); // Imposta un tempo di vita del cookie (modifica a seconda delle necessità)
+            timestampCookie.setHttpOnly(true); // Sicurezza per evitare l'accesso tramite JavaScript
+            timestampCookie.setPath("/"); // Può essere modificato a seconda delle necessità
+
+            // Aggiungi il cookie alla risposta
+            response.addCookie(timestampCookie);
+
+            return ResponseEntity.ok("Casa prenotata temporaneamente!");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente.");
+        }
     }
+
 }
 
