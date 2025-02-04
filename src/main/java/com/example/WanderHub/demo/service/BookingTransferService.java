@@ -102,6 +102,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -123,13 +124,28 @@ public class BookingTransferService {
     private AccommodationRepository accommodationRepository;
 
     public void removeArchivedBookings(Date today) {
-        //Date todayDate = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
         Query query = new Query();
-        Update update = new Update().pull("books", Query.query(Criteria.where("occupiedDates.end").lt(today)));
 
+        Update update = new Update()
+                // Rimuove interi "books" se il loro occupiedDates.end è passato
+                .pull("books", Query.query(Criteria.where("occupiedDates.end").lt(today)))
+
+                // Rimuove solo le date specifiche all'interno di "occupiedDates"
+                .pull("occupiedDates", Query.query(Criteria.where("end").lt(today)));
+
+        // Esegue la pull delle date scadute
         mongoTemplate.updateMulti(query, update, Accommodation.class);
+
+        // Assicura che "books" e "occupiedDates" rimangano come array vuoti se sono stati svuotati
+        Update setEmptyArrays = new Update()
+                .set("books", new ArrayList<>()) // Imposta un array vuoto se necessario
+                .set("occupiedDates", new ArrayList<>()); // Imposta un array vuoto se necessario
+
+        mongoTemplate.updateMulti(new Query(Criteria.where("books").exists(false)), setEmptyArrays, Accommodation.class);
+        mongoTemplate.updateMulti(new Query(Criteria.where("occupiedDates").exists(false)), setEmptyArrays, Accommodation.class);
     }
+
+
 
     // Metodo eseguito subito dopo l'inizializzazione del bean
     @PostConstruct
