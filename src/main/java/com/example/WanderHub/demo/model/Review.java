@@ -7,7 +7,7 @@ public class Review {
     private String reviewText;
     private double rating;
     private String username;
-    private LocalDate reviewDate;
+    private LocalDate date;
 
     // Costruttore senza parametri
     public Review() {}
@@ -18,7 +18,7 @@ public class Review {
         this.reviewText = reviewText;
         this.rating = rating;
         this.username = username;
-        this.reviewDate = reviewDate;
+        this.date = reviewDate;
     }
 
     // Getter e Setter
@@ -54,11 +54,11 @@ public class Review {
         this.username = username;
     }
 
-    public LocalDate getReviewDate() {
-        return reviewDate;
+    public LocalDate getDate() {
+        return date;
     }
-    public void setReviewDate(LocalDate reviewDate) {
-        this.reviewDate = reviewDate;
+    public void setDate(LocalDate reviewDate) {
+        this.date = reviewDate;
     }
 
     // Metodo toString
@@ -69,7 +69,7 @@ public class Review {
                 ", reviewText='" + reviewText + '\'' +
                 ", rating=" + rating +
                 ", username='" + username + '\'' +
-                ", reviewDate=" + reviewDate +
+                ", reviewDate=" + date +
                 '}';
     }
 }

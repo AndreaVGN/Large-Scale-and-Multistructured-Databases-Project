@@ -4,10 +4,7 @@ import com.example.WanderHub.demo.DTO.AverageCostDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
-import com.example.WanderHub.demo.model.ArchivedBooking;
-import com.example.WanderHub.demo.model.Book;
-import com.example.WanderHub.demo.model.Review;
-import com.example.WanderHub.demo.model.Accommodation;
+import com.example.WanderHub.demo.model.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -136,6 +133,20 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
                     "} }"
     })
     List<ArchivedBooking> findCompletedBookings(Date today);
+
+    @Aggregation(pipeline = {
+            "{ $unwind: '$reviews' }", // Scompatta l'array di recensioni
+            "{ $match: { 'reviews.date': { $lt: ?0 } } }", // Filtra le recensioni più vecchie di un mese
+            "{ $project: { " +
+                    "reviewId: '$reviews.reviewId', " +
+                    "accommodationId: '$_id', " +  // Salva anche l'ID dell'alloggio
+                    "username: '$reviews.username', " +
+                    "rate: '$reviews.rate', " +
+                    "reviewText: '$reviews.reviewText', " +
+                    "date: '$reviews.date' " +
+                    "} }"
+    })
+    List<ArchivedReview> findOldReviews(Date oneMonthAgo);
 
 
     @Query(value = "{ '_id': ?0, 'books.username': ?1, 'books.occupiedDates.end': { $gte: ?2, $lte: ?3 } }", exists = true)

@@ -368,7 +368,7 @@ public class AccommodationService {
         LocalDate date = calendar.getTime();
         System.out.println(date);*/
 
-        LocalDate date = review.getReviewDate().minusDays(3);
+        LocalDate date = review.getDate().minusDays(3);
         System.out.println(date);
         LocalDate today = LocalDate.now();
         if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {

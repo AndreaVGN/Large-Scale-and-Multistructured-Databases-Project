@@ -160,7 +160,7 @@ public class RegisteredUserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
         }
         review.setUsername(usernam);
-        review.setReviewDate(LocalDate.now());
+        review.setDate(LocalDate.now());
        Accommodation accommodation = accommodationService.addReviewToAccommodation(username,accommodationId,review);
         return new ResponseEntity<>("Review aggiunte con successo!", HttpStatus.OK);
     }
