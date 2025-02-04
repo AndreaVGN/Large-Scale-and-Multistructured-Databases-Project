@@ -1,5 +1,6 @@
 package com.example.WanderHub.demo.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -11,7 +12,8 @@ import com.example.WanderHub.demo.utility.OccupiedPeriod;
 @Document(collection = "accommodations")  // La collezione in MongoDB
 public class Accommodation {
     @Id
-    private int accommodationId;
+    private ObjectId id;
+
     private String description;
     private String type;
     private boolean[] facilities;
@@ -37,11 +39,10 @@ public class Accommodation {
     public Accommodation() {}
 
     // Costruttore con parametri
-    public Accommodation(int accommodationId, String description, String type, boolean[] facilities, String place,
+    public Accommodation(String description, String type, boolean[] facilities, String place,
                          String city, String address, String hostUsername, double latitude, double longitude,
                          List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate,
                          String[] photos, List<Book> books, List<Review> reviews) {
-        this.accommodationId = accommodationId;
         this.description = description;
         this.type = type;
         this.facilities = facilities;
@@ -61,19 +62,11 @@ public class Accommodation {
     }
 
     // Getter e Setter
-    public int getAccommodationId() {
-        return accommodationId;
-    }
-
-    public void setAccommodationId(int accommodationId) {
-        this.accommodationId = accommodationId;
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setAccommodationId(String description) {
         this.description = description;
     }
 
@@ -201,7 +194,6 @@ public class Accommodation {
     @Override
     public String toString() {
         return "Accommodation{" +
-                "accommodationId=" + accommodationId +
                 ", description='" + description + '\'' +
                 ", type='" + type + '\'' +
                 ", facilities=" + Arrays.toString(facilities) +

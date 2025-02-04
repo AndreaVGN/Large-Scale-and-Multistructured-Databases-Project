@@ -2,6 +2,7 @@ package com.example.WanderHub.demo.repository;
 
 import com.example.WanderHub.demo.model.Book;
 import jakarta.servlet.http.Cookie;
+import org.bson.types.ObjectId;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.RedisConnectionException;
@@ -27,8 +28,8 @@ public class BookingRepository {
     @Autowired
     private RedissonClient redissonClient; // Redisson client per il lock distribuito
 
-    /*public boolean lockHouse(int houseId, String start, String end) {
-        String lockKey = LOCK_KEY + houseId;  // Utilizza la chiave unica per ogni casa (houseId)
+    /*public boolean lockHouse(int description, String start, String end) {
+        String lockKey = LOCK_KEY + description;  // Utilizza la chiave unica per ogni casa (description)
         RLock lock = redissonClient.getLock(lockKey); // Crea un lock distribuito basato sulla chiave
 
         try {
@@ -41,7 +42,7 @@ public class BookingRepository {
             // Procedi con la logica di booking solo se il lock è stato acquisito
             String keyStart = "booking:" + start;
             String keyEnd = "booking:" + end;
-            String accommodation = "booking"+ String.valueOf(houseId);
+            String accommodation = "booking"+ String.valueOf(description);
             String timeStamp = "booking" + "timestamp";
 
             // Verifica se la casa è già prenotata
@@ -56,7 +57,7 @@ public class BookingRepository {
 
             redisTemplate.opsForValue().set(keyStart, start, TTL, TimeUnit.SECONDS);
             redisTemplate.opsForValue().set(keyEnd, end, TTL, TimeUnit.SECONDS);
-            redisTemplate.opsForValue().set(accommodation, houseId, TTL, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(accommodation, description, TTL, TimeUnit.SECONDS);
             redisTemplate.opsForValue().set(timeStamp, now.format(formatter), TTL, TimeUnit.SECONDS);
 
             return true;
@@ -71,8 +72,8 @@ public class BookingRepository {
             }
         }
     }*/
-    /*public boolean lockHouse(int houseId, String start, String end) {
-        String lockKey = LOCK_KEY + houseId;
+    /*public boolean lockHouse(int description, String start, String end) {
+        String lockKey = LOCK_KEY + description;
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
@@ -82,7 +83,7 @@ public class BookingRepository {
             }
 
             // Chiave base per le prenotazioni di questa casa
-            String houseBookingPattern = "booking:" + houseId + ":*";
+            String houseBookingPattern = "booking:" + description + ":*";
 
             // Cerca tutte le chiavi corrispondenti in Redis
             Set<String> existingKeys = redisTemplate.keys(houseBookingPattern);
@@ -109,7 +110,7 @@ public class BookingRepository {
             }
 
             // Se non ci sono sovrapposizioni, salva la nuova prenotazione in Redis
-            String keyStart = "booking:" + houseId + ":" + start + ":" + end;
+            String keyStart = "booking:" + description + ":" + start + ":" + end;
 
             redisTemplate.opsForValue().set(keyStart, "reserved", TTL, TimeUnit.SECONDS);
             return true;
@@ -125,8 +126,8 @@ public class BookingRepository {
     }*/
 
 
-    /*public boolean lockHouseReg(int houseId, String username, String start, String end) {
-        String lockKey = LOCK_KEY + houseId + ":" + username; // Lock basato su houseId e username
+    /*public boolean lockHouseReg(int description, String username, String start, String end) {
+        String lockKey = LOCK_KEY + description + ":" + username; // Lock basato su description e username
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
@@ -139,7 +140,7 @@ public class BookingRepository {
             // Procedi con la logica di booking solo se il lock è stato acquisito
             String keyStart = "booking:" + start;
             String keyEnd = "booking:" + end;
-            String accommodation = String.valueOf(houseId);
+            String accommodation = String.valueOf(description);
             String utente = username;
             String timeStamp = "booking_timestamp";
 
@@ -154,7 +155,7 @@ public class BookingRepository {
 
             redisTemplate.opsForValue().set(keyStart, start, TTL, TimeUnit.SECONDS);
             redisTemplate.opsForValue().set(keyEnd, end, TTL, TimeUnit.SECONDS);
-            redisTemplate.opsForValue().set(accommodation, houseId, TTL, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(accommodation, description, TTL, TimeUnit.SECONDS);
             redisTemplate.opsForValue().set(timeStamp, now.format(formatter), TTL, TimeUnit.SECONDS);
             redisTemplate.opsForValue().set(utente, username, TTL, TimeUnit.SECONDS);
 
@@ -170,8 +171,8 @@ public class BookingRepository {
             }
         }
     }*/
-    /*public boolean lockHouseReg(int houseId, String username, String start, String end) {
-        String lockKey = "lock:house:" + houseId + ":" + username;  // Lock specifico per houseId + username
+    /*public boolean lockHouseReg(int description, String username, String start, String end) {
+        String lockKey = "lock:house:" + description + ":" + username;  // Lock specifico per description + username
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
@@ -181,7 +182,7 @@ public class BookingRepository {
             }
 
             // Chiave base per le prenotazioni della casa
-            String houseBookingPattern = "booking:" + houseId + ":*";
+            String houseBookingPattern = "booking:" + description + ":*";
 
             // Cerca tutte le chiavi esistenti per la casa
             Set<String> existingKeys = redisTemplate.keys(houseBookingPattern);
@@ -193,7 +194,7 @@ public class BookingRepository {
                 for (String key : existingKeys) {
                     // Estrarre la data e l'utente dalla chiave esistente
                     String[] parts = key.split(":");
-                    if (parts.length < 5) continue;  // La chiave deve contenere houseId, start, end, username
+                    if (parts.length < 5) continue;  // La chiave deve contenere description, start, end, username
 
                     LocalDate existingStart = LocalDate.parse(parts[2]);
                     LocalDate existingEnd = LocalDate.parse(parts[3]);
@@ -209,7 +210,7 @@ public class BookingRepository {
             }
 
             // Se non ci sono sovrapposizioni, salva la nuova prenotazione in Redis
-            String bookingKey = "booking:" + houseId + ":" + start + ":" + end + ":" + username;
+            String bookingKey = "booking:" + description + ":" + start + ":" + end + ":" + username;
 
             redisTemplate.opsForValue().set(bookingKey, "reserved", TTL, TimeUnit.SECONDS);
             return true;
@@ -223,8 +224,8 @@ public class BookingRepository {
             }
         }
     }*/
-    private boolean isOverlappingBooking(int houseId, String start, String end) {
-        String houseBookingPattern = "booking:" + houseId + ":*";  // Cerca tutte le prenotazioni per una casa
+    private boolean isOverlappingBooking(ObjectId accommodationId, String start, String end) {
+        String houseBookingPattern = "booking:" + accommodationId + ":*";  // Cerca tutte le prenotazioni per una casa
         Set<String> existingKeys = redisTemplate.keys(houseBookingPattern);
 
         if (existingKeys != null) {
@@ -233,7 +234,7 @@ public class BookingRepository {
 
             for (String key : existingKeys) {
                 String[] parts = key.split(":");
-                if (parts.length < 4) continue; // Deve contenere houseId, start, end e timestamp/username
+                if (parts.length < 4) continue; // Deve contenere description, start, end e timestamp/username
 
                 LocalDate existingStart = LocalDate.parse(parts[2]);
                 LocalDate existingEnd = LocalDate.parse(parts[3]);
@@ -249,18 +250,18 @@ public class BookingRepository {
     }
 
     /*
-    public boolean lockHouse(int houseId, String start, String end) {
-        String lockKey = "lock:house:" + houseId;
+    public boolean lockHouse(int description, String start, String end) {
+        String lockKey = "lock:house:" + description;
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
             boolean isLocked = lock.tryLock(100, 10, TimeUnit.SECONDS);
             if (!isLocked) return false;
 
-            if (isOverlappingBooking(houseId, start, end)) return false;  // Controlla sovrapposizioni
+            if (isOverlappingBooking(description, start, end)) return false;  // Controlla sovrapposizioni
 
             String timestamp = String.valueOf(System.currentTimeMillis());
-            String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
+            String bookingKey = "booking:" + description + ":" + start + ":" + end;
 
 
             redisTemplate.opsForValue().set(bookingKey, timestamp, TTL, TimeUnit.SECONDS);
@@ -274,18 +275,18 @@ public class BookingRepository {
         }
     }*/
 
-    public String lockHouse(int houseId, String start, String end) {
-        String lockKey = "lock:house:" + houseId;
+    public String lockHouse(ObjectId accommodationId, String start, String end) {
+        String lockKey = "lock:house:" + accommodationId;
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
             boolean isLocked = lock.tryLock(100, 10, TimeUnit.SECONDS);
             if (!isLocked) return null; // Indica che non è stato possibile acquisire il lock
 
-            if (isOverlappingBooking(houseId, start, end)) return null;  // Controlla sovrapposizioni
+            if (isOverlappingBooking(accommodationId, start, end)) return null;  // Controlla sovrapposizioni
 
             String timestamp = String.valueOf(System.currentTimeMillis());
-            String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
+            String bookingKey = "booking:" + accommodationId + ":" + start + ":" + end;
 
             // Imposta il timestamp in Redis
             redisTemplate.opsForValue().set(bookingKey, timestamp, TTL, TimeUnit.SECONDS);
@@ -301,17 +302,17 @@ public class BookingRepository {
     }
 
 
-    public boolean lockHouseReg(int houseId, String username, String start, String end) {
-        String lockKey = "lock:house:" + houseId + ":" + username;
+    public boolean lockHouseReg(ObjectId accommodationId, String username, String start, String end) {
+        String lockKey = "lock:house:" + accommodationId+ ":" + username;
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
             boolean isLocked = lock.tryLock(100, 10, TimeUnit.SECONDS);
             if (!isLocked) return false;
 
-            if (isOverlappingBooking(houseId, start, end)) return false;  // Controlla sovrapposizioni
+            if (isOverlappingBooking(accommodationId, start, end)) return false;  // Controlla sovrapposizioni
 
-            String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
+            String bookingKey = "booking:" + accommodationId + ":" + start + ":" + end;
 
             redisTemplate.opsForValue().set(bookingKey, username, TTL, TimeUnit.SECONDS);
             return true;
@@ -324,7 +325,7 @@ public class BookingRepository {
         }
     }
 
-    public boolean unlockHouse(int houseId, String start, String end, String timestampCookie) {
+    public boolean unlockHouse(ObjectId houseId, String start, String end, String timestampCookie) {
         String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
 
         String storedTimestamp = (String) redisTemplate.opsForValue().get(bookingKey);
@@ -336,7 +337,7 @@ public class BookingRepository {
 
         return false;
     }
-    public boolean unlockHouseReg(int houseId, String username, String start, String end) {
+    public boolean unlockHouseReg(ObjectId houseId, String username, String start, String end) {
         String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
 
         // Recuperiamo il valore (username) associato alla prenotazione in Redis

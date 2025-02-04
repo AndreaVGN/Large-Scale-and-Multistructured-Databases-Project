@@ -4,6 +4,7 @@ import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.BookingRepository;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class BookingService {
         return bookingRepository.lockHouse(houseId, start, end);
     }*/
 
-    public String getBookingTimestamp(int houseId, String start, String end) {
+    public String getBookingTimestamp(ObjectId houseId, String start, String end) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate today = LocalDate.now();
         LocalDate inizio = LocalDate.parse(start, formatter);
@@ -42,7 +43,7 @@ public class BookingService {
     }
 
 
-    public boolean bookHouseReg(int houseId,String username, String start, String end) {
+    public boolean bookHouseReg(ObjectId houseId,String username, String start, String end) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate today = LocalDate.now();
         LocalDate inizio = LocalDate.parse(start, formatter);
@@ -65,10 +66,10 @@ public class BookingService {
 
         return bookingRepository.lockHouseReg(houseId,username, start, end);
     }
-    public boolean unlockHouse(int houseId, String start, String end, String timestampCookie) {
+    public boolean unlockHouse(ObjectId houseId, String start, String end, String timestampCookie) {
         return bookingRepository.unlockHouse(houseId, start, end, timestampCookie);
     }
-    public boolean unlockHouseReg(int houseId, String username, String start, String end) {
+    public boolean unlockHouseReg(ObjectId houseId, String username, String start, String end) {
         return bookingRepository.unlockHouseReg(houseId, username, start, end);
     }
 }

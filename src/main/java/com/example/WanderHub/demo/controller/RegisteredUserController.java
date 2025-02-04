@@ -11,6 +11,7 @@ import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.BookingService;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import jakarta.servlet.http.HttpSession;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +57,7 @@ public class RegisteredUserController {
     @PutMapping("/{accommodationId}/addBook/{username}")
     public ResponseEntity<?> addBookToAccommodation(
             @PathVariable String username,
-            @PathVariable int accommodationId,
+            @PathVariable ObjectId accommodationId,
             @RequestBody Book newBook,
             HttpSession session) {
 
@@ -129,7 +130,7 @@ public class RegisteredUserController {
     @DeleteMapping("/{username}/accommodation/{accommodationId}/book/{bookId}")
     public ResponseEntity<String> deleteBook(
             @PathVariable String username,
-            @PathVariable int accommodationId,
+            @PathVariable ObjectId accommodationId,
             @PathVariable int bookId) {
 
         boolean isDeleted = accommodationService.deleteBook(username, accommodationId, bookId);
@@ -142,7 +143,7 @@ public class RegisteredUserController {
         }
     }
     @PostMapping("/{username}/{accommodationId}/lock")
-    public ResponseEntity<String> lockHouse(@PathVariable int accommodationId,@PathVariable String username, @RequestParam String startDate, @RequestParam String endDate) {
+    public ResponseEntity<String> lockHouse(@PathVariable ObjectId accommodationId, @PathVariable String username, @RequestParam String startDate, @RequestParam String endDate) {
         boolean success = bookingService.bookHouseReg(accommodationId, username, startDate,endDate);
         if (success) {
             return ResponseEntity.ok("Casa prenotata temporaneamente!");
@@ -151,7 +152,7 @@ public class RegisteredUserController {
         }
     }
     @PutMapping("/{username}/{accommodationId}/writeReview")
-    public ResponseEntity<?> writeReview(@PathVariable String username, @PathVariable int accommodationId, @RequestBody Review review, HttpSession session) {
+    public ResponseEntity<?> writeReview(@PathVariable String username, @PathVariable ObjectId accommodationId, @RequestBody Review review, HttpSession session) {
         String usernam = (String) session.getAttribute("user");
         System.out.println(usernam);
 
@@ -166,7 +167,7 @@ public class RegisteredUserController {
     }
     @DeleteMapping("/{username}/{accommodationId}/unlock")
     public ResponseEntity<String> unlockHouse(
-            @PathVariable int accommodationId,
+            @PathVariable ObjectId accommodationId,
             @PathVariable String username,
             @RequestParam String startDate,
             @RequestParam String endDate) {

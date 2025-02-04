@@ -5,6 +5,7 @@ import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.RegisteredUser;
+import org.bson.types.ObjectId;
 import org.springframework.data.redis.core.RedisTemplate;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
@@ -61,7 +62,7 @@ public class AccommodationService {
         }
     }
 
-    public AccommodationDTO getAccommodationById(int accommodationId) {
+    public AccommodationDTO getAccommodationById(ObjectId accommodationId) {
         try {
             // Trova la sistemazione esistente
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
@@ -79,9 +80,9 @@ public class AccommodationService {
     }
 
     // Eliminazione di una sistemazione
-    public boolean deleteAccommodationById(int accommodationId) {
-        if (accommodationRepository.existsByAccommodationId(accommodationId)) {
-            accommodationRepository.deleteByAccommodationId(accommodationId);
+    public boolean deleteAccommodationByDescription(ObjectId accommodationId) {
+        if (accommodationRepository.existsByDescription(accommodationId)) {
+            accommodationRepository.deleteByDescription(accommodationId);
             return true;
         }
         return false;
@@ -216,14 +217,14 @@ public class AccommodationService {
 
 
     // Metodo per aggiungere una prenotazione alla casa scelta dal cliente
-    /*public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
+    /*public Accommodation addBookToAccommodation(String username, String description, Book newBook) {
         try {
 
 
             Validator.validateBook(newBook);
 
             // Recupera l'accommodation tramite il suo ID
-            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(description)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
             // Recupera l'utente cliente che sta facendo la prenotazione
@@ -231,7 +232,7 @@ public class AccommodationService {
                     .orElseThrow(() -> new RuntimeException("Customer not found"));
 
             // Definisci la chiave per il lock in Redis
-            String lockKey = "booking_lock:" + accommodationId + ":" + newBook.getStartDate();  // Usa una chiave univoca (per esempio in base all'accommodationId e alla data di inizio)
+            String lockKey = "booking_lock:" + description + ":" + newBook.getStartDate();  // Usa una chiave univoca (per esempio in base all'description e alla data di inizio)
 
             // Ottieni il lock distribuito con Redisson
             RLock lock = redissonClient.getLock(lockKey);
@@ -264,7 +265,7 @@ public class AccommodationService {
         }
     }*/
 
-    public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
+    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook) {
         try {
 
             LocalDate start = newBook.getStartDate();
@@ -274,7 +275,7 @@ public class AccommodationService {
             int aux = accommodationRepository.checkAvailability(accommodationId,start,end);
             System.out.println(aux);
             if(aux>0){
-                throw new IllegalArgumentException("accommodationId " + accommodationId + " is not available.");
+                throw new IllegalArgumentException("description " + accommodationId + " is not available.");
             }
             Validator.validateBook(newBook);
 
@@ -318,7 +319,7 @@ public class AccommodationService {
 
 
 
-    public boolean deleteBook(String username, int accommodationId, int bookId) {
+    public boolean deleteBook(String username, ObjectId accommodationId, int bookId) {
         try {
             // Retrieve the accommodation by its ID
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
@@ -361,7 +362,7 @@ public class AccommodationService {
     public List<AverageCostDTO> viewAvgCostPerNight(String city) {
            return  accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
     }
-    public Accommodation addReviewToAccommodation(String username, int accommodationId, Review review) {
+    public Accommodation addReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 

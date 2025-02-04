@@ -5,6 +5,7 @@ import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,10 +20,10 @@ import java.util.List;
 public interface AccommodationRepository extends MongoRepository<Accommodation, Integer> {
     // Trova una sistemazione per ID
     @Query("{ '_id': ?0 }")
-    Optional<Accommodation> findByAccommodationId(int _id);
+    Optional<Accommodation> findByAccommodationId(ObjectId _id);
 
-    boolean existsByAccommodationId(int accommodationId);
-    void deleteByAccommodationId(int accommodationId);
+    boolean existsByDescription(ObjectId accommodationId);
+    void deleteByDescription(ObjectId accommodationId);
 
 
     @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
@@ -31,8 +32,8 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
 
     // Recupera tutte le recensioni dell'accommodation dato un accommodationId
-    @Query("{ 'accommodationId': ?0 }")
-    Accommodation findReviewsByAccommodationId(int accommodationId);
+    @Query("{ '_id': ?0 }")
+    Accommodation findReviewsByAccommodationId(String description);
 
     @Query("{'city':  ?0}")
     List<Accommodation> findAccommodationsByCity(String city);
@@ -107,11 +108,11 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     })
     List<AverageCostDTO> findAverageCostPerNightByCityAndGuests(String city);
 
-    @Query(value = "{ 'accommodationId': ?0, 'books.occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
+    @Query(value = "{ '_id': ?0, 'books.occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
     //@Query(value = "{ 'accommodationId': ?0, 'occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
-    int checkAvailability(int accommodationId, LocalDate startDate, LocalDate endDate);
+    int checkAvailability(ObjectId accommodationId, LocalDate startDate, LocalDate endDate);
 
-    /*default boolean checkAvailability(int accommodationId, LocalDate startDate, LocalDate endDate) {
+    /*default boolean checkAvailability(String description, LocalDate startDate, LocalDate endDate) {
         long count =  countOverlappingReservations(accommodationId, startDate, endDate);
     }*/
 
@@ -150,7 +151,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
 
     @Query(value = "{ '_id': ?0, 'books.username': ?1, 'books.occupiedDates.end': { $gte: ?2, $lte: ?3 } }", exists = true)
-    boolean existsBookingForUser(int accommodationId, String username, LocalDate maxEndDate, LocalDate today);
+    boolean existsBookingForUser(ObjectId accommodationId, String username, LocalDate maxEndDate, LocalDate today);
 
 }
 

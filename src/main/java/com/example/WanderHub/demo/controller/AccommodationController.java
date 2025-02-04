@@ -15,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class AccommodationController {
 
 
     @GetMapping("/{id}")
-    public AccommodationDTO getAccommodationById(@PathVariable int id) {
+    public AccommodationDTO getAccommodationById(@PathVariable ObjectId id) {
         return accommodationService.getAccommodationById(id);
    }
 
@@ -134,7 +135,7 @@ public class AccommodationController {
 
     @PutMapping("/{accommodationId}/addBook")
     public ResponseEntity<?> addBookToAccommodation(
-            @PathVariable int accommodationId,
+            @PathVariable ObjectId accommodationId,
             @RequestBody Book newBook,
             HttpServletRequest request) {
 
@@ -187,7 +188,7 @@ public class AccommodationController {
     }*/
 
     @PostMapping("/{accommodationId}/lock")
-    public ResponseEntity<String> lockHouse(@PathVariable int accommodationId, @RequestParam String startDate, @RequestParam String endDate, HttpServletResponse response) {
+    public ResponseEntity<String> lockHouse(@PathVariable ObjectId accommodationId, @RequestParam String startDate, @RequestParam String endDate, HttpServletResponse response) {
         String timestamp = bookingService.getBookingTimestamp(accommodationId, startDate, endDate);
 
         if (timestamp != null) {
@@ -208,7 +209,7 @@ public class AccommodationController {
 
     @DeleteMapping("/{accommodationId}/unlock")
     public ResponseEntity<String> unlockHouse(
-            @PathVariable int accommodationId,
+            @PathVariable ObjectId accommodationId,
             @RequestParam String startDate,
             @RequestParam String endDate,
             @CookieValue(value = "bookingTimestamp", required = false) String timestampCookie) {
