@@ -1,4 +1,4 @@
-/*package com.example.WanderHub.demo.service;
+package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.ArchivedReview;
@@ -87,5 +87,5 @@ public class ReviewTransferService {
             logger.error("Errore durante l'archiviazione delle recensioni: ", e);
         }
     }
-}*/
+}
 

@@ -1,4 +1,4 @@
-package com.example.WanderHub.demo.service;
+/*package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
@@ -44,4 +44,4 @@ public class DataPopulatorService {
             e.printStackTrace();
         }
     }
-}
+}*/
