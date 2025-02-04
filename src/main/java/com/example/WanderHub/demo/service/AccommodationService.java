@@ -12,9 +12,7 @@ import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
-import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import com.example.WanderHub.demo.utility.Validator;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -24,7 +22,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -361,6 +358,25 @@ public class AccommodationService {
 
     public List<AverageCostDTO> viewAvgCostPerNight(String city) {
            return  accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
+    }
+    public Accommodation addReviewToAccommodation(String username, int accommodationId, Review review) {
+        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+
+        /*Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, -3); // Sottrarre 3 giorni da oggi
+        LocalDate date = calendar.getTime();
+        System.out.println(date);*/
+
+        LocalDate date = review.getReviewDate().minusDays(3);
+        System.out.println(date);
+        LocalDate today = LocalDate.now();
+        if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
+            throw new RuntimeException("User has not booked this accommodation within 3 days before");
+        }
+
+        accommodation.getReviews().add(review);
+        return accommodationRepository.save(accommodation);
     }
 
 }

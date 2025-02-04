@@ -150,4 +150,18 @@ public class RegisteredUserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente.");
         }
     }
+    @PutMapping("/{username}/{accommodationId}/writeReview")
+    public ResponseEntity<?> writeReview(@PathVariable String username, @PathVariable int accommodationId, @RequestBody Review review, HttpSession session) {
+        String usernam = (String) session.getAttribute("user");
+        System.out.println(usernam);
+
+        if (usernam == null || !usernam.equals(username)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
+        review.setUsername(usernam);
+        review.setReviewDate(LocalDate.now());
+       Accommodation accommodation = accommodationService.addReviewToAccommodation(username,accommodationId,review);
+        return new ResponseEntity<>("Review aggiunte con successo!", HttpStatus.OK);
+    }
 }

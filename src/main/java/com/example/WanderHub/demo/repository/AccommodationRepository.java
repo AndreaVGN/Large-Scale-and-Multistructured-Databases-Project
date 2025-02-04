@@ -138,5 +138,8 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<ArchivedBooking> findCompletedBookings(Date today);
 
 
+    @Query(value = "{ '_id': ?0, 'books.username': ?1, 'books.occupiedDates.end': { $gte: ?2, $lte: ?3 } }", exists = true)
+    boolean existsBookingForUser(int accommodationId, String username, LocalDate maxEndDate, LocalDate today);
+
 }
 

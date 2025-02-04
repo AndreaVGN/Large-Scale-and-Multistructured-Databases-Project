@@ -1,20 +1,24 @@
 package com.example.WanderHub.demo.model;
 
+import java.time.LocalDate;
+
 public class Review {
     private int reviewId;
     private String reviewText;
     private double rating;
     private String username;
+    private LocalDate reviewDate;
 
     // Costruttore senza parametri
     public Review() {}
 
     // Costruttore con parametri
-    public Review(int reviewId, String reviewText, double rating, String username) {
+    public Review(int reviewId, String reviewText, double rating, String username, LocalDate reviewDate) {
         this.reviewId = reviewId;
         this.reviewText = reviewText;
         this.rating = rating;
         this.username = username;
+        this.reviewDate = reviewDate;
     }
 
     // Getter e Setter
@@ -50,6 +54,13 @@ public class Review {
         this.username = username;
     }
 
+    public LocalDate getReviewDate() {
+        return reviewDate;
+    }
+    public void setReviewDate(LocalDate reviewDate) {
+        this.reviewDate = reviewDate;
+    }
+
     // Metodo toString
     @Override
     public String toString() {
@@ -58,6 +69,7 @@ public class Review {
                 ", reviewText='" + reviewText + '\'' +
                 ", rating=" + rating +
                 ", username='" + username + '\'' +
+                ", reviewDate=" + reviewDate +
                 '}';
     }
 }
