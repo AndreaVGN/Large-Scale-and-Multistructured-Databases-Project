@@ -221,6 +221,8 @@ public class AccommodationService {
     // Metodo per aggiungere una prenotazione alla casa scelta dal cliente
     /*public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
         try {
+
+
             Validator.validateBook(newBook);
 
             // Recupera l'accommodation tramite il suo ID

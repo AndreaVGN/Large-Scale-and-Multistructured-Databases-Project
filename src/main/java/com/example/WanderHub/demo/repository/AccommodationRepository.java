@@ -4,6 +4,7 @@ import com.example.WanderHub.demo.DTO.AverageCostDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
+import com.example.WanderHub.demo.model.ArchivedBooking;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.model.Accommodation;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.mongodb.repository.Aggregation;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
 import java.util.List;
 
@@ -115,5 +117,26 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     /*default boolean checkAvailability(int accommodationId, LocalDate startDate, LocalDate endDate) {
         long count =  countOverlappingReservations(accommodationId, startDate, endDate);
     }*/
+
+    @Aggregation(pipeline = {
+            "{ $unwind: '$books' }", // Scompatta l'array di books
+            "{ $unwind: '$books.occupiedDates' }", // Scompatta l'array occupiedDates
+            "{ $match: { 'books.occupiedDates.end': { $lt: ?0 } } }", // Filtra le prenotazioni concluse
+            "{ $project: { " +
+                    "accommodationId: '$_id', " +
+                    "hostUsername: '$hostUsername', " +
+                    "city: '$city', " +
+                    "country: '$place', " +
+                    "startDate: '$books.occupiedDates.start', " +
+                    "endDate: '$books.occupiedDates.end', " +
+                    "nights: { $dateDiff: { startDate: '$books.occupiedDates.start', endDate: '$books.occupiedDates.end', unit: 'day' } }, " +
+                    "totalCost: { $multiply: [{ $dateDiff: { startDate: '$books.occupiedDates.start', endDate: '$books.occupiedDates.end', unit: 'day' } }, '$costPerNight'] }, " +
+                    "username: '$books.username', " +
+                    "guestCount: { $size: '$books.guestFirstNames' } " +
+                    "} }"
+    })
+    List<ArchivedBooking> findCompletedBookings(Date today);
+
+
 }
 
