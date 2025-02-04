@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.mongodb.repository.Aggregation;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.List;
 
@@ -107,5 +108,11 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     })
     List<AverageCostDTO> findAverageCostPerNightByCityAndGuests(String city);
 
+    @Query(value = "{ 'accommodationId': ?0, 'occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
+    int checkAvailability(int accommodationId, LocalDate startDate, LocalDate endDate);
+
+    /*default boolean checkAvailability(int accommodationId, LocalDate startDate, LocalDate endDate) {
+        long count =  countOverlappingReservations(accommodationId, startDate, endDate);
+    }*/
 }
 

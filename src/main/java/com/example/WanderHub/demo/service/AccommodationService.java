@@ -268,7 +268,15 @@ public class AccommodationService {
     public Accommodation addBookToAccommodation(String username, int accommodationId, Book newBook) {
         try {
 
-
+            LocalDate start = newBook.getStartDate();
+            LocalDate end = newBook.getEndDate();
+            System.out.println(start);
+            System.out.println(end);
+            int aux = accommodationRepository.checkAvailability(accommodationId,start,end);
+            System.out.println(aux);
+            if(aux>0){
+                throw new IllegalArgumentException("accommodationId " + accommodationId + " is not available.");
+            }
             Validator.validateBook(newBook);
 
             // Recupera l'accommodation tramite il suo ID
