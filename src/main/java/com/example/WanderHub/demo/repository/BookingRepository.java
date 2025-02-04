@@ -324,4 +324,32 @@ public class BookingRepository {
         }
     }
 
+    public boolean unlockHouse(int houseId, String start, String end, String timestampCookie) {
+        String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
+
+        String storedTimestamp = (String) redisTemplate.opsForValue().get(bookingKey);
+
+        if (storedTimestamp != null && storedTimestamp.equals(timestampCookie)) {
+            redisTemplate.delete(bookingKey);
+            return true;
+        }
+
+        return false;
+    }
+    public boolean unlockHouseReg(int houseId, String username, String start, String end) {
+        String bookingKey = "booking:" + houseId + ":" + start + ":" + end;
+
+        // Recuperiamo il valore (username) associato alla prenotazione in Redis
+        String storedUsername = (String) redisTemplate.opsForValue().get(bookingKey);
+
+        // Verifica che l'utente sia effettivamente quello che ha fatto la prenotazione
+        if (storedUsername != null && storedUsername.equals(username)) {
+            // Elimina la chiave se l'utente corrisponde
+            redisTemplate.delete(bookingKey);
+            return true;
+        }
+
+        return false;
+    }
+
 }

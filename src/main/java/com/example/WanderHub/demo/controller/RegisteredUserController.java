@@ -147,7 +147,7 @@ public class RegisteredUserController {
         if (success) {
             return ResponseEntity.ok("Casa prenotata temporaneamente!");
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente. Oppure periodo di tempo non valido");
         }
     }
     @PutMapping("/{username}/{accommodationId}/writeReview")
@@ -163,5 +163,20 @@ public class RegisteredUserController {
         review.setDate(LocalDate.now());
        Accommodation accommodation = accommodationService.addReviewToAccommodation(username,accommodationId,review);
         return new ResponseEntity<>("Review aggiunte con successo!", HttpStatus.OK);
+    }
+    @DeleteMapping("/{username}/{accommodationId}/unlock")
+    public ResponseEntity<String> unlockHouse(
+            @PathVariable int accommodationId,
+            @PathVariable String username,
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+
+        boolean success = bookingService.unlockHouseReg(accommodationId, username, startDate, endDate);
+
+        if (success) {
+            return ResponseEntity.ok("Casa sbloccata con successo.");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Errore nello sblocco della casa o la prenotazione non esiste.");
+        }
     }
 }

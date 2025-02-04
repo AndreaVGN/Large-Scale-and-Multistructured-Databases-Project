@@ -206,5 +206,25 @@ public class AccommodationController {
         }
     }
 
+    @DeleteMapping("/{accommodationId}/unlock")
+    public ResponseEntity<String> unlockHouse(
+            @PathVariable int accommodationId,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @CookieValue(value = "bookingTimestamp", required = false) String timestampCookie) {
+
+        if (timestampCookie == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nessun timestamp di prenotazione trovato.");
+        }
+
+        boolean unlocked = bookingService.unlockHouse(accommodationId, startDate, endDate, timestampCookie);
+
+        if (unlocked) {
+            return ResponseEntity.ok("Casa sbloccata con successo.");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Errore nello sblocco della casa.");
+        }
+    }
+
 }
 
