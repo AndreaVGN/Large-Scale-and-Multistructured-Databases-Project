@@ -108,7 +108,8 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     })
     List<AverageCostDTO> findAverageCostPerNightByCityAndGuests(String city);
 
-    @Query(value = "{ 'accommodationId': ?0, 'occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
+    @Query(value = "{ 'accommodationId': ?0, 'books.occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
+    //@Query(value = "{ 'accommodationId': ?0, 'occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
     int checkAvailability(int accommodationId, LocalDate startDate, LocalDate endDate);
 
     /*default boolean checkAvailability(int accommodationId, LocalDate startDate, LocalDate endDate) {
