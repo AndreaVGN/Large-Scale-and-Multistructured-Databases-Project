@@ -27,8 +27,8 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
 
     @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
-            fields = "{ 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] }, '_id': 0 }")
-    List<Accommodation> findAvailableAccommodations(String city, int minGuests, String startDate, String endDate);
+            fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
+    List<Accommodation> findAvailableAccommodations(String city, int minGuests, LocalDate startDate, LocalDate endDate);
 
 
     // Recupera tutte le recensioni dell'accommodation dato un accommodationId

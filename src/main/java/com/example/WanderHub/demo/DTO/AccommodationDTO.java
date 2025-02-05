@@ -5,6 +5,7 @@ import com.example.WanderHub.demo.model.Book;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.example.WanderHub.demo.model.Review;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)  // Include solo campi non nulli
 public class AccommodationDTO {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)  // Ignora se vale 0
+    private String accommodationId;
     //private ObjectId accommodationId;
     private String description;
     private String type;
@@ -26,9 +28,9 @@ public class AccommodationDTO {
     private List<Review> reviews;  // Aggiunto campo reviews
 
     // Costruttore privato per forzare l'uso dei metodi factory
-    private AccommodationDTO(/*int accommodationId,*/ String description, String type, String city, String hostUsername,
+    private AccommodationDTO(String accommodationId, String description, String type, String city, String hostUsername,
                             int costPerNight, double averageRate, List<String> photos, List<Review> reviews) {
-        //this.accommodationId = accommodationId;
+        this.accommodationId = accommodationId;
         this.description = description;
         this.type = type;
         this.city = city;
@@ -40,7 +42,8 @@ public class AccommodationDTO {
     }
 
     // Costruttore per il caso con informazioni limitate (senza ID e reviews)
-    private AccommodationDTO(String description, String type, String city, String hostUsername, int costPerNight, double averageRate, List<String> photos) {
+    private AccommodationDTO(String accommodationId, String description, String type, String city, String hostUsername, int costPerNight, double averageRate, List<String> photos) {
+        this.accommodationId = accommodationId;
         this.description = description;
         this.type = type;
         this.city = city;
@@ -50,8 +53,8 @@ public class AccommodationDTO {
         this.photos = photos;
     }
 
-    private AccommodationDTO(/*ObjectId accommodationId,*/ String description, List<Book> books, List<Review> reviews){
-       // this.accommodationId = accommodationId;
+    private AccommodationDTO(String accommodationId, String description, List<Book> books, List<Review> reviews){
+       this.accommodationId = accommodationId;
         this.description = description;
         this.books = books;
         this.reviews = reviews;
@@ -59,7 +62,7 @@ public class AccommodationDTO {
 
     public static AccommodationDTO fromBasicInfo(Accommodation accommodation) {
         return new AccommodationDTO(
-                /*accommodation.getAccommodationId(),*/
+                accommodation.getAccommodationId(),
                 accommodation.getDescription(),
                 null, // Non necessario per il caso basic
                 null, // Non necessario per il caso basic
@@ -76,7 +79,7 @@ public class AccommodationDTO {
         List<String> allPhotos = (accommodation.getPhotos() != null && accommodation.getPhotos().length > 0) ?
                 Arrays.asList(accommodation.getPhotos()) : null;  // Restituisce tutte le foto come lista
         return new AccommodationDTO(
-                /*accommodation.getAccommodationId(),*/
+                accommodation.getAccommodationId(),
                 accommodation.getDescription(),
                 accommodation.getType(),
                 accommodation.getCity(),
@@ -93,6 +96,7 @@ public class AccommodationDTO {
         String firstPhoto = (accommodation.getPhotos() != null && accommodation.getPhotos().length > 0) ?
                 accommodation.getPhotos()[0] : null; // Restituisce la prima foto o null
         return new AccommodationDTO(
+                accommodation.getAccommodationId(),
                 accommodation.getDescription(),
                 accommodation.getType(),
                 accommodation.getCity(),
@@ -104,7 +108,7 @@ public class AccommodationDTO {
     }
     public static AccommodationDTO fromSomeInfo(Accommodation accommodation){
         return new AccommodationDTO(
-                /*accommodation.getAccommodationId(),*/
+                accommodation.getAccommodationId(),
                 accommodation.getDescription(),
                 accommodation.getBooks(),
                 null
@@ -113,17 +117,17 @@ public class AccommodationDTO {
 
     public static AccommodationDTO withReviews(Accommodation accommodation) {
         return new AccommodationDTO(
-                /*accommodation.getAccommodationId(),*/
+                accommodation.getAccommodationId(),
                 accommodation.getDescription(),
                 null,
                 accommodation.getReviews()
         );
     }
-/*
+
     // Getter e Setter
-    public int getAccommodationId() { return accommodationId; }
-    public void setAccommodationId(int accommodationId) { this.accommodationId = accommodationId; }
-*/
+    public String getAccommodationId() { return accommodationId; }
+    public void setAccommodationId(String accommodationId) { this.accommodationId = accommodationId; }
+
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 

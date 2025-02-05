@@ -235,9 +235,9 @@ public class BookingRepository {
 
             for (String key : existingKeys) {
                 String[] parts = key.split(":");
-                if (parts.length < 8) continue; // Deve contenere description, start, end e timestamp/username
+                if (parts.length < 7) continue; // Deve contenere description, start, end e timestamp/username
 
-                LocalDate existingStart = LocalDate.parse(parts[5]);
+                LocalDate existingStart = LocalDate.parse(parts[4]);
                 LocalDate existingEnd = LocalDate.parse(parts[6]);
 
                 boolean isOverlapping = !(newEnd.isBefore(existingStart) || newStart.isAfter(existingEnd));

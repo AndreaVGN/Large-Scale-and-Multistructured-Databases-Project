@@ -35,9 +35,9 @@ public class AccommodationController {
     @PostMapping("/{username}")
     public ResponseEntity<?> createAccommodation(@PathVariable String username, @RequestBody Accommodation accommodation, HttpSession session) {
         // Controlla se l'utente nella sessione è lo stesso che è nel path
-        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+        String usernam = (String) session.getAttribute("user");
 
-        if (loggedInUser == null || !loggedInUser.getUsername().equals(username)) {
+        if (usernam == null || !usernam.equals(username)) {
             // Se l'utente non è loggato o non corrisponde, restituisci un errore
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
@@ -60,6 +60,7 @@ public class AccommodationController {
             @RequestParam("guestSize") int minGuests,
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate) {
+
 
         return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate);
     }

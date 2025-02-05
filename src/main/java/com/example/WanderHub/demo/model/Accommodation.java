@@ -12,7 +12,7 @@ import com.example.WanderHub.demo.utility.OccupiedPeriod;
 @Document(collection = "accommodations")  // La collezione in MongoDB
 public class Accommodation {
     @Id
-    private ObjectId id;
+    private String accommodationId;
 
     private String description;
     private String type;
@@ -61,12 +61,14 @@ public class Accommodation {
         this.reviews = reviews;
     }
 
+    public String getAccommodationId() { return accommodationId; }
+    public void setAccommodationId(String accommodationId) { this.accommodationId = accommodationId; }
     // Getter e Setter
     public String getDescription() {
         return description;
     }
 
-    public void setAccommodationId(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 

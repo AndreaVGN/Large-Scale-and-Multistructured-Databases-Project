@@ -105,6 +105,7 @@ public class AccommodationService {
             if(place==null || place.trim().isEmpty()){
                 throw new IllegalArgumentException("place cannot be null.");
             }
+
             if (startDate == null || startDate.trim().isEmpty()) {
                 throw new IllegalArgumentException("startDate cannot be empty.");
             }
@@ -120,7 +121,7 @@ public class AccommodationService {
             }
 
             // Esegui la query che restituisce le Accommodation
-            List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, startDate, endDate);
+            List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, start, end);
 
             // Mappa le Accommodation in DTO utilizzando il factory method
             return accommodations.stream()
