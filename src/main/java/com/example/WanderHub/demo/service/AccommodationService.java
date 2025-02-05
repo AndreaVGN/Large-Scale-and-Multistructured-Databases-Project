@@ -5,6 +5,7 @@ import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.RegisteredUser;
+import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import org.bson.types.ObjectId;
 import org.springframework.data.redis.core.RedisTemplate;
 import com.example.WanderHub.demo.model.Review;
@@ -12,6 +13,7 @@ import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
+import com.example.WanderHub.demo.repository.BookingRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.utility.Validator;
 import org.redisson.api.RedissonClient;
@@ -36,6 +38,11 @@ public class AccommodationService {
     private RedissonClient redissonClient;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private BookingService bookingService;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Autowired
     public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
@@ -265,7 +272,7 @@ public class AccommodationService {
         }
     }*/
 
-    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook) {
+    /*public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook) {
         try {
 
             LocalDate start = newBook.getStartDate();
@@ -283,9 +290,7 @@ public class AccommodationService {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-            // Recupera l'utente cliente che sta facendo la prenotazione
-           /* RegisteredUser customer = registeredUserRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Customer not found"));*/
+
             if (accommodation.getHostUsername().equals(username)) {
                 throw new RuntimeException("Host cannot book their own accommodation.");
             }
@@ -311,6 +316,54 @@ public class AccommodationService {
 
 
             return savedAccommodation;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
+        }
+    }*/
+    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook) {
+        try {
+            LocalDate start = newBook.getStartDate();
+            LocalDate end = newBook.getEndDate();
+
+            int aux = accommodationRepository.checkAvailability(accommodationId, start, end);
+            if (aux > 0) {
+                throw new IllegalArgumentException("Accommodation " + accommodationId + " is not available for the selected period.");
+            }
+
+            Validator.validateBook(newBook);
+
+            // Recupera l'accommodation dal database
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+
+            // Controlla che l'utente non sia il proprietario dell'alloggio
+            if (accommodation.getHostUsername().equals(username)) {
+                throw new RuntimeException("Host cannot book their own accommodation.");
+            }
+
+            // Controlla se l'utente ha già una prenotazione nello stesso periodo
+            String bookingKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
+            String existingBooking = (String) redisTemplate.opsForValue().get(bookingKey);
+            System.out.println(existingBooking);
+            if (!username.equals(existingBooking)) {
+                throw new RuntimeException("User already has a booking for this accommodation in the selected period.");
+            }
+
+            // Imposta il nome utente sulla prenotazione
+            newBook.setUsername(username);
+
+            // **1. Aggiungi la prenotazione alla lista delle books dell'accommodation**
+            accommodation.getBooks().add(newBook);
+
+            // **2. Aggiorna il campo occupiedDates dell'accommodation con il nuovo periodo occupato**
+            if (accommodation.getOccupiedDates() == null) {
+                accommodation.setOccupiedDates(new ArrayList<>());
+            }
+            accommodation.getOccupiedDates().add(new OccupiedPeriod(start, end));
+
+            // Salva l'accommodation aggiornata nel database
+            return accommodationRepository.save(accommodation);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
@@ -370,7 +423,12 @@ public class AccommodationService {
         calendar.add(Calendar.DAY_OF_YEAR, -3); // Sottrarre 3 giorni da oggi
         LocalDate date = calendar.getTime();
         System.out.println(date);*/
-
+        String text = bookingRepository.existsBozzaText(username,accommodationId);
+        String rating = bookingRepository.existsBozzaRating(username,accommodationId);
+        if(text!=null && rating!=null && review.getReviewText()==null) {
+            review.setReviewText(text);
+            review.setRating(Double.parseDouble(rating));
+        }
         LocalDate date = review.getDate().minusDays(3);
         System.out.println(date);
         LocalDate today = LocalDate.now();
@@ -381,6 +439,18 @@ public class AccommodationService {
         accommodation.getReviews().add(review);
         return accommodationRepository.save(accommodation);
     }
+    public boolean addBozzaToAccommodation(String username, ObjectId accommodationId, Review review) {
+        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
+
+        LocalDate date = review.getDate().minusDays(3);
+        System.out.println(date);
+        LocalDate today = LocalDate.now();
+        if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
+            throw new RuntimeException("User has not booked this accommodation within 3 days before");
+        }
+        return bookingRepository.addBozza(username,accommodationId,review);
+    }
 }
 

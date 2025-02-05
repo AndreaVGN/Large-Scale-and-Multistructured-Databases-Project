@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.repository;
 
 import com.example.WanderHub.demo.model.Book;
+import com.example.WanderHub.demo.model.Review;
 import jakarta.servlet.http.Cookie;
 import org.bson.types.ObjectId;
 import org.redisson.api.RLock;
@@ -353,5 +354,22 @@ public class BookingRepository {
 
         return false;
     }
+    public boolean addBozza(String username, ObjectId accommodationId, Review review) {
+        String text = review.getReviewText();
+        String rating = String.valueOf(review.getRating());
 
+        String bozzaTextKey = "review:accId:" + accommodationId + ":username:" + username +":text";
+        String bozzaRatingKey = "review:accId:" + accommodationId + ":username" + username +":rating";
+        redisTemplate.opsForValue().set(bozzaTextKey, text, TTL, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(bozzaRatingKey, rating, TTL, TimeUnit.SECONDS);
+        return true;
+    }
+   public String existsBozzaText(String username, ObjectId accommodationId) {
+       String bozzaTextKey = "review:accId:" + accommodationId + ":username:" + username +":text";
+       return (String) redisTemplate.opsForValue().get(bozzaTextKey);
+   }
+   public String existsBozzaRating(String username, ObjectId accommodationId) {
+       String bozzaRatingKey = "review:accId:" + accommodationId + ":username" + username +":rating";
+       return (String) redisTemplate.opsForValue().get(bozzaRatingKey);
+   }
 }

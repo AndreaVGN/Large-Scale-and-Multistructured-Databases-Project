@@ -180,4 +180,19 @@ public class RegisteredUserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Errore nello sblocco della casa o la prenotazione non esiste.");
         }
     }
+    @PostMapping("/{username}/{accommodationId}/writeBozza")
+    public ResponseEntity<?> writeBozza(@PathVariable String username, @PathVariable ObjectId accommodationId, @RequestBody Review review, HttpSession session) {
+        String usernam = (String) session.getAttribute("user");
+        System.out.println(usernam);
+
+        if (usernam == null || !usernam.equals(username)) {
+            // Se l'utente non è loggato o non corrisponde, restituisci un errore
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+        }
+        review.setUsername(usernam);
+        review.setDate(LocalDate.now());
+        //if(accommodationService.addBozzaToAccommodation(username,accommodationId,review))
+        accommodationService.addBozzaToAccommodation(username,accommodationId,review);
+        return new ResponseEntity<>("Bozza aggiunta con successo!", HttpStatus.OK);
+    }
 }
