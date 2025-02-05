@@ -19,6 +19,7 @@ public class ReviewController {
         return reviewService.createReview(review);
     }
 
+    /*
     @GetMapping("/{id}")
     public Review getReview(@PathVariable int id) {
         return reviewService.getReviewById(id);
@@ -33,7 +34,7 @@ public class ReviewController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
 
 
 

@@ -1,4 +1,4 @@
-/*package com.example.WanderHub.demo.service;
+package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.ArchivedBooking;
@@ -70,7 +70,9 @@ public class BookingTransferService {
     public void archiveOldBookings() {
         System.out.println("Partititiiiiii");
         LocalDate todayLocalDate = LocalDate.now();
-        Date today = Date.from(todayLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        //Date today = Date.from(todayLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        LocalDate today = LocalDate.now();
 
 
         try {
@@ -82,6 +84,22 @@ public class BookingTransferService {
                 return;
             }
 
+
+            for (ArchivedBooking booking : completedBookings) {
+                logger.info("AccommodationId: {}", booking.getAccommodationId());
+                logger.info("Host Username: {}", booking.getHostUsername());
+                logger.info("City: {}", booking.getCity());
+                logger.info("Country: {}", booking.getCountry());
+                logger.info("Start Date: {}", booking.getStartDate());
+                logger.info("End Date: {}", booking.getEndDate());
+                logger.info("Nights: {}", booking.getNights());
+                logger.info("Total Cost: {}", booking.getTotalCost());
+                logger.info("Username: {}", booking.getUsername());
+                logger.info("Guest Count: {}", booking.getGuestCount());
+            }
+
+            /*
+
             // 3️⃣ Salvare in `ArchivedBookings` usando BATCH
             int batchSize = 500; // Numero di documenti per batch
             for (int i = 0; i < completedBookings.size(); i += batchSize) {
@@ -92,12 +110,12 @@ public class BookingTransferService {
 
             // 4️⃣ Rimuovere da accommodations con Batch
             removeArchivedBookings(today);
-            logger.info("Prenotazioni archiviate rimosse da accommodations.");
+            logger.info("Prenotazioni archiviate rimosse da accommodations.");*/
 
         } catch (Exception e) {
             logger.error("Errore durante l'archiviazione delle prenotazioni: ", e);
         }
     }
-}*/
+}
 
 

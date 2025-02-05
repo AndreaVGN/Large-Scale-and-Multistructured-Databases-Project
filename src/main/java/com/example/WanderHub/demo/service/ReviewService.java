@@ -18,6 +18,7 @@ public class ReviewService {
         return ReviewRepository.save(review);
     }
 
+    /*
     public Review getReviewById(int reviewId) {
         return ReviewRepository.findByReviewId(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + reviewId));
@@ -29,7 +30,7 @@ public class ReviewService {
             return true;
         }
         return false;
-    }
+    }*/
 
     // Altri metodi per gestire le sistemazioni
 

@@ -55,7 +55,7 @@ public class DataPopulatorServiceRegUser {
 
             // Carica il file JSON e mappa correttamente in una lista di oggetti RegisteredUser
             List<RegisteredUser> users = objectMapper.readValue(
-                    new FileReader("C:/Users/andre/Downloads/popolamentoUsernamesFinale_modificato_output.json"),
+                    new FileReader("C:/Users/andre/Downloads/popolamentoUsernamesFinale.json"),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, RegisteredUser.class));
 
             System.out.println("Totale utenti letti dal file: " + users.size());
@@ -90,6 +90,6 @@ public class DataPopulatorServiceRegUser {
             e.printStackTrace();  // Log dettagliato dell'errore
         }
     }
-}
-*/
+}*/
+
 

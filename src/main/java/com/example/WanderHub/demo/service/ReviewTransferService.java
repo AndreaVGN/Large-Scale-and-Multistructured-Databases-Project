@@ -6,6 +6,7 @@ import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.ArchivedReviewRepository;
 import com.example.WanderHub.demo.repository.ReviewRepository;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -39,7 +40,7 @@ public class ReviewTransferService {
     @Autowired
     private AccommodationRepository accommodationRepository;
 
-    public void removeArchivedReviews(Date oneMonthAgo) {
+    public void removeArchivedReviews(LocalDate oneMonthAgo) {
         Query query = new Query();
 
         Update update = new Update()
@@ -60,10 +61,11 @@ public class ReviewTransferService {
         logger.info("Inizio archiviazione recensioni scadute...");
 
         LocalDate todayLocalDate = LocalDate.now();
-        LocalDate oneMonthAgoLocalDate = todayLocalDate.minusMonths(1);
-        Date oneMonthAgo = Date.from(oneMonthAgoLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        LocalDate oneMonthAgo = todayLocalDate.minusMonths(1);
+
 
         try {
+
             // 1️⃣ Estrarre le recensioni più vecchie di un mese
             List<ArchivedReview> oldReviews = accommodationRepository.findOldReviews(oneMonthAgo);
             if (oldReviews.isEmpty()) {
@@ -71,10 +73,25 @@ public class ReviewTransferService {
                 return;
             }
 
+
+
+
+            for (ArchivedReview review : oldReviews) {
+                logger.info("AccommodationId: {}", review.getAccommodationId());
+                logger.info("Username: {}", review.getUsername());
+                logger.info("Rating: {}", review.getRate());
+                logger.info("Review Text: {}", review.getReviewText());
+                logger.info("Date: {}", review.getDate());
+            }
+
+
+
             // 2️⃣ Salvare in `ArchivedReview` in batch
             int batchSize = 500;
             for (int i = 0; i < oldReviews.size(); i += batchSize) {
+
                 int end = Math.min(i + batchSize, oldReviews.size());
+                //System.out.println(oldReviews.subList(i, end));
                 archivedReviewRepository.saveAll(oldReviews.subList(i, end));
                 logger.info("Batch recensioni archiviato: {} - {}", i, end);
             }
