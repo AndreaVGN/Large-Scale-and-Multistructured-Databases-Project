@@ -144,6 +144,7 @@ public class RegisteredUserController {
     }
     @PostMapping("/{username}/{accommodationId}/lock")
     public ResponseEntity<String> lockHouse(@PathVariable ObjectId accommodationId, @PathVariable String username, @RequestParam String startDate, @RequestParam String endDate) {
+        System.out.println("Controller received startDate: " + startDate + ", endDate: " + endDate);
         boolean success = bookingService.bookHouseReg(accommodationId, username, startDate,endDate);
         if (success) {
             return ResponseEntity.ok("Casa prenotata temporaneamente!");

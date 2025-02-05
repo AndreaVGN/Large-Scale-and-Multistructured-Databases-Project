@@ -44,6 +44,8 @@ public class BookingService {
 
 
     public boolean bookHouseReg(ObjectId houseId,String username, String start, String end) {
+        System.out.println("DEBUG: Start date received -> " + start);
+        System.out.println("DEBUG: End date received -> " + end);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate today = LocalDate.now();
         LocalDate inizio = LocalDate.parse(start, formatter);

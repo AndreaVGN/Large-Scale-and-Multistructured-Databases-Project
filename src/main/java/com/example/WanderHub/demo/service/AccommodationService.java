@@ -429,6 +429,11 @@ public class AccommodationService {
             review.setReviewText(text);
             review.setRating(Double.parseDouble(rating));
         }
+        review.setDate(LocalDate.now());
+        /*LocalDate aux = review.getDate();
+        if(aux.isBefore(LocalDate.now())) {
+            throw new RuntimeException("you cannot review an accommodation before the end of the stay");
+        }*/
         LocalDate date = review.getDate().minusDays(3);
         System.out.println(date);
         LocalDate today = LocalDate.now();
@@ -443,7 +448,11 @@ public class AccommodationService {
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-
+        /*LocalDate aux = review.getDate();
+        if(aux.isBefore(LocalDate.now())) {
+            throw new RuntimeException("you cannot review an accommodation before the end of the stay");
+        }*/
+        review.setDate(LocalDate.now());
         LocalDate date = review.getDate().minusDays(3);
         System.out.println(date);
         LocalDate today = LocalDate.now();
