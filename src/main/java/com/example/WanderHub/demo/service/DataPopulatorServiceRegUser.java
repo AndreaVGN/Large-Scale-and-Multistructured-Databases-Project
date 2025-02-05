@@ -1,4 +1,4 @@
-
+/*
 package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.RegisteredUser;  // Modifica il nome del modello
@@ -91,5 +91,5 @@ public class DataPopulatorServiceRegUser {
         }
     }
 }
-
+*/
 
