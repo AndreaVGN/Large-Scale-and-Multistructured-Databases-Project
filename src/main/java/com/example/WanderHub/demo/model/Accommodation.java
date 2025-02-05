@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 
 @Document(collection = "accommodations")  // La collezione in MongoDB
@@ -16,7 +18,7 @@ public class Accommodation {
 
     private String description;
     private String type;
-    private boolean[] facilities;
+    private Map<String, Integer> facilities;
     private String place;
     private String city;
     private String address;
@@ -39,7 +41,7 @@ public class Accommodation {
     public Accommodation() {}
 
     // Costruttore con parametri
-    public Accommodation(String description, String type, boolean[] facilities, String place,
+    public Accommodation(String description, String type, Map<String, Integer> facilities, String place,
                          String city, String address, String hostUsername, double latitude, double longitude,
                          List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate,
                          String[] photos, List<Book> books, List<Review> reviews) {
@@ -80,11 +82,11 @@ public class Accommodation {
         this.type = type;
     }
 
-    public boolean[] getFacilities() {
+    public Map<String, Integer> getFacilities() {
         return facilities;
     }
 
-    public void setFacilities(boolean[] facilities) {
+    public void setFacilities(Map<String, Integer> facilities) {
         this.facilities = facilities;
     }
 
@@ -198,7 +200,7 @@ public class Accommodation {
         return "Accommodation{" +
                 ", description='" + description + '\'' +
                 ", type='" + type + '\'' +
-                ", facilities=" + Arrays.toString(facilities) +
+                ", facilities=" + facilities.toString() +
                 ", place='" + place + '\'' +
                 ", city='" + city + '\'' +
                 ", address='" + address + '\'' +
