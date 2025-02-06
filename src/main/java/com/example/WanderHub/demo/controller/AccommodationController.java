@@ -253,11 +253,11 @@ public class AccommodationController {
         if (city == null || city.isEmpty()) {
             throw new IllegalArgumentException("La città non può essere null o vuota");
         }
-        return archivedBookingService.findAverageBookingDurationByCity(city);
+        return ArchivedBookingService.findAverageBookingDurationByCity(city);
     }
     @GetMapping("/{city}/mostCommonBirthPlace")
     public BirthPlaceFrequency getMostCommonBirthPlaceByCity(@PathVariable String city){
-        return archivedBookingService.findMostCommonBirthPlaceByCity(city);
+        return ArchivedBookingService.findMostCommonBirthPlaceByCity(city);
     }
 }
 

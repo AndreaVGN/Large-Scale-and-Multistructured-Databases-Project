@@ -1,6 +1,6 @@
 package com.example.WanderHub.demo.repository;
 
-import com.example.WanderHub.demo.DTO.CityBookingRankingDTO;
+import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.ArchivedBooking;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;

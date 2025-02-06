@@ -1,6 +1,6 @@
 package com.example.WanderHub.demo.service;
 
-import com.example.WanderHub.demo.DTO.CityBookingRankingDTO;
+import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.repository.ArchivedBookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
