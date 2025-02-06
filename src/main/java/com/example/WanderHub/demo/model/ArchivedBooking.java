@@ -8,6 +8,8 @@ import java.util.List;
 public class ArchivedBooking {
 
     private String accommodationId;
+    private String hostUsername;
+    private String city;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
     private String username;
     private String email;
@@ -19,10 +21,12 @@ public class ArchivedBooking {
     private String[] guestLastNames;
 
     // Costruttore
-    public ArchivedBooking(String accommodationId, List<OccupiedPeriod> occupiedDates, String username,
+    public ArchivedBooking(String accommodationId,String hostUsername, String city, List<OccupiedPeriod> occupiedDates, String username,
                            String email, String birthPlace, String address, int addressNumber, String birthDate,
                            String[] guestFirstNames, String[] guestLastNames) {
         this.accommodationId = accommodationId;
+        this.hostUsername = hostUsername;
+        this.city = city;
         this.occupiedDates = occupiedDates;
         this.username = username;
         this.email = email;
@@ -41,6 +45,18 @@ public class ArchivedBooking {
 
     public void setAccommodationId(String accommodationId) {
         this.accommodationId = accommodationId;
+    }
+    public String getHostUsername() {
+        return hostUsername;
+    }
+    public void setHostUsername(String hostUsername) {
+        this.hostUsername = hostUsername;
+    }
+    public String getCity() {
+        return city;
+    }
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public List<OccupiedPeriod> getOccupiedDates() {
@@ -144,6 +160,8 @@ public class ArchivedBooking {
     public String toString() {
         return "ArchivedBooking{" +
                 "accommodationId='" + accommodationId + '\'' +
+                ", hostUsername='" + hostUsername + '\'' +
+                ", city='" + city + '\'' +
                 ", occupiedDates=" + occupiedDates +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +

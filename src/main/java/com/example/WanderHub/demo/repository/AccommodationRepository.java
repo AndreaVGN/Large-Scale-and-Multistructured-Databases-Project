@@ -195,7 +195,7 @@ List<ArchivedReview> findOldReviews(LocalDate oneMonthAgo);
     @Aggregation(pipeline = {
             "{ $unwind: '$books' }",
             "{ $match: { 'books.occupiedDates.end': { $lt: ?0 } } }",
-            "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$books', { accommodationId: '$_id' } ] } } }"
+            "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$books', { accommodationId: '$_id' }, {city: '$city'}, {hostUsername: '$hostUsername'} ] } } }"
     })
 
     List<ArchivedBooking> findOldBookings(LocalDate oneMonthAgo);

@@ -178,7 +178,7 @@ public class BookingTransferService {
         mongoTemplate.updateMulti(new Query(Criteria.where("occupiedDates").size(0)), setEmptyOccupiedDates, Accommodation.class);
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void archiveOldBookings() {
         logger.info("Inizio archiviazione prenotazioni scadute...");
         LocalDate oneMonthAgo = LocalDate.now().plusMonths(10);
