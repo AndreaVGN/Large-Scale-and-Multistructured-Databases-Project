@@ -478,7 +478,7 @@ public class AccommodationService {
 
 
     //@Scheduled(cron = "0 0 3 * * ?") // Ogni giorno alle 03:00 AM
-    //@PostConstruct
+   // @PostConstruct
     public void updateAverageRates() {
         List<AccommodationAverageRate> averages = archivedReviewRepository.calculateAverageRatesForAllAccommodations();
 

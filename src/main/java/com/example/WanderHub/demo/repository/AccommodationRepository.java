@@ -89,20 +89,35 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<ReviewDTO> viewAccommodationReviews(String username,int id);
 
     @Aggregation(pipeline = {
-            "{ $match: { 'city': ?0, 'averageRate': { $gt: 0 } } }", // Filtra per città
-            "{ $unwind: '$facilities' }",  // Scompone l'array facilities
-            "{ $group: { " +
-                    "_id: { 'facility': '$facilities', 'city': '$city' }, " + // Raggruppa per facility e città
-                    "averageRating: { $avg: '$averageRate' } " + // Calcola il rating medio
-                    "} }",
+            // Filtro per città e per valutazione maggiore di 0
+            "{ $match: { 'city': ?0, 'averageRate': { $gt: 0 } } }",
+            // Converte l'oggetto facilities in un array di key-value
             "{ $project: { " +
-                    "'facility': '$_id.facility', " +
-                    "'city': '$_id.city', " +
-                    "'averageRating': 1, " +
-                    "_id: 0 " + // Rimuove il campo _id
+                    "city: 1, " +  // Mantieni la città
+                    "facilities: { $objectToArray: '$facilities' }, " +  // Converte l'oggetto 'facilities' in un array
+                    "averageRate: 1 " +  // Mantieni il campo averageRate
+                    "} }",
+            // Filtro per facilitazioni con valore uguale a 1 (attivo)
+            "{ $unwind: '$facilities' }",  // Scompone l'array di facilitazioni
+            "{ $match: { 'facilities.v': 1 } }",  // Filtra solo le facilitazioni con valore uguale a 1
+            // Raggruppa per facilità e città, calcolando la valutazione media
+            "{ $group: { " +
+                    "_id: { 'facility': '$facilities.k', 'city': '$city' }, " +  // Raggruppa per nome facilità (facilities.k) e città
+                    "averageRating: { $avg: '$averageRate' } " +  // Calcola la valutazione media
+                    "} }",
+            // Proietta il risultato finale
+            "{ $project: { " +
+                    "facility: '$_id.facility', " +  // Estrai il nome della facilità
+                    "city: '$_id.city', " +  // Estrai la città
+                    "averageRating: 1, " +  // La valutazione media
+                    "_id: 0 " +  // Rimuove il campo _id
                     "} }"
     })
     List<FacilityRatingDTO> getAverageRatingByFacilityInCity(String city);
+
+
+
+
 
     @Aggregation(pipeline = {
             "{ $match: { 'city': ?0 } }",

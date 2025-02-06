@@ -1,8 +1,8 @@
 package com.example.WanderHub.demo.DTO;
 
 public class FacilityRatingDTO {
-    private String city;
     private String facility;
+    private String city;
     private double averageRating;
 
     public FacilityRatingDTO(String city, String facility, double averageRating) {
