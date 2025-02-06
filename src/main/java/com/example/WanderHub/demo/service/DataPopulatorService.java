@@ -1,5 +1,5 @@
 
-/*
+
 package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.Accommodation;
@@ -20,7 +20,7 @@ public class DataPopulatorService {
     @Autowired
     private AccommodationRepository accommodationRepository;
 
-    @PostConstruct
+    //@PostConstruct
     public void populateData() {
         try {
             // Crea l'ObjectMapper
@@ -35,7 +35,7 @@ public class DataPopulatorService {
             System.out.println("Dati popolati correiiiiiiiiiiiiiiiiittamente nel database.");
 
             // Carica il file JSON e mappa correttamente in una lista di oggetti Accommodation
-            List<Accommodation> accommodations = objectMapper.readValue(new FileReader("C:/Users/franc/Downloads/popolamentoAccommodationFinale (1).json"),
+            List<Accommodation> accommodations = objectMapper.readValue(new FileReader("C:/Users/andre/Downloads/popolamentoAccommodationFinale.json"),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, Accommodation.class));
 
             // Salva i dati nel database
@@ -46,4 +46,4 @@ public class DataPopulatorService {
             e.printStackTrace();
         }
     }
-}*/
+}

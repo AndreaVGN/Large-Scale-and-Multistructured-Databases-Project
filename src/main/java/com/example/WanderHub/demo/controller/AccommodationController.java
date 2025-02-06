@@ -4,10 +4,7 @@ import com.example.WanderHub.demo.DTO.AverageCostDTO;
 import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
-import com.example.WanderHub.demo.model.RegisteredUser;
-import com.example.WanderHub.demo.model.Review;
-import com.example.WanderHub.demo.model.Accommodation;
-import com.example.WanderHub.demo.model.Book;
+import com.example.WanderHub.demo.model.*;
 import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.BookingService;
 import com.example.WanderHub.demo.utility.SessionUtils;
@@ -21,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController

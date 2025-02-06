@@ -133,14 +133,16 @@ public class RegisteredUserController {
             @PathVariable ObjectId accommodationId,
             @PathVariable int bookId) {
 
-        boolean isDeleted = accommodationService.deleteBook(username, accommodationId, bookId);
+      //  boolean isDeleted = accommodationService.deleteBook(username, accommodationId, bookId);
 
-        if (isDeleted) {
+    /*    if (isDeleted) {
             return ResponseEntity.ok("Prenotazione cancellata con successo.");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Non è possibile cancellare la prenotazione. Verifica che la prenotazione esista e che sia più vicina di due giorni alla data di inizio.");
-        }
+        }*/
+
+        return null;
     }
     @PostMapping("/{username}/{accommodationId}/lock")
     public ResponseEntity<String> lockHouse(@PathVariable ObjectId accommodationId, @PathVariable String username, @RequestParam String startDate, @RequestParam String endDate) {

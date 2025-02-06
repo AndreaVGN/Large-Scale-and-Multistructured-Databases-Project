@@ -384,7 +384,7 @@ public class AccommodationService {
     }
 
 
-
+/*
     public boolean deleteBook(String username, ObjectId accommodationId, int bookId) {
         try {
             // Retrieve the accommodation by its ID
@@ -419,7 +419,7 @@ public class AccommodationService {
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
         }
-    }
+    }*/
 
     public List<FacilityRatingDTO> getAverageRatingByFacility(String city) {
         return accommodationRepository.getAverageRatingByFacilityInCity(city);

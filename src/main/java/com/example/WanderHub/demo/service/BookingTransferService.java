@@ -155,14 +155,27 @@ public class BookingTransferService {
     private MongoTemplate mongoTemplate;
 
     public void removeArchivedBookings(LocalDate thresholdDate) {
-        Query query = new Query();
-        Update update = new Update()
-                .pull("books", Query.query(Criteria.where("occupiedDates.endDate").lt(thresholdDate)));
 
+        // Query per rimuovere i booking dalla collection che sono precedenti alla thresholdDate
+        Query query = new Query();
+
+        // Aggiornamento per rimuovere i booking che hanno una data di fine (in occupiedDates) prima della thresholdDate
+        Update update = new Update()
+                // Rimuove i booking con una data di fine in "books.occupiedDates" precedente alla threshold
+                .pull("books", Query.query(Criteria.where("occupiedDates.end").lt(thresholdDate)))
+                // Rimuove le date di fine precedenti alla threshold dalla proprietà "occupiedDates"
+                .pull("occupiedDates", Query.query(Criteria.where("end").lt(thresholdDate)));
+
+        // Applichiamo l'update a tutti gli accommodation
         mongoTemplate.updateMulti(query, update, Accommodation.class);
 
+        // Svuotiamo i campi "books" se sono vuoti
         Update setEmptyArray = new Update().set("books", new ArrayList<>());
-        mongoTemplate.updateMulti(new Query(Criteria.where("books").exists(false)), setEmptyArray, Accommodation.class);
+        mongoTemplate.updateMulti(new Query(Criteria.where("books").size(0)), setEmptyArray, Accommodation.class);
+
+        // Svuotiamo i campi "occupiedDates" se sono vuoti
+        Update setEmptyOccupiedDates = new Update().set("occupiedDates", new ArrayList<>());
+        mongoTemplate.updateMulti(new Query(Criteria.where("occupiedDates").size(0)), setEmptyOccupiedDates, Accommodation.class);
     }
 
     @PostConstruct

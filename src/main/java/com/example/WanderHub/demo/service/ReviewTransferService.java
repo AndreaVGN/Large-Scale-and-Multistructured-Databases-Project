@@ -1,4 +1,4 @@
-/*package com.example.WanderHub.demo.service;
+package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.ArchivedReview;
@@ -56,7 +56,7 @@ public class ReviewTransferService {
         mongoTemplate.updateMulti(new Query(Criteria.where("reviews").exists(false)), setEmptyArray, Accommodation.class);
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void archiveOldReviews() {
         logger.info("Inizio archiviazione recensioni scadute...");
 
@@ -104,5 +104,5 @@ public class ReviewTransferService {
             logger.error("Errore durante l'archiviazione delle recensioni: ", e);
         }
     }
-}*/
+}
 

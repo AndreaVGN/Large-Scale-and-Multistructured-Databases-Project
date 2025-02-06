@@ -100,9 +100,6 @@ public class Validator {
     // Metodo per validare un oggetto di tipo Book
     public static void validateBook(Book book) {
         // Validate the fields of the Book
-        if (book.getBookId() == 0) {
-            throw new IllegalArgumentException("Book ID cannot be zero.");
-        }
 
         // Check if the occupiedDates is null
         if (book.getOccupiedDates() == null) {
