@@ -24,9 +24,17 @@ public interface ArchivedBookingRepository extends MongoRepository<ArchivedBooki
             // Ordiniamo in base al numero di prenotazioni (bookingCount) in modo decrescente
             "{ $sort: { 'bookingCount': -1 } }",
             // Limitiamo il risultato alle prime 10 città
-            "{ $limit: 10 }"
+            "{ $limit: 10 }",
+            // Proiettiamo un formato più pulito
+            "{ $project: { " +
+                    "city: '$_id', " +  // Mappiamo _id su city
+                    "bookingCount: 1, " +  // Manteniamo bookingCount
+                    "_id: 0" +  // Rimuoviamo _id dalla risposta
+                    "} }"
     })
     List<CityBookingRankingDTO> findTopCitiesByBookings(LocalDate lastYearStart);
+
+
 
 
 }
