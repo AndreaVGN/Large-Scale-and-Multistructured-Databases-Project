@@ -230,5 +230,23 @@ public class AccommodationController {
         return ArchivedBookingService.getTopCities();
     }
 
+    @GetMapping("/average-age/{city}")
+    public List<CityAverageAgeDTO> getAverageAgeByCity(@PathVariable String city) {
+        return ArchivedBookingService.getAverageAgeByCity(city);
+    }
+
+    @GetMapping("/top-cities-price-range")
+    public List<CityBookingRankingDTO> getTopCitiesByPriceRange(
+            @RequestParam double minPrice,
+            @RequestParam double maxPrice) {
+        // Chiamata al service per ottenere la classifica
+        return ArchivedBookingService.getTopCitiesByPriceRange(minPrice, maxPrice);
+    }
+
+    @GetMapping("/city/{city}/monthly-visits")
+    public List<CityMonthlyVisitDTO> getMonthlyVisits(@PathVariable String city) {
+        return ArchivedBookingService.getMonthlyVisitsByCity(city);
+    }
+
 }
 

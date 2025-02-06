@@ -1,6 +1,8 @@
 package com.example.WanderHub.demo.service;
 
+import com.example.WanderHub.demo.DTO.CityAverageAgeDTO;
 import com.example.WanderHub.demo.DTO.CityBookingRankingDTO;
+import com.example.WanderHub.demo.DTO.CityMonthlyVisitDTO;
 import com.example.WanderHub.demo.repository.ArchivedBookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,4 +23,21 @@ public class ArchivedBookingService {
         // Recuperiamo la classifica delle città più visitate
         return ArchivedBookingRepository.findTopCitiesByBookings(lastYearStart);
     }
+
+    public List<CityAverageAgeDTO> getAverageAgeByCity(String city) {
+        int currentYear = LocalDate.now().getYear();
+        return ArchivedBookingRepository.findAverageAgeByCity(city, currentYear);
+    }
+
+    // Funzione per ottenere la classifica delle città in base alla fascia di prezzo
+    public List<CityBookingRankingDTO> getTopCitiesByPriceRange(double minPrice, double maxPrice) {
+        // Chiamata al repository per ottenere le città più visitate in base alla fascia di prezzo
+        return ArchivedBookingRepository.findTopCitiesByPriceRange(minPrice, maxPrice);
+    }
+
+    public List<CityMonthlyVisitDTO> getMonthlyVisitsByCity(String city) {
+        return ArchivedBookingRepository.findMonthlyVisitsByCity(city);
+    }
+
+
 }
