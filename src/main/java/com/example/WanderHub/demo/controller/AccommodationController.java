@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/accommodations")
@@ -28,6 +29,8 @@ public class AccommodationController {
     private BookingService bookingService;
     @Autowired
     private ArchivedBookingService ArchivedBookingService;
+    @Autowired
+    private ArchivedBookingService archivedBookingService;
 
     @PostMapping("/{username}")
     public ResponseEntity<?> createAccommodation(@PathVariable String username, @RequestBody Accommodation accommodation, HttpSession session) {
@@ -230,5 +233,16 @@ public class AccommodationController {
         return ArchivedBookingService.getTopCities();
     }
 
+    @GetMapping("/{city}/avgHolidayDuration")
+    public AverageBookingResult findAverageBookingDurationByCity(@PathVariable String city){
+        if (city == null || city.isEmpty()) {
+            throw new IllegalArgumentException("La città non può essere null o vuota");
+        }
+        return archivedBookingService.findAverageBookingDurationByCity(city);
+    }
+    @GetMapping("/{city}/mostCommonBirthPlace")
+    public BirthPlaceFrequency getMostCommonBirthPlaceByCity(@PathVariable String city){
+        return archivedBookingService.findMostCommonBirthPlaceByCity(city);
+    }
 }
 
