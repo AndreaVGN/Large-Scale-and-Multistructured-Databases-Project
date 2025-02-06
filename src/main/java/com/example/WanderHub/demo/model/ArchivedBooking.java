@@ -17,13 +17,14 @@ public class ArchivedBooking {
     private String address;
     private int addressNumber;
     private String birthDate;
+    private int costPerNight;
     private String[] guestFirstNames; // Array dei nomi degli ospiti
     private String[] guestLastNames;
 
     // Costruttore
     public ArchivedBooking(String accommodationId,String hostUsername, String city, List<OccupiedPeriod> occupiedDates, String username,
                            String email, String birthPlace, String address, int addressNumber, String birthDate,
-                           String[] guestFirstNames, String[] guestLastNames) {
+                           String[] guestFirstNames, String[] guestLastNames, int costPerNight) {
         this.accommodationId = accommodationId;
         this.hostUsername = hostUsername;
         this.city = city;
@@ -36,6 +37,7 @@ public class ArchivedBooking {
         this.birthDate = birthDate;
         this.guestFirstNames = guestFirstNames;
         this.guestLastNames = guestLastNames;
+        this.costPerNight = costPerNight;
     }
 
     // Getter e Setter
@@ -155,6 +157,14 @@ public class ArchivedBooking {
         }
     }
 
+    public void setCostPerNight(int costPerNight) {
+        this.costPerNight = costPerNight;
+    }
+
+    public int getCostPerNight() {
+        return costPerNight;
+    }
+
     // Metodo toString
     @Override
     public String toString() {
@@ -169,6 +179,7 @@ public class ArchivedBooking {
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
                 ", birthDate='" + birthDate + '\'' +
+                ", costPerNight=" + costPerNight +
                 ", guestFirstNames=" + (guestFirstNames != null ? String.join(", ", guestFirstNames) : "null") +
                 ", guestLastNames=" + (guestLastNames != null ? String.join(", ", guestLastNames) : "null") +
                 '}';
