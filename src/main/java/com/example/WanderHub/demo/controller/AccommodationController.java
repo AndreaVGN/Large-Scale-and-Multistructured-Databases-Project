@@ -1,10 +1,7 @@
 package com.example.WanderHub.demo.controller;
-import com.example.WanderHub.demo.DTO.AccommodationDTO;
-import com.example.WanderHub.demo.DTO.AverageCostDTO;
-import com.example.WanderHub.demo.DTO.BookDTO;
-import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
-import com.example.WanderHub.demo.DTO.ReviewDTO;
+import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.*;
+import com.example.WanderHub.demo.service.ArchivedBookingService;
 import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.BookingService;
 import com.example.WanderHub.demo.utility.SessionUtils;
@@ -29,6 +26,8 @@ public class AccommodationController {
     private AccommodationService accommodationService;
     @Autowired
     private BookingService bookingService;
+    @Autowired
+    private ArchivedBookingService ArchivedBookingService;
 
     @PostMapping("/{username}")
     public ResponseEntity<?> createAccommodation(@PathVariable String username, @RequestBody Accommodation accommodation, HttpSession session) {
@@ -224,6 +223,11 @@ public class AccommodationController {
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Errore nello sblocco della casa.");
         }
+    }
+
+    @GetMapping("/top-cities")
+    public List<CityBookingRankingDTO> getTopCities() {
+        return ArchivedBookingService.getTopCities();
     }
 
 }

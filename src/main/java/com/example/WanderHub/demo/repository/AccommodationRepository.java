@@ -1,9 +1,5 @@
 package com.example.WanderHub.demo.repository;
-import com.example.WanderHub.demo.DTO.AccommodationDTO;
-import com.example.WanderHub.demo.DTO.AverageCostDTO;
-import com.example.WanderHub.demo.DTO.BookDTO;
-import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
-import com.example.WanderHub.demo.DTO.ReviewDTO;
+import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.*;
 import jakarta.transaction.Transactional;
 import org.bson.Document;
@@ -220,6 +216,8 @@ List<ArchivedReview> findOldReviews(LocalDate oneMonthAgo);
 
     @Query(value = "{ '_id': ?0, 'books.username': ?1, 'books.occupiedDates.end': { $gte: ?2, $lte: ?3 } }", exists = true)
     boolean existsBookingForUser(ObjectId accommodationId, String username, LocalDate maxEndDate, LocalDate today);
+
+
 
 }
 

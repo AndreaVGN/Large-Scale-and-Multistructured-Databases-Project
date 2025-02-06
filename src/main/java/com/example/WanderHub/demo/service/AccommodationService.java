@@ -499,5 +499,7 @@ public class AccommodationService {
 
         System.out.println("Aggiornamento completato.");
     }
+
+
 }
 
