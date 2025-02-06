@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Book {
 
-    private int bookId;
+    //private int bookId;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
     private String username;
     private String email;
@@ -25,9 +25,9 @@ public class Book {
     public Book() {}
 
     // Costruttore con parametri
-    public Book(int bookId, List<OccupiedPeriod> occupiedDates, String username, String email,
+    public Book(List<OccupiedPeriod> occupiedDates, String username, String email,
                 String birthPlace, String address, int addressNumber, String birthDate, String[] guestFirstNames, String[] guestLastNames) {
-        this.bookId = bookId;
+        //this.bookId = bookId;
         this.occupiedDates = occupiedDates;
         this.username = username;
         this.email = email;
@@ -41,13 +41,13 @@ public class Book {
 
     // Getters and Setters
 
-    public int getBookId() {
+    /*public int getBookId() {
         return bookId;
     }
 
     public void setBookId(int bookId) {
         this.bookId = bookId;
-    }
+    }*/
 
     public List<OccupiedPeriod> getOccupiedDates() {
         return occupiedDates;
@@ -150,7 +150,6 @@ public class Book {
     @Override
     public String toString() {
         return "Book{" +
-                "bookId=" + bookId +
                 ", occupiedDates=" + occupiedDates +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +

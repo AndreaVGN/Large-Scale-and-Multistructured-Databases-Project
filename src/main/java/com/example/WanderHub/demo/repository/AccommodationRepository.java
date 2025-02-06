@@ -5,8 +5,10 @@ import com.example.WanderHub.demo.DTO.BookDTO;
 import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.*;
+import jakarta.transaction.Transactional;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -188,6 +190,15 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
         "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$reviews', { accommodationId: '$_id' } ] } } }"
     })
 List<ArchivedReview> findOldReviews(LocalDate oneMonthAgo);
+
+
+    @Aggregation(pipeline = {
+            "{ $unwind: '$books' }",
+            "{ $match: { 'books.occupiedDates.end': { $lt: ?0 } } }",
+            "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$books', { accommodationId: '$_id' } ] } } }"
+    })
+
+    List<ArchivedBooking> findOldBookings(LocalDate oneMonthAgo);
 
 
 

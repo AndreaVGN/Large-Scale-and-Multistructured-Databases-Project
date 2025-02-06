@@ -20,6 +20,7 @@ public class BookService {
         return BookRepository.save(book);
     }
 
+    /*
     public Book getBookById(int bookId) {
         return BookRepository.findByBookId(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
@@ -31,7 +32,7 @@ public class BookService {
             return true;
         }
         return false;
-    }
+    }*/
 
     public List<Book> getBooksByCityAndPeriod(String city, String period) {
         return BookRepository.findByCityAndPeriod(city, period);

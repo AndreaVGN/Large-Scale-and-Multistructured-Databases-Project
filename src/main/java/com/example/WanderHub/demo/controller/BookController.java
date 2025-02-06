@@ -22,6 +22,7 @@ public class BookController {
         return BookService.createBook(book);
     }
 
+    /*
     @GetMapping("/{id}")
     public Book getBook(@PathVariable int id) {
         return BookService.getBookById(id);
@@ -36,7 +37,7 @@ public class BookController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
 
     @GetMapping("/filter")
     public List<Book> getBooksByCityAndPeriod(

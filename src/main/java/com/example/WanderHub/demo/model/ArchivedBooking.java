@@ -1,32 +1,37 @@
 package com.example.WanderHub.demo.model;
 
-import java.util.Date;
+import com.example.WanderHub.demo.utility.OccupiedPeriod;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public class ArchivedBooking {
-    private String accommodationId;
-    private String hostUsername;
-    private String city;
-    private String country;
-    private Date startDate;
-    private Date endDate;
-    private int nights;
-    private double totalCost;
-    private String username;
-    private int guestCount;
 
-    public ArchivedBooking(String accommodationId, String hostUsername, String city, String country,
-                           Date startDate, Date endDate, int nights, double totalCost,
-                           String username, int guestCount) {
+    private String accommodationId;
+    private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
+    private String username;
+    private String email;
+    private String birthPlace;
+    private String address;
+    private int addressNumber;
+    private String birthDate;
+    private String[] guestFirstNames; // Array dei nomi degli ospiti
+    private String[] guestLastNames;
+
+    // Costruttore
+    public ArchivedBooking(String accommodationId, List<OccupiedPeriod> occupiedDates, String username,
+                           String email, String birthPlace, String address, int addressNumber, String birthDate,
+                           String[] guestFirstNames, String[] guestLastNames) {
         this.accommodationId = accommodationId;
-        this.hostUsername = hostUsername;
-        this.city = city;
-        this.country = country;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.nights = nights;
-        this.totalCost = totalCost;
+        this.occupiedDates = occupiedDates;
         this.username = username;
-        this.guestCount = guestCount;
+        this.email = email;
+        this.birthPlace = birthPlace;
+        this.address = address;
+        this.addressNumber = addressNumber;
+        this.birthDate = birthDate;
+        this.guestFirstNames = guestFirstNames;
+        this.guestLastNames = guestLastNames;
     }
 
     // Getter e Setter
@@ -38,60 +43,12 @@ public class ArchivedBooking {
         this.accommodationId = accommodationId;
     }
 
-    public String getHostUsername() {
-        return hostUsername;
+    public List<OccupiedPeriod> getOccupiedDates() {
+        return occupiedDates;
     }
 
-    public void setHostUsername(String hostUsername) {
-        this.hostUsername = hostUsername;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public int getNights() {
-        return nights;
-    }
-
-    public void setNights(int nights) {
-        this.nights = nights;
-    }
-
-    public double getTotalCost() {
-        return totalCost;
-    }
-
-    public void setTotalCost(double totalCost) {
-        this.totalCost = totalCost;
+    public void setOccupiedDates(List<OccupiedPeriod> occupiedDates) {
+        this.occupiedDates = occupiedDates;
     }
 
     public String getUsername() {
@@ -102,27 +59,100 @@ public class ArchivedBooking {
         this.username = username;
     }
 
-    public int getGuestCount() {
-        return guestCount;
+    public String getEmail() {
+        return email;
     }
 
-    public void setGuestCount(int guestCount) {
-        this.guestCount = guestCount;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
+    public String getBirthPlace() {
+        return birthPlace;
+    }
+
+    public void setBirthPlace(String birthPlace) {
+        this.birthPlace = birthPlace;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getAddressNumber() {
+        return addressNumber;
+    }
+
+    public void setAddressNumber(int addressNumber) {
+        this.addressNumber = addressNumber;
+    }
+
+    public String getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String[] getGuestFirstNames() {
+        return guestFirstNames;
+    }
+
+    public void setGuestFirstNames(String[] guestFirstNames) {
+        this.guestFirstNames = guestFirstNames;
+    }
+
+    public String[] getGuestLastNames() {
+        return guestLastNames;
+    }
+
+    public void setGuestLastNames(String[] guestLastNames) {
+        this.guestLastNames = guestLastNames;
+    }
+
+    public LocalDate getStartDate() {
+        if (occupiedDates != null && !occupiedDates.isEmpty()) {
+            return occupiedDates.get(0).getStart(); // Restituisce la data di inizio del primo periodo
+        }
+        return null; // Se non ci sono periodi, restituisci null
+    }
+    public LocalDate getEndDate() {
+        if (occupiedDates != null && !occupiedDates.isEmpty()) {
+            return occupiedDates.get(0).getEnd(); // Restituisce la data di inizio del primo periodo
+        }
+        return null; // Se non ci sono periodi, restituisci null
+    }
+    public void setStartDate(LocalDate startDate) {
+        if (occupiedDates != null && !occupiedDates.isEmpty()) {
+            occupiedDates.get(0).setStart(startDate); // Imposta la data di inizio del primo periodo
+        }
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        if (occupiedDates != null && !occupiedDates.isEmpty()) {
+            occupiedDates.get(0).setEnd(endDate); // Imposta la data di fine del primo periodo
+        }
+    }
+
+    // Metodo toString
     @Override
     public String toString() {
         return "ArchivedBooking{" +
                 "accommodationId='" + accommodationId + '\'' +
-                ", hostUsername='" + hostUsername + '\'' +
-                ", city='" + city + '\'' +
-                ", country='" + country + '\'' +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", nights=" + nights +
-                ", totalCost=" + totalCost +
+                ", occupiedDates=" + occupiedDates +
                 ", username='" + username + '\'' +
-                ", guestCount=" + guestCount +
+                ", email='" + email + '\'' +
+                ", birthPlace='" + birthPlace + '\'' +
+                ", address='" + address + '\'' +
+                ", addressNumber=" + addressNumber +
+                ", birthDate='" + birthDate + '\'' +
+                ", guestFirstNames=" + (guestFirstNames != null ? String.join(", ", guestFirstNames) : "null") +
+                ", guestLastNames=" + (guestLastNames != null ? String.join(", ", guestLastNames) : "null") +
                 '}';
     }
 }

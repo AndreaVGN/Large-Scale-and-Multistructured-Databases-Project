@@ -1,12 +1,15 @@
 package com.example.WanderHub.demo.service;
-import com.example.WanderHub.demo.DTO.AccommodationDTO;
-import com.example.WanderHub.demo.DTO.AverageCostDTO;
-import com.example.WanderHub.demo.DTO.BookDTO;
-import com.example.WanderHub.demo.DTO.FacilityRatingDTO;
-import com.example.WanderHub.demo.DTO.ReviewDTO;
+import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.RegisteredUser;
+import com.example.WanderHub.demo.repository.ArchivedReviewRepository;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Update;
+//import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.core.query.Query;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
@@ -19,8 +22,11 @@ import com.example.WanderHub.demo.utility.Validator;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -40,6 +46,12 @@ public class AccommodationService {
     private RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private ArchivedReviewRepository archivedReviewRepository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -461,6 +473,31 @@ public class AccommodationService {
             throw new RuntimeException("User has not booked this accommodation within 3 days before");
         }
         return bookingRepository.addBozza(username,accommodationId,review);
+    }
+
+
+
+    //@Scheduled(cron = "0 0 3 * * ?") // Ogni giorno alle 03:00 AM
+    //@PostConstruct
+    public void updateAverageRates() {
+        List<AccommodationAverageRate> averages = archivedReviewRepository.calculateAverageRatesForAllAccommodations();
+
+        for (AccommodationAverageRate avg : averages) {
+            //System.out.println(avg.get_id());
+            //System.out.println(avg.getAverageRate());
+            /*if(avg.get_id().equals("67a492d4acacc96805400d35")){
+                System.out.println("trovato");
+                System.out.println(avg.getAverageRate());
+            }*/
+            Query query = new Query();
+            query.addCriteria(Criteria.where("accommodationId").is(avg.get_id()));
+
+            Update update = new Update().set("averageRate", avg.getAverageRate());
+
+            mongoTemplate.updateFirst(query, update, Accommodation.class);
+        }
+
+        System.out.println("Aggiornamento completato.");
     }
 }
 

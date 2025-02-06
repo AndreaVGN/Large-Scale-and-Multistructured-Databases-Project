@@ -1,4 +1,4 @@
-package com.example.WanderHub.demo.service;
+/*package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.ArchivedBooking;
@@ -98,7 +98,7 @@ public class BookingTransferService {
                 logger.info("Guest Count: {}", booking.getGuestCount());
             }
 
-            /*
+
 
             // 3️⃣ Salvare in `ArchivedBookings` usando BATCH
             int batchSize = 500; // Numero di documenti per batch
@@ -110,8 +110,87 @@ public class BookingTransferService {
 
             // 4️⃣ Rimuovere da accommodations con Batch
             removeArchivedBookings(today);
-            logger.info("Prenotazioni archiviate rimosse da accommodations.");*/
+            logger.info("Prenotazioni archiviate rimosse da accommodations.");
 
+        } catch (Exception e) {
+            logger.error("Errore durante l'archiviazione delle prenotazioni: ", e);
+        }
+    }
+}*/
+package com.example.WanderHub.demo.service;
+
+import com.example.WanderHub.demo.model.Accommodation;
+import com.example.WanderHub.demo.model.ArchivedBooking;
+import com.example.WanderHub.demo.model.Book;
+import com.example.WanderHub.demo.repository.AccommodationRepository;
+import com.example.WanderHub.demo.repository.ArchivedBookingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+@Service
+public class BookingTransferService {
+
+    private static final Logger logger = LoggerFactory.getLogger(BookingTransferService.class);
+
+    @Autowired
+    private AccommodationRepository accommodationRepository;
+
+    @Autowired
+    private ArchivedBookingRepository archivedBookingRepository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    public void removeArchivedBookings(LocalDate thresholdDate) {
+        Query query = new Query();
+        Update update = new Update()
+                .pull("books", Query.query(Criteria.where("occupiedDates.endDate").lt(thresholdDate)));
+
+        mongoTemplate.updateMulti(query, update, Accommodation.class);
+
+        Update setEmptyArray = new Update().set("books", new ArrayList<>());
+        mongoTemplate.updateMulti(new Query(Criteria.where("books").exists(false)), setEmptyArray, Accommodation.class);
+    }
+
+    @PostConstruct
+    public void archiveOldBookings() {
+        logger.info("Inizio archiviazione prenotazioni scadute...");
+        LocalDate oneMonthAgo = LocalDate.now().plusMonths(10);
+
+        try {
+            List<ArchivedBooking> expiredBookings = accommodationRepository.findOldBookings(oneMonthAgo);
+            if (expiredBookings.isEmpty()) {
+                logger.info("Nessuna prenotazione da archiviare.");
+                return;
+            }
+
+            for (ArchivedBooking booking : expiredBookings) {
+                logger.info("Archiving Booking - AccommodationId: {}, Username: {}, EndDate: {}",
+                        booking.getAccommodationId(), booking.getUsername(), booking.getEndDate());
+            }
+
+            int batchSize = 500;
+            for (int i = 0; i < expiredBookings.size(); i += batchSize) {
+                int end = Math.min(i + batchSize, expiredBookings.size());
+                archivedBookingRepository.saveAll(expiredBookings.subList(i, end));
+                logger.info("Batch prenotazioni archiviato: {} - {}", i, end);
+            }
+
+            removeArchivedBookings(oneMonthAgo);
+            logger.info("Prenotazioni archiviate rimosse da accommodations.");
         } catch (Exception e) {
             logger.error("Errore durante l'archiviazione delle prenotazioni: ", e);
         }

@@ -24,11 +24,12 @@ import java.util.Optional;
 public interface BookRepository extends MongoRepository<Book, Long> {
     // Metodi per interrogare il database, se necessari
     // Metodi per interrogare il database, se necessari
+    /*
     @Query("{ 'bookId': ?0 }")
     Optional<Book> findByBookId(int bookId);
 
     boolean existsByBookId(int bookId);
-    void deleteByBookId(int bookId);
+    void deleteByBookId(int bookId);*/
 
     @Query("{ 'birthPlace': ?0, 'bookPeriod': ?1 }")
     List<Book> findByCityAndPeriod(String city, String period);
