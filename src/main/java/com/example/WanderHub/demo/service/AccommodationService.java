@@ -61,13 +61,14 @@ public class AccommodationService {
         this.registeredUserRepository = registeredUserRepository;
     }
 
-    public Accommodation createAccommodation(Accommodation accommodation) {
+    public boolean createAccommodation(Accommodation accommodation) {
         try {
 
             Validator.validateAccommodation(accommodation);
 
             // If all checks pass, save the accommodation in the database
-            return accommodationRepository.save(accommodation);
+            //return accommodationRepository.save(accommodation);
+            return bookingRepository.insertAccommodation(accommodation);
 
         } catch (IllegalArgumentException e) {
             // Re-throw the exception to notify the controller
