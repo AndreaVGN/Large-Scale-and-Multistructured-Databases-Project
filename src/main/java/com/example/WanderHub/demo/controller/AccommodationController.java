@@ -4,7 +4,7 @@ import com.example.WanderHub.demo.model.*;
 import com.example.WanderHub.demo.service.ArchivedBookingService;
 import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.BookingService;
-import com.example.WanderHub.demo.utility.SessionUtils;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+
 import java.util.List;
 
 @RestController
@@ -115,20 +115,7 @@ public class AccommodationController {
         return ResponseEntity.ok(reviews);
     }
 
-    /*
-    // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
-    @PutMapping("/{accommodationId}/addBook")
-    public ResponseEntity<Accommodation> addBookToAccommodation(
-            @PathVariable int accommodationId,
-            @RequestBody Book newBook) {
 
-        String username = "Unregistered User";
-        // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
-        Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(username, accommodationId, newBook);
-
-        // Restituisci l'accommodation aggiornata
-        return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
-    }*/
 
 
     @PutMapping("/{accommodationId}/addBook")
@@ -158,7 +145,7 @@ public class AccommodationController {
         }
 
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
-        Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook);
+        accommodationService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook);
 
 
         return new ResponseEntity<>("Prenotazione avvenuta con successo!", HttpStatus.OK);
@@ -174,16 +161,7 @@ public class AccommodationController {
         return new ResponseEntity<>(accommodationService.viewAvgCostPerNight(city),HttpStatus.OK);
     }
 
-    /*
-    @PostMapping("/{accommodationId}/lock")
-    public ResponseEntity<String> lockHouse(@PathVariable int accommodationId, @RequestParam String startDate, @RequestParam String endDate) {
-        boolean success = bookingService.bookHouse(accommodationId, startDate,endDate);
-        if (success) {
-            return ResponseEntity.ok("Casa prenotata temporaneamente!");
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente.");
-        }
-    }*/
+
 
     @PostMapping("/{accommodationId}/lock")
     public ResponseEntity<String> lockHouse(@PathVariable ObjectId accommodationId, @RequestParam String startDate, @RequestParam String endDate, HttpServletResponse response) {

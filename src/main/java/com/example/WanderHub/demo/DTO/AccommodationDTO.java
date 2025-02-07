@@ -4,8 +4,7 @@ import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.example.WanderHub.demo.model.Review;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
+
 
 import java.util.Arrays;
 import java.util.List;

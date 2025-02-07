@@ -1,9 +1,8 @@
 package com.example.WanderHub.demo.controller;
 
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
-import com.example.WanderHub.demo.DTO.BookDTO;
-import com.example.WanderHub.demo.DTO.ReviewDTO;
-import com.example.WanderHub.demo.model.Accommodation;
+
+
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/users")
@@ -69,8 +68,7 @@ public class RegisteredUserController {
         int addressNumber = (int) session.getAttribute("addressNumber");
         String birthDate = (String) session.getAttribute("birthDate");
 
-/*
-        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");*/
+
 
 
         if (usernam == null || !usernam.equals(username)) {
@@ -87,7 +85,7 @@ public class RegisteredUserController {
 
         newBook.setBirthDate(birthDate);
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
-        Accommodation updatedAccommodation = accommodationService.addBookToAccommodation(username, accommodationId, newBook);
+        accommodationService.addBookToAccommodation(username, accommodationId, newBook);
 
         return new ResponseEntity<>("Prenotazione avvenuta con successo!", HttpStatus.OK);
 
@@ -165,7 +163,7 @@ public class RegisteredUserController {
         }
         review.setUsername(usernam);
         review.setDate(LocalDate.now());
-       Accommodation accommodation = accommodationService.addReviewToAccommodation(username,accommodationId,review);
+        accommodationService.addReviewToAccommodation(username,accommodationId,review);
         return new ResponseEntity<>("Review aggiunte con successo!", HttpStatus.OK);
     }
     @DeleteMapping("/{username}/{accommodationId}/unlock")
@@ -194,7 +192,7 @@ public class RegisteredUserController {
         }
         review.setUsername(usernam);
         review.setDate(LocalDate.now());
-        //if(accommodationService.addBozzaToAccommodation(username,accommodationId,review))
+
         accommodationService.addBozzaToAccommodation(username,accommodationId,review);
         return new ResponseEntity<>("Bozza aggiunta con successo!", HttpStatus.OK);
     }
