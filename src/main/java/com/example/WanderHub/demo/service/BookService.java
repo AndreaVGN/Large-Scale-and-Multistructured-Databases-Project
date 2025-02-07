@@ -20,21 +20,7 @@ public class BookService {
         return BookRepository.save(book);
     }
 
-    /*
-    public Book getBookById(int bookId) {
-        return BookRepository.findByBookId(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
-    }
-
-    public boolean deleteBookById(int bookId) {
-        if(BookRepository.existsByBookId(bookId)) {
-            BookRepository.deleteByBookId(bookId);
-            return true;
-        }
-        return false;
-    }*/
-
-    public List<Book> getBooksByCityAndPeriod(String city, String period) {
+   public List<Book> getBooksByCityAndPeriod(String city, String period) {
         return BookRepository.findByCityAndPeriod(city, period);
     }
     // Altri metodi per gestire le sistemazioni

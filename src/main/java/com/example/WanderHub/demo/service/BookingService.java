@@ -19,10 +19,6 @@ public class BookingService {
     @Autowired
     private AccommodationRepository accommodationRepository;
 
-/*
-    public boolean bookHouse(int houseId, String start, String end) {
-        return bookingRepository.lockHouse(houseId, start, end);
-    }*/
 
     public String getBookingTimestamp(ObjectId houseId, String start, String end) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -61,10 +57,6 @@ public class BookingService {
         }
         Accommodation accommodation = accommodationRepository.findByAccommodationId(houseId)
                 .orElseThrow(() -> new RuntimeException("Accommodation not found"));
-
-        // Recupera l'utente cliente che sta facendo la prenotazione
-           /* RegisteredUser customer = registeredUserRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Customer not found"));*/
 
         return bookingRepository.lockHouseReg(houseId,username, start, end);
     }

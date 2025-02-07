@@ -123,17 +123,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<AverageCostDTO> findAverageCostPerNightByCityAndGuests(String city);
 
     @Query(value = "{ '_id': ?0, 'books.occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
-    //@Query(value = "{ 'accommodationId': ?0, 'occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
     int checkAvailability(ObjectId accommodationId, LocalDate startDate, LocalDate endDate);
-
-    /*default boolean checkAvailability(String description, LocalDate startDate, LocalDate endDate) {
-        long count =  countOverlappingReservations(accommodationId, startDate, endDate);
-    }*/
-
-  /*  @Aggregation(pipeline = {
-            "{ $unwind: '$books' }", // Scompatta l'array di books
-            "{ $unwind: '$books.occupiedDates' }", // Scompatta l'array occupiedDates
-            "{ $match: { 'books.occupiedDates.end': { $lt: ?0 } } }", // Filtra le prenotazioni concluse*/
 
     @Aggregation(pipeline = {
             "{ $unwind: '$books' }",  // Scompatta l'array 'books'
@@ -156,45 +146,6 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<ArchivedBooking> findCompletedBookings(LocalDate today);
 
 
-
-
-
-
-
-
-    /*
-    @Aggregation(pipeline = {
-            "{ $unwind: '$reviews' }",
-            "{ $match: { 'reviews.date': { $lt: ?0 } } }",
-            "{ $project: { " +
-                    "'_id': 1, " +
-                    "'reviews.username': 1, " +
-                    "'reviews.rating': 1, " +
-                    "'reviews.reviewText': 1, " +
-                    "'reviews.date': 1 " +
-                    "} }"
-    })
-    List<Document> findOldReviews(LocalDate oneMonthAgo);*/
-
-/*
-    @Aggregation(pipeline = {
-            "{ $unwind: '$reviews' }",  // Scompatta l'array reviews
-            "{ $match: { 'reviews.date': { $lt: ?0 } } }",  // Filtra per recensioni più vecchie di una data specificata
-            "{ $project: { " +
-                   // "'_id': 1, " +  // Aggiungi esplicitamente l'ID dell'alloggio
-                    "'reviews.username': 1, " +  // Mantieni il campo username nella recensione
-                    "'reviews.rating': 1, " +  // Mantieni il campo rating nella recensione
-                    "'reviews.reviewText': 1, " +  // Mantieni il campo reviewText nella recensione
-                    "'reviews.date': 1 " +  // Mantieni il campo date nella recensione
-                    "} }"
-    })*/
-    /*
-@Aggregation(pipeline = {
-        "{ $unwind: '$reviews' }",
-        "{ $match: { 'reviews.date': { $lt: ?0 } } }",
-        "{ $replaceRoot: { newRoot: '$reviews' } }"
-})*/
-
     @Aggregation(pipeline = {
         "{ $unwind: '$reviews' }",
         "{ $match: { 'reviews.date': { $lt: ?0 } } }",
@@ -210,8 +161,6 @@ List<ArchivedReview> findOldReviews(LocalDate oneMonthAgo);
     })
 
     List<ArchivedBooking> findOldBookings(LocalDate oneMonthAgo);
-
-
 
 
     @Query(value = "{ '_id': ?0, 'books.username': ?1, 'books.occupiedDates.end': { $gte: ?2, $lte: ?3 } }", exists = true)

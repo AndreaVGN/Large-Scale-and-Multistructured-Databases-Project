@@ -9,12 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends MongoRepository<Review, Integer> {
-    // Metodi per interrogare il database, se necessari
-   /*
-    @Query("{ 'reviewId': ?0 }")
-    Optional<Review> findByReviewId(int reviewId);
-
-    boolean existsByReviewId(int reviewId);
-    void deleteByReviewId(int reviewId);*/
 }
 

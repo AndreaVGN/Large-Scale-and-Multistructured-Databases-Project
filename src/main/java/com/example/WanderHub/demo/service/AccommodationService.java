@@ -236,105 +236,6 @@ public class AccommodationService {
         }
     }
 
-
-    // Metodo per aggiungere una prenotazione alla casa scelta dal cliente
-    /*public Accommodation addBookToAccommodation(String username, String description, Book newBook) {
-        try {
-
-
-            Validator.validateBook(newBook);
-
-            // Recupera l'accommodation tramite il suo ID
-            Accommodation accommodation = accommodationRepository.findByAccommodationId(description)
-                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
-
-            // Recupera l'utente cliente che sta facendo la prenotazione
-            RegisteredUser customer = registeredUserRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Customer not found"));
-
-            // Definisci la chiave per il lock in Redis
-            String lockKey = "booking_lock:" + description + ":" + newBook.getStartDate();  // Usa una chiave univoca (per esempio in base all'description e alla data di inizio)
-
-            // Ottieni il lock distribuito con Redisson
-            RLock lock = redissonClient.getLock(lockKey);
-
-            // Prova ad acquisire il lock (per esempio per 30 secondi con una scadenza di 10 secondi)
-            boolean isLockAcquired = lock.tryLock(30, 10, TimeUnit.SECONDS);
-
-            if (!isLockAcquired) {
-                throw new RuntimeException("The accommodation is already locked by another user or is in the process of booking.");
-            }
-
-            // Se il lock è acquisito, procedi con la prenotazione
-            try {
-                // Aggiungi il nome dell'utente (cliente) alla prenotazione
-                newBook.setUsername(username);
-
-                // Aggiungi la nuova prenotazione alla lista delle prenotazioni della casa
-                accommodation.getBooks().add(newBook);
-
-                // Salva l'accommodation aggiornata nel database
-                return accommodationRepository.save(accommodation);
-            } finally {
-                // Rilascia il lock una volta completata l'operazione
-                lock.unlock();
-            }
-
-        } catch (Exception e) {
-            // Gestisci qualsiasi errore, inclusi lock non acquisiti e altre eccezioni
-            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
-        }
-    }*/
-
-    /*public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook) {
-        try {
-
-            LocalDate start = newBook.getStartDate();
-            LocalDate end = newBook.getEndDate();
-            System.out.println(start);
-            System.out.println(end);
-            int aux = accommodationRepository.checkAvailability(accommodationId,start,end);
-            System.out.println(aux);
-            if(aux>0){
-                throw new IllegalArgumentException("description " + accommodationId + " is not available.");
-            }
-            Validator.validateBook(newBook);
-
-            // Recupera l'accommodation tramite il suo ID
-            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
-
-
-            if (accommodation.getHostUsername().equals(username)) {
-                throw new RuntimeException("Host cannot book their own accommodation.");
-            }
-            // Definisci la chiave di prenotazione in Redis
-            String bookingKey = "booking:" + accommodationId + ":" + newBook.getStartDate() + ":" + newBook.getEndDate();
-
-            System.out.println(username);
-            // Controlla se esiste già una prenotazione con lo stesso periodo e username
-            String existingBooking = (String) redisTemplate.opsForValue().get(bookingKey);
-            System.out.println(existingBooking);
-            if (!username.equals(existingBooking)) {
-                throw new RuntimeException("User already has a booking for this accommodation in the selected period.");
-            }
-
-            // Aggiungi il nome dell'utente alla prenotazione
-            newBook.setUsername(username);
-
-            // Aggiungi la prenotazione alla lista delle prenotazioni dell'alloggio
-            accommodation.getBooks().add(newBook);
-
-            // Salva l'accommodation aggiornata nel database
-            Accommodation savedAccommodation = accommodationRepository.save(accommodation);
-
-
-            return savedAccommodation;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
-        }
-    }*/
     public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook) {
         try {
             LocalDate start = newBook.getStartDate();
@@ -488,12 +389,7 @@ public class AccommodationService {
         List<AccommodationAverageRate> averages = archivedReviewRepository.calculateAverageRatesForAllAccommodations();
 
         for (AccommodationAverageRate avg : averages) {
-            //System.out.println(avg.get_id());
-            //System.out.println(avg.getAverageRate());
-            /*if(avg.get_id().equals("67a492d4acacc96805400d35")){
-                System.out.println("trovato");
-                System.out.println(avg.getAverageRate());
-            }*/
+
             Query query = new Query();
             query.addCriteria(Criteria.where("accommodationId").is(avg.get_id()));
 

@@ -107,13 +107,6 @@ public interface ArchivedBookingRepository extends MongoRepository<ArchivedBooki
     List<CityMonthlyVisitDTO> findMonthlyVisitsByCity(String city);
 
 
-
-
-
-
-
-
-
     @Aggregation(pipeline = {
             "{ $match: { 'city': ?0 } }", // Filtra per la città
             "{ $group: { '_id': '$birthPlace', 'count': { $sum: 1 } } }", // Raggruppa per 'birthPlace' e conta
