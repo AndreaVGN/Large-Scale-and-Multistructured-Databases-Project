@@ -384,8 +384,8 @@ public class AccommodationService {
     }
 
 
-/*
-    public boolean deleteBook(String username, ObjectId accommodationId, int bookId) {
+
+    public boolean deleteBook(String username, ObjectId accommodationId, LocalDate startDate, LocalDate endDate) {
         try {
             // Retrieve the accommodation by its ID
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
@@ -397,14 +397,18 @@ public class AccommodationService {
 
             // Find the booking to be deleted
             Book bookToDelete = accommodation.getBooks().stream()
-                    .filter(book -> book.getBookId() == bookId && book.getUsername().equals(username))
+                    .filter(book -> book.getStartDate().equals(startDate) &&
+                            book.getEndDate().equals(endDate) &&
+                            book.getUsername().equals(username))
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Booking not found"));
 
+
             // Calculate the difference in days between the booking start date and today
             long daysUntilStart = ChronoUnit.DAYS.between(LocalDate.now(), bookToDelete.getStartDate());
+            System.out.println(daysUntilStart);
 
-            if (daysUntilStart <= 2) {
+            if (daysUntilStart >= 2) {
                 // Remove the booking from the list and update the accommodation
                 accommodation.getBooks().remove(bookToDelete);
                 accommodationRepository.save(accommodation);
@@ -419,7 +423,7 @@ public class AccommodationService {
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
         }
-    }*/
+    }
 
     public List<FacilityRatingDTO> getAverageRatingByFacility(String city) {
         return accommodationRepository.getAverageRatingByFacilityInCity(city);
