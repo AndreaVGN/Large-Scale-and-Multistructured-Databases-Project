@@ -1,7 +1,7 @@
 package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.Accommodation;
-import com.example.WanderHub.demo.model.ArchivedBooking;
+import com.example.WanderHub.demo.model.ArchivedBook;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.ArchivedBookingRepository;
@@ -65,13 +65,13 @@ public class BookingTransferService {
         LocalDate oneMonthAgo = LocalDate.now().plusMonths(10);
 
         try {
-            List<ArchivedBooking> expiredBookings = accommodationRepository.findOldBookings(oneMonthAgo);
+            List<ArchivedBook> expiredBookings = accommodationRepository.findOldBookings(oneMonthAgo);
             if (expiredBookings.isEmpty()) {
                 logger.info("Nessuna prenotazione da archiviare.");
                 return;
             }
 
-            for (ArchivedBooking booking : expiredBookings) {
+            for (ArchivedBook booking : expiredBookings) {
                 logger.info("Archiving Booking - AccommodationId: {}, Username: {}, EndDate: {}",
                         booking.getAccommodationId(), booking.getUsername(), booking.getEndDate());
             }

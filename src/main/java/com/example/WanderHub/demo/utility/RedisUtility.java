@@ -1,0 +1,66 @@
+package com.example.WanderHub.demo.utility;
+
+import com.example.WanderHub.demo.model.Accommodation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+@Component  // Rende la classe un Bean di Spring
+public class RedisUtility {
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    private static final long lock_TTL = 1200;
+
+    public Set<String> getKeys(String pattern) {
+        return redisTemplate.keys(pattern);
+    }
+    public Boolean lock(String pattern) {
+
+            return redisTemplate.opsForValue().setIfAbsent(pattern, "locked", lock_TTL, TimeUnit.SECONDS);
+
+
+    }
+    public void delete(String pattern) {
+        redisTemplate.delete(pattern);
+    }
+    public void setKey(String key, String value, Long ttl) {
+        redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
+    }
+    public String getValue(String key){
+        return (String) redisTemplate.opsForValue().get(key);
+    }
+    public void saveAccommodation(Accommodation accommodation, String baseKey, Long TTL) {
+        ValueOperations<String, Object> ops = redisTemplate.opsForValue();
+
+        // Serializzazione dei campi di tipo String
+        ops.set(baseKey + ":description", accommodation.getDescription(), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":type", accommodation.getType(), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":place", accommodation.getPlace(), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":city", accommodation.getCity(), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":address", accommodation.getAddress(), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":hostUsername", accommodation.getHostUsername(), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":latitude", String.valueOf(accommodation.getLatitude()), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":longitude", String.valueOf(accommodation.getLongitude()), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":maxGuestSize", String.valueOf(accommodation.getMaxGuestSize()), TTL, TimeUnit.SECONDS);
+        ops.set(baseKey + ":costPerNight", String.valueOf(accommodation.getCostPerNight()), TTL, TimeUnit.SECONDS);
+
+        // Salvataggio delle foto come chiavi separate
+        String[] photos = accommodation.getPhotos();
+        for (int i = 0; i < photos.length; i++) {
+            ops.set(baseKey + ":photo:" + i, photos[i], TTL, TimeUnit.SECONDS);
+        }
+
+        // Salvataggio delle facilities come chiavi separate
+        Map<String, Integer> facilities = accommodation.getFacilities();
+        for (Map.Entry<String, Integer> entry : facilities.entrySet()) {
+            ops.set(baseKey + ":facility:" + entry.getKey(), String.valueOf(entry.getValue()), TTL, TimeUnit.SECONDS);
+        }
+    }
+}
+

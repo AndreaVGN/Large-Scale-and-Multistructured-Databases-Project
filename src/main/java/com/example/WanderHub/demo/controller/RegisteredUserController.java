@@ -8,6 +8,7 @@ import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.service.AccommodationService;
+import com.example.WanderHub.demo.service.BookService;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import jakarta.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
@@ -30,7 +31,7 @@ public class RegisteredUserController {
     @Autowired
     private AccommodationService accommodationService;
     @Autowired
-    private BookingService bookingService;
+    private BookService bookService;
 
     @PostMapping
     public RegisteredUser createRegisteredUser(@RequestBody RegisteredUser registeredUser) {
@@ -145,7 +146,7 @@ public class RegisteredUserController {
     @PostMapping("/{username}/{accommodationId}/lock")
     public ResponseEntity<String> lockHouse(@PathVariable ObjectId accommodationId, @PathVariable String username, @RequestParam String startDate, @RequestParam String endDate) {
         System.out.println("Controller received startDate: " + startDate + ", endDate: " + endDate);
-        boolean success = bookingService.bookHouseReg(accommodationId, username, startDate,endDate);
+        boolean success = bookService.lockHouseReg(accommodationId, username, startDate,endDate);
         if (success) {
             return ResponseEntity.ok("Casa prenotata temporaneamente!");
         } else {
@@ -173,7 +174,7 @@ public class RegisteredUserController {
             @RequestParam String startDate,
             @RequestParam String endDate) {
 
-        boolean success = bookingService.unlockHouseReg(accommodationId, username, startDate, endDate);
+        boolean success = bookService.unlockHouseReg(accommodationId, username, startDate, endDate);
 
         if (success) {
             return ResponseEntity.ok("Casa sbloccata con successo.");

@@ -2,6 +2,7 @@ package com.example.WanderHub.demo.service;
 import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.repository.ArchivedReviewRepository;
+import com.example.WanderHub.demo.repository.BookRepository;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -42,7 +43,7 @@ public class AccommodationService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
     @Autowired
-    private BookingService bookingService;
+    private BookService bookService;
 
     @Autowired
     private ArchivedReviewRepository archivedReviewRepository;
@@ -51,24 +52,21 @@ public class AccommodationService {
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private BookingRepository bookingRepository;
-
-    @Autowired
-    private BookService bookService;
+    private BookRepository bookRepository;
 
     @Autowired
     public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
         this.registeredUserRepository = registeredUserRepository;
     }
 
-    public boolean createAccommodation(Accommodation accommodation) {
+    public void createAccommodation(Accommodation accommodation) {
         try {
 
             Validator.validateAccommodation(accommodation);
 
             // If all checks pass, save the accommodation in the database
             //return accommodationRepository.save(accommodation);
-            return bookService.insertAccommodation(accommodation);
+             bookService.insertAccommodation(accommodation);
 
         } catch (IllegalArgumentException e) {
             // Re-throw the exception to notify the controller
@@ -368,7 +366,7 @@ public class AccommodationService {
     }
 
 
-    public boolean addBozzaToAccommodation(String username, ObjectId accommodationId, Review review) {
+    public void addBozzaToAccommodation(String username, ObjectId accommodationId, Review review) {
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
@@ -383,7 +381,7 @@ public class AccommodationService {
         if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
             throw new RuntimeException("User has not booked this accommodation within 3 days before");
         }
-        return bookService.addBozza(username,accommodationId,review);
+        bookService.addBozza(username,accommodationId,review);
     }
 
 

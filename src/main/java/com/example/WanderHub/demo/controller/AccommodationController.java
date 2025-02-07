@@ -1,7 +1,7 @@
 package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.*;
-import com.example.WanderHub.demo.service.ArchivedBookingService;
+import com.example.WanderHub.demo.service.ArchivedBookService;
 import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.BookService;
 
@@ -24,7 +24,7 @@ public class AccommodationController {
     @Autowired
     private BookService bookService;
     @Autowired
-    private ArchivedBookingService ArchivedBookingService;
+    private ArchivedBookService archivedBookService;
 
     @PostMapping("/{username}")
     public ResponseEntity<?> createAccommodation(@PathVariable String username, @RequestBody Accommodation accommodation, HttpSession session) {
