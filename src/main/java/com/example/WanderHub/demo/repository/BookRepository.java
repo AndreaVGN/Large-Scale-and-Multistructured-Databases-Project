@@ -1,7 +1,6 @@
 package com.example.WanderHub.demo.repository;
 
 import com.example.WanderHub.demo.model.Accommodation;
-import com.example.WanderHub.demo.model.ArchivedBooking;
 import com.example.WanderHub.demo.model.Book;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -25,6 +24,8 @@ public interface BookRepository extends MongoRepository<Book, Long> {
 
     @Query("{ 'birthPlace': ?0, 'bookPeriod': ?1 }")
     List<Book> findByCityAndPeriod(String city, String period);
+
+
 
 
 

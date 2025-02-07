@@ -5,7 +5,7 @@ import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import java.time.LocalDate;
 import java.util.List;
 
-public class ArchivedBooking {
+public class ArchivedBook {
 
     private String accommodationId;
     private String hostUsername;
@@ -22,7 +22,7 @@ public class ArchivedBooking {
     private String[] guestLastNames;
 
     // Costruttore
-    public ArchivedBooking(String accommodationId,String hostUsername, String city, List<OccupiedPeriod> occupiedDates, String username,
+    public ArchivedBook(String accommodationId,String hostUsername, String city, List<OccupiedPeriod> occupiedDates, String username,
                            String email, String birthPlace, String address, int addressNumber, String birthDate,
                            String[] guestFirstNames, String[] guestLastNames, int costPerNight) {
         this.accommodationId = accommodationId;

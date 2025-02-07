@@ -3,11 +3,11 @@ package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
 
 
+import com.example.WanderHub.demo.DTO.AuthRequest;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.service.AccommodationService;
-import com.example.WanderHub.demo.service.BookingService;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import jakarta.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
@@ -195,5 +195,37 @@ public class RegisteredUserController {
 
         accommodationService.addBozzaToAccommodation(username,accommodationId,review);
         return new ResponseEntity<>("Bozza aggiunta con successo!", HttpStatus.OK);
+    }
+
+    // Endpoint per il login
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest loginRequest, HttpSession session) {
+        boolean isAuthenticated = registeredUserService.authenticate(loginRequest, session);
+        if (isAuthenticated) {
+            return ResponseEntity.status(HttpStatus.OK).body("Login successful");
+
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password.");
+        }
+    }
+
+    // Endpoint for user signup
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody RegisteredUser registerUser) {
+        try {
+            registeredUserService.createRegisteredUser(registerUser);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+        }
+    }
+
+    // Endpoint per il logout
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate(); // Invalidiamo la sessione per disconnettere l'utente
+        return ResponseEntity.ok("Logged out successfully.");
     }
 }

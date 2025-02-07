@@ -9,39 +9,39 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class ArchivedBookingService {
+public class ArchivedBookService {
 
     @Autowired
-    private ArchivedBookingRepository ArchivedBookingRepository;
+    private ArchivedBookingRepository archivedBookRepository;
 
     public List<CityBookingRankingDTO> getTopCities() {
         // Calcoliamo la data di inizio dell'anno scorso
         LocalDate lastYearStart = LocalDate.now().minusYears(1).withDayOfYear(1);
 
         // Recuperiamo la classifica delle città più visitate
-        return ArchivedBookingRepository.findTopCitiesByBookings(lastYearStart);
+        return archivedBookRepository.findTopCitiesByBookings(lastYearStart);
     }
     public AverageBookingResult findAverageBookingDurationByCity(String city){
         System.out.println("ci sono");
-        return ArchivedBookingRepository.findAverageBookingDurationByCity(city);
+        return archivedBookRepository.findAverageBookingDurationByCity(city);
     }
     public BirthPlaceFrequency findMostCommonBirthPlaceByCity(String city){
-        return ArchivedBookingRepository.findMostCommonBirthPlaceByCity(city);
+        return archivedBookRepository.findMostCommonBirthPlaceByCity(city);
     }
 
     public List<CityAverageAgeDTO> getAverageAgeByCity(String city) {
         int currentYear = LocalDate.now().getYear();
-        return ArchivedBookingRepository.findAverageAgeByCity(city, currentYear);
+        return archivedBookRepository.findAverageAgeByCity(city, currentYear);
     }
 
     // Funzione per ottenere la classifica delle città in base alla fascia di prezzo
     public List<CityBookingRankingDTO> getTopCitiesByPriceRange(double minPrice, double maxPrice) {
         // Chiamata al repository per ottenere le città più visitate in base alla fascia di prezzo
-        return ArchivedBookingRepository.findTopCitiesByPriceRange(minPrice, maxPrice);
+        return archivedBookRepository.findTopCitiesByPriceRange(minPrice, maxPrice);
     }
 
     public List<CityMonthlyVisitDTO> getMonthlyVisitsByCity(String city) {
-        return ArchivedBookingRepository.findMonthlyVisitsByCity(city);
+        return archivedBookRepository.findMonthlyVisitsByCity(city);
     }
 
 

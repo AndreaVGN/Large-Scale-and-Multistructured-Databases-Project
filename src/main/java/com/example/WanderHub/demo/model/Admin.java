@@ -4,6 +4,8 @@ public class Admin {
     private String username;
     private String password;
     private String email;
+
+
     public Admin(String username, String password, String email) {
         this.username = username;
         this.password = password;

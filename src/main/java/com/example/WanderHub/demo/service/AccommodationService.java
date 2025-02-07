@@ -16,17 +16,14 @@ import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
-import com.example.WanderHub.demo.repository.BookingRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.utility.Validator;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -57,6 +54,9 @@ public class AccommodationService {
     private BookingRepository bookingRepository;
 
     @Autowired
+    private BookService bookService;
+
+    @Autowired
     public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
         this.registeredUserRepository = registeredUserRepository;
     }
@@ -68,7 +68,7 @@ public class AccommodationService {
 
             // If all checks pass, save the accommodation in the database
             //return accommodationRepository.save(accommodation);
-            return bookingRepository.insertAccommodation(accommodation);
+            return bookService.insertAccommodation(accommodation);
 
         } catch (IllegalArgumentException e) {
             // Re-throw the exception to notify the controller
@@ -334,6 +334,7 @@ public class AccommodationService {
     public List<AverageCostDTO> viewAvgCostPerNight(String city) {
            return  accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
     }
+
     public Accommodation addReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new RuntimeException("Accommodation not found"));
@@ -342,8 +343,10 @@ public class AccommodationService {
         calendar.add(Calendar.DAY_OF_YEAR, -3); // Sottrarre 3 giorni da oggi
         LocalDate date = calendar.getTime();
         System.out.println(date);*/
-        String text = bookingRepository.existsBozzaText(username,accommodationId);
-        String rating = bookingRepository.existsBozzaRating(username,accommodationId);
+        String bozzaTextKey = "review:accId:" + accommodationId + ":username:" + username +":text";
+        String text = (String) redisTemplate.opsForValue().get(bozzaTextKey);
+        String bozzaRatingKey = "review:accId:" + accommodationId + ":username" + username +":rating";
+        String rating = (String) redisTemplate.opsForValue().get(bozzaRatingKey);
         if(text!=null && rating!=null && review.getReviewText()==null) {
             review.setReviewText(text);
             review.setRating(Double.parseDouble(rating));
@@ -363,6 +366,8 @@ public class AccommodationService {
         accommodation.getReviews().add(review);
         return accommodationRepository.save(accommodation);
     }
+
+
     public boolean addBozzaToAccommodation(String username, ObjectId accommodationId, Review review) {
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new RuntimeException("Accommodation not found"));
@@ -378,7 +383,7 @@ public class AccommodationService {
         if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
             throw new RuntimeException("User has not booked this accommodation within 3 days before");
         }
-        return bookingRepository.addBozza(username,accommodationId,review);
+        return bookService.addBozza(username,accommodationId,review);
     }
 
 

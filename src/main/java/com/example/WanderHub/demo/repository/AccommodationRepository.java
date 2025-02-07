@@ -143,7 +143,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
                     "guestCount: { $size: { $ifNull: [ '$books.guestFirstNames', [] ] } } " +  // Se 'guestFirstNames' è mancante o null, usa un array vuoto
                     "} }"
     })
-    List<ArchivedBooking> findCompletedBookings(LocalDate today);
+    List<ArchivedBook> findCompletedBookings(LocalDate today);
 
 
     @Aggregation(pipeline = {
@@ -160,7 +160,7 @@ List<ArchivedReview> findOldReviews(LocalDate oneMonthAgo);
             "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$books', { accommodationId: '$_id' }, {city: '$city'}, {hostUsername: '$hostUsername'}, {costPerNight:  '$costPerNight'} ] } } }"
     })
 
-    List<ArchivedBooking> findOldBookings(LocalDate oneMonthAgo);
+    List<ArchivedBook> findOldBookings(LocalDate oneMonthAgo);
 
 
     @Query(value = "{ '_id': ?0, 'books.username': ?1, 'books.occupiedDates.end': { $gte: ?2, $lte: ?3 } }", exists = true)
