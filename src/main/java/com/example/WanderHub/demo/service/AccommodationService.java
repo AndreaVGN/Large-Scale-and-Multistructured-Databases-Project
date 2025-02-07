@@ -360,7 +360,7 @@ public class AccommodationService {
             String existingBooking = (String) redisTemplate.opsForValue().get(bookingKey);
             System.out.println(existingBooking);
             if (!username.equals(existingBooking)) {
-                throw new RuntimeException("User already has a booking for this accommodation in the selected period.");
+                throw new RuntimeException("pERIODO DIVERSO PER QUESTO UTENTE.");
             }
 
             // Imposta il nome utente sulla prenotazione
