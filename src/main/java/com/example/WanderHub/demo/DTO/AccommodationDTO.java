@@ -4,15 +4,11 @@ import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.example.WanderHub.demo.model.Review;
-import lombok.*;
 
 
 import java.util.Arrays;
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)  // Include solo campi non nulli
 public class AccommodationDTO {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)  // Ignora se vale 0
@@ -127,4 +123,34 @@ public class AccommodationDTO {
         );
     }
 
+    // Getter e Setter
+    public String getAccommodationId() { return accommodationId; }
+    public void setAccommodationId(String accommodationId) { this.accommodationId = accommodationId; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public String getHostUsername() { return hostUsername; }
+    public void setHostUsername(String hostUsername) { this.hostUsername = hostUsername; }
+
+    public int getCostPerNight() { return costPerNight; }
+    public void setCostPerNight(int costPerNight) { this.costPerNight = costPerNight; }
+
+    public double getAverageRate() { return averageRate; }
+    public void setAverageRate(double averageRate) { this.averageRate = averageRate; }
+
+    public List<String> getPhotos() { return photos; }
+    public void setPhotos(List<String> photos) { this.photos = photos; }
+
+    public List<Book> getBooks() { return books; }
+    public void setBooks(List<Book> books) { this.books = books; }
+
+    public List<Review> getReviews() { return reviews; }
+    public void setReviews(List<Review> reviews) { this.reviews = reviews; }
 }
