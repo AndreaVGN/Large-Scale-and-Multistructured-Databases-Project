@@ -1,10 +1,21 @@
 package com.example.WanderHub.demo.service;
 
 
+import com.example.WanderHub.demo.DTO.AccommodationDTO;
+import com.example.WanderHub.demo.DTO.ReviewDTO;
+import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Review;
+import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.ReviewRepository;
+import com.example.WanderHub.demo.utility.RedisUtility;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -13,8 +24,99 @@ public class ReviewService {
     @Autowired
     private ReviewRepository ReviewRepository;
 
+    @Autowired
+    private AccommodationRepository accommodationRepository;
+
+    @Autowired
+    private RedisUtility redisUtility;
+
+    private static final long reviewTTL = 21600;
+
     // Creazione di una nuova sistemazione
     public Review createReview(Review review) {
         return ReviewRepository.save(review);
+    }
+
+    public List<AccommodationDTO> getReviewsByUsername(String username) {
+        try {
+            List<Accommodation> reviews = accommodationRepository.findReviewsByUsername(username);
+            return reviews.stream()
+                    .map(AccommodationDTO::withReviews)
+                    .collect(Collectors.toList());
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException("Error while retrieving reviews from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving reviews from the database: ", e);
+        }
+
+
+    }
+
+    public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
+        try {
+            // Recupera la lista di Accommodation corrispondente alla query
+            return accommodationRepository.viewAccommodationReviews(hostUsername, id);
+        }
+        catch(DataAccessException e){
+            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while retrieving accommodation: ", e);
+        }
+    }
+
+    public Accommodation addReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
+        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+
+
+        String draftTextKey = "review:accId:" + accommodationId + ":username:" + username +":text";
+        String text = redisUtility.getValue(draftTextKey);
+
+        String draftRatingKey = "review:accId:" + accommodationId + ":username" + username +":rating";
+        String rating = redisUtility.getValue(draftRatingKey);
+
+        if(text!=null && rating!=null && review.getReviewText()==null) {
+            review.setReviewText(text);
+            review.setRating(Double.parseDouble(rating));
+        }
+
+        review.setDate(LocalDate.now());
+        LocalDate date = review.getDate().minusDays(3);
+        LocalDate today = LocalDate.now();
+
+        if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
+            throw new RuntimeException("User has not booked this accommodation within 3 days before");
+        }
+
+        accommodation.getReviews().add(review);
+        return accommodationRepository.save(accommodation);
+    }
+
+
+    public void addDraftReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
+        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+
+
+        review.setDate(LocalDate.now());
+        LocalDate date = review.getDate().minusDays(3);
+        LocalDate today = LocalDate.now();
+
+        if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
+            throw new RuntimeException("User has not booked this accommodation within 3 days before");
+        }
+
+        String text = review.getReviewText();
+        String rating = String.valueOf(review.getRating());
+
+        String draftTextKey = "review:accId:" + accommodationId + ":username:" + username + ":text";
+        String draftRatingKey = "review:accId:" + accommodationId + ":username" + username + ":rating";
+
+        redisUtility.setKey(draftTextKey, text, reviewTTL);
+        redisUtility.setKey(draftRatingKey, rating, reviewTTL);
+
     }
 }

@@ -21,11 +21,12 @@ public class ArchivedBookService {
         // Recuperiamo la classifica delle città più visitate
         return archivedBookRepository.findTopCitiesByBookings(lastYearStart);
     }
-    public AverageBookingResult findAverageBookingDurationByCity(String city){
+    public AverageBookingResultDTO findAverageBookingDurationByCity(String city){
         System.out.println("ci sono");
         return archivedBookRepository.findAverageBookingDurationByCity(city);
     }
-    public BirthPlaceFrequency findMostCommonBirthPlaceByCity(String city){
+
+    public BirthPlaceFrequencyDTO findMostCommonBirthPlaceByCity(String city){
         return archivedBookRepository.findMostCommonBirthPlaceByCity(city);
     }
 

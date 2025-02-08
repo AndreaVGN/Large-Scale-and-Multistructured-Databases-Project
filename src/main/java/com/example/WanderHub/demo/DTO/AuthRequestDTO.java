@@ -1,6 +1,6 @@
 package com.example.WanderHub.demo.DTO;
 
-public class AuthRequest {
+public class AuthRequestDTO {
 
     private String username;
     private String password;

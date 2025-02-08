@@ -1,11 +1,13 @@
 package com.example.WanderHub.demo.utility;
 
 import com.example.WanderHub.demo.model.Accommodation;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -18,22 +20,33 @@ public class RedisUtility {
     private static final long lock_TTL = 1200;
 
     public Set<String> getKeys(String pattern) {
+
         return redisTemplate.keys(pattern);
+
     }
+
     public Boolean lock(String pattern) {
 
-            return redisTemplate.opsForValue().setIfAbsent(pattern, "locked", lock_TTL, TimeUnit.SECONDS);
-
+        return redisTemplate.opsForValue().setIfAbsent(pattern, "locked", lock_TTL, TimeUnit.SECONDS);
 
     }
+
     public void delete(String pattern) {
+
         redisTemplate.delete(pattern);
+
     }
+
     public void setKey(String key, String value, Long ttl) {
+
         redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
+
     }
+
     public String getValue(String key){
+
         return (String) redisTemplate.opsForValue().get(key);
+
     }
     public void saveAccommodation(Accommodation accommodation, String baseKey, Long TTL) {
         ValueOperations<String, Object> ops = redisTemplate.opsForValue();
@@ -61,6 +74,37 @@ public class RedisUtility {
         for (Map.Entry<String, Integer> entry : facilities.entrySet()) {
             ops.set(baseKey + ":facility:" + entry.getKey(), String.valueOf(entry.getValue()), TTL, TimeUnit.SECONDS);
         }
+    }
+
+    public boolean isOverlappingBooking(ObjectId accommodationId, String start, String end) {
+
+        Set<String> existingKeys = getKeys("booking:accId:" + accommodationId + ":*");
+
+        if (existingKeys != null) {
+            LocalDate newStart = LocalDate.parse(start);
+            LocalDate newEnd = LocalDate.parse(end);
+
+            for (String key : existingKeys) {
+
+                String[] parts = key.split(":");
+
+                if (parts.length < 7) continue;
+
+                LocalDate existingStart = LocalDate.parse(parts[4]);
+                LocalDate existingEnd = LocalDate.parse(parts[6]);
+
+                boolean isOverlapping = !(newEnd.isBefore(existingStart) || newStart.isAfter(existingEnd));
+                boolean isNotTheSame = !(newStart.isEqual(existingStart) && newEnd.isEqual(existingEnd));
+
+                if (isOverlapping && isNotTheSame) {
+                    return true;  // Sovrapposizione trovata
+                }
+
+            }
+
+        }
+
+        return false;
     }
 }
 

@@ -1,17 +1,17 @@
 package com.example.WanderHub.demo.DTO;
 
-public class AverageBookingResult {
+public class AverageBookingResultDTO {
     private String city;
     private double averageDays;
 
     // Costruttore
-    public AverageBookingResult(String city, double averageDays) {
+    public AverageBookingResultDTO(String city, double averageDays) {
         this.city = city;
         this.averageDays = averageDays;
     }
 
     // Costruttore senza parametri (necessario per alcune librerie di serializzazione)
-    public AverageBookingResult() {
+    public AverageBookingResultDTO() {
     }
 
     // Getter per city

@@ -2,10 +2,10 @@ package com.example.WanderHub.demo.controller;
 
 import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.Book;
-import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.ArchivedBookService;
 import com.example.WanderHub.demo.service.BookService;
+import com.example.WanderHub.demo.utility.SessionUtilility;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -37,33 +38,58 @@ public class BookController {
         return bookService.createBook(book);
     }
 
+    /*
     @GetMapping("/filter")
     public List<Book> getBooksByCityAndPeriod(
             @RequestParam String city,
             @RequestParam String period) {
         return bookService.getBooksByCityAndPeriod(city, period);
-    }
+    }*/
 
     @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
     public ResponseEntity<?> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id, HttpSession session) {
-        RegisteredUser loggedInUser = (RegisteredUser) session.getAttribute("user");
+        if (!SessionUtilility.isLogged(session, hostUsername)) {
 
-
-        if (loggedInUser == null || !loggedInUser.getUsername().equals(hostUsername)) {
-            // Se l'utente non è loggato o non corrisponde, restituisci un errore
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
         List<Book> books = accommodationService.viewAccommodationBooks(hostUsername,id);
+
         if (books.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessuna book trovata per questo host.");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No book found for this host");
         }
 
         return ResponseEntity.ok(books);
     }
 
+    // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
+    @PutMapping("/{username}/{accommodationId}/addBook/")
+    public ResponseEntity<?> addBookToAccommodationRegistered(
+            @PathVariable String username,
+            @PathVariable ObjectId accommodationId,
+            @RequestBody Book newBook,
+            HttpSession session) {
+
+        if (!SessionUtilility.isLogged(session, username)) {
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        newBook.setUsername((String) session.getAttribute("user"));
+        newBook.setEmail((String) session.getAttribute("email"));
+        newBook.setBirthPlace((String) session.getAttribute("birthPlace"));
+        newBook.setAddress((String) session.getAttribute("address"));
+        newBook.setAddressNumber((int) session.getAttribute("addressNumber"));
+        newBook.setBirthDate((String) session.getAttribute("birthDate"));
+
+        bookService.addBookToAccommodation(username, accommodationId, newBook);
+
+        return new ResponseEntity<>("Booking successfully completed!", HttpStatus.OK);
+
+    }
+
     @PutMapping("/{accommodationId}/addBook")
-    public ResponseEntity<?> addBookToAccommodation(
+    public ResponseEntity<?> addBookToAccommodationUnregistered(
             @PathVariable ObjectId accommodationId,
             @RequestBody Book newBook,
             HttpServletRequest request) {
@@ -81,24 +107,23 @@ public class BookController {
                 }
             }
         }
-        System.out.println(bookingTimestamp);
 
         // Verifica se il cookie è stato trovato
         if (bookingTimestamp == null) {
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Se non trovato, restituisci un errore
         }
 
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
-        accommodationService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook);
-
+        bookService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook);
 
         return new ResponseEntity<>("Prenotazione avvenuta con successo!", HttpStatus.OK);
     }
 
-
     @PostMapping("/{accommodationId}/lock")
-    public ResponseEntity<String> lockHouse(@PathVariable ObjectId accommodationId, @RequestParam String startDate, @RequestParam String endDate, HttpServletResponse response) {
-        String timestamp = bookService.lockHouse(accommodationId, startDate, endDate);
+    public ResponseEntity<String> lockHouseUnregistered(@PathVariable ObjectId accommodationId, @RequestParam String startDate, @RequestParam String endDate, HttpServletResponse response) {
+
+        String timestamp = (String) bookService.lockHouse(accommodationId, startDate, endDate, null);
 
         if (timestamp != null) {
             // Crea il cookie con il timestamp
@@ -116,8 +141,24 @@ public class BookController {
         }
     }
 
+    @PostMapping("/{username}/{accommodationId}/lock")
+    public ResponseEntity<String> lockHouseRegistered(@PathVariable ObjectId accommodationId, @PathVariable String username, @RequestParam String startDate, @RequestParam String endDate, HttpSession session) {
+        if (!SessionUtilility.isLogged(session, username)) {
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        boolean success = (boolean) bookService.lockHouse(accommodationId, startDate, endDate, username);
+        if (success) {
+            return ResponseEntity.ok("Accommodation temporarily booked");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente. Oppure periodo di tempo non valido");
+        }
+    }
+
+
     @DeleteMapping("/{accommodationId}/unlock")
-    public ResponseEntity<String> unlockHouse(
+    public ResponseEntity<String> unlockHouseUnregistered(
             @PathVariable ObjectId accommodationId,
             @RequestParam String startDate,
             @RequestParam String endDate,
@@ -136,13 +177,80 @@ public class BookController {
         }
     }
 
+
+    @GetMapping("/{username}/pendingBooks")
+    public ResponseEntity<?> getPendingBooks(@PathVariable String username, HttpSession session) {
+
+        if (!SessionUtilility.isLogged(session, username)) {
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        List<AccommodationDTO> pendingBookings = bookService.getPendingBookings(username);
+
+        if (pendingBookings.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No pending books found for this username");
+        }
+
+        return ResponseEntity.ok(pendingBookings);
+    }
+
+    @DeleteMapping("/{username}/accommodation/{accommodationId}/deleteBook")
+    public ResponseEntity<String> deleteBook(
+            @PathVariable String username,
+            @PathVariable ObjectId accommodationId,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
+            HttpSession session
+    ) {
+
+        if (!SessionUtilility.isLogged(session, username)) {
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        boolean isDeleted = bookService.deleteBook(username, accommodationId, startDate, endDate);
+
+        if (isDeleted) {
+            return ResponseEntity.ok("Booking cancelled successfully!");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("It's not possibile to delete this booking. Check that it exists or that its date is not closer than two days to the start of the booking");
+        }
+    }
+
+
+    @DeleteMapping("/{username}/{accommodationId}/unlock")
+    public ResponseEntity<String> unlockHouseRegistered(
+            @PathVariable ObjectId accommodationId,
+            @PathVariable String username,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            HttpSession session) {
+
+        if (!SessionUtilility.isLogged(session, username)) {
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        boolean success = bookService.unlockHouse(accommodationId, startDate, endDate, username);
+
+        if (success) {
+            return ResponseEntity.ok("Casa sbloccata con successo.");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Errore nello sblocco della casa o la prenotazione non esiste.");
+        }
+    }
+
     @GetMapping("/top-cities")
     public List<CityBookingRankingDTO> getTopCities() {
+
         return archivedBookService.getTopCities();
     }
 
     @GetMapping("/average-age/{city}")
     public List<CityAverageAgeDTO> getAverageAgeByCity(@PathVariable String city) {
+
         return archivedBookService.getAverageAgeByCity(city);
     }
 
@@ -150,24 +258,28 @@ public class BookController {
     public List<CityBookingRankingDTO> getTopCitiesByPriceRange(
             @RequestParam double minPrice,
             @RequestParam double maxPrice) {
+
         // Chiamata al service per ottenere la classifica
         return archivedBookService.getTopCitiesByPriceRange(minPrice, maxPrice);
     }
 
     @GetMapping("/city/{city}/monthly-visits")
     public List<CityMonthlyVisitDTO> getMonthlyVisits(@PathVariable String city) {
+
         return archivedBookService.getMonthlyVisitsByCity(city);
     }
 
     @GetMapping("/{city}/avgHolidayDuration")
-    public AverageBookingResult findAverageBookingDurationByCity(@PathVariable String city){
+    public AverageBookingResultDTO findAverageBookingDurationByCity(@PathVariable String city){
         if (city == null || city.isEmpty()) {
             throw new IllegalArgumentException("La città non può essere null o vuota");
         }
+
         return archivedBookService.findAverageBookingDurationByCity(city);
     }
     @GetMapping("/{city}/mostCommonBirthPlace")
-    public BirthPlaceFrequency getMostCommonBirthPlaceByCity(@PathVariable String city){
+    public BirthPlaceFrequencyDTO getMostCommonBirthPlaceByCity(@PathVariable String city){
+
         return archivedBookService.findMostCommonBirthPlaceByCity(city);
     }
 

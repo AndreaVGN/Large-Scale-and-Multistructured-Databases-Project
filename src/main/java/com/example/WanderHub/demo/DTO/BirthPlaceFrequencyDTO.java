@@ -1,11 +1,11 @@
 package com.example.WanderHub.demo.DTO;
 
-public class BirthPlaceFrequency {
+public class BirthPlaceFrequencyDTO {
     private String birthPlace;
     private int count;
 
     // Costruttore, getter, setter e toString
-    public BirthPlaceFrequency(String birthPlace, int count) {
+    public BirthPlaceFrequencyDTO(String birthPlace, int count) {
         this.birthPlace = birthPlace;
         this.count = count;
     }

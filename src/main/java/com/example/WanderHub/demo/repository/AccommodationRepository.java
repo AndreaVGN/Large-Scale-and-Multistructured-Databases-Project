@@ -55,7 +55,6 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<Accommodation> findReviewsByUsername(String username);
 
 
-
     @Aggregation(pipeline = {
             "{ $match: { 'books': { $elemMatch: { 'username': ?0, 'occupiedDates.start': { $exists: true, $not: { $size: 0 }, $gt: new Date() } } } } }",
             "{ $project: { " +

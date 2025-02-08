@@ -19,7 +19,6 @@ import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.utility.Validator;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -38,10 +37,10 @@ public class AccommodationService {
     private AccommodationRepository accommodationRepository;
 
     private final RegisteredUserRepository registeredUserRepository;
-    @Autowired
-    private RedissonClient redissonClient;
+
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
     @Autowired
     private BookService bookService;
 
@@ -52,7 +51,7 @@ public class AccommodationService {
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private BookRepository bookRepository;
+    private ReviewService reviewService;
 
     @Autowired
     public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
@@ -97,14 +96,6 @@ public class AccommodationService {
         }
     }
 
-    // Eliminazione di una sistemazione
-    public boolean deleteAccommodationByDescription(ObjectId accommodationId) {
-        if (accommodationRepository.existsByDescription(accommodationId)) {
-            accommodationRepository.deleteByDescription(accommodationId);
-            return true;
-        }
-        return false;
-    }
 
 
     public List<AccommodationDTO> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate) {
@@ -150,39 +141,6 @@ public class AccommodationService {
         }
     }
 
-    public List<AccommodationDTO> getReviewsByUsername(String username) {
-        try {
-            List<Accommodation> reviews = accommodationRepository.findReviewsByUsername(username);
-            return reviews.stream()
-                    .map(AccommodationDTO::withReviews)
-                    .collect(Collectors.toList());
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException("Error while retrieving reviews from the database: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Error while retrieving reviews from the database: ", e);
-        }
-
-
-    }
-    
-    public List<AccommodationDTO> getPendingBookings(String username) {
-        try {
-            // Ottieni BookDTO dal repository
-            //return accommodationRepository.findPendingBookingsByUsername(username);
-            List<Accommodation> books = accommodationRepository.findPendingBookingsByUsername(username);
-            return books.stream()
-                    .map(AccommodationDTO::fromSomeInfo)
-                    .collect(Collectors.toList());
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException("Error while retrieving pending bookings from the database: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
-        }
-    }
 
 
     public List<AccommodationDTO> findOwnAccommodations(String hostUsername) {
@@ -221,109 +179,9 @@ public class AccommodationService {
     }
 
 
-    public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
-        try {
-            // Recupera la lista di Accommodation corrispondente alla query
-            return accommodationRepository.viewAccommodationReviews(hostUsername, id);
-        }
-        catch(DataAccessException e){
-            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Error while retrieving accommodation: ", e);
-        }
-    }
-
-    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook) {
-        try {
-            LocalDate start = newBook.getStartDate();
-            LocalDate end = newBook.getEndDate();
-
-            int aux = accommodationRepository.checkAvailability(accommodationId, start, end);
-            if (aux > 0) {
-                throw new IllegalArgumentException("Accommodation " + accommodationId + " is not available for the selected period.");
-            }
-
-            Validator.validateBook(newBook);
-
-            // Recupera l'accommodation dal database
-            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
-
-            // Controlla che l'utente non sia il proprietario dell'alloggio
-            if (accommodation.getHostUsername().equals(username)) {
-                throw new RuntimeException("Host cannot book their own accommodation.");
-            }
-
-            // Controlla se l'utente ha già una prenotazione nello stesso periodo
-            String bookingKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
-            String existingBooking = (String) redisTemplate.opsForValue().get(bookingKey);
-            System.out.println(existingBooking);
-            if (!username.equals(existingBooking)) {
-                throw new RuntimeException("pERIODO DIVERSO PER QUESTO UTENTE.");
-            }
-
-            // Imposta il nome utente sulla prenotazione
-            newBook.setUsername(username);
-
-            // **1. Aggiungi la prenotazione alla lista delle books dell'accommodation**
-            accommodation.getBooks().add(newBook);
-
-            // **2. Aggiorna il campo occupiedDates dell'accommodation con il nuovo periodo occupato**
-            if (accommodation.getOccupiedDates() == null) {
-                accommodation.setOccupiedDates(new ArrayList<>());
-            }
-            accommodation.getOccupiedDates().add(new OccupiedPeriod(start, end));
-
-            // Salva l'accommodation aggiornata nel database
-            return accommodationRepository.save(accommodation);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
-        }
-    }
 
 
 
-    public boolean deleteBook(String username, ObjectId accommodationId, LocalDate startDate, LocalDate endDate) {
-        try {
-            // Retrieve the accommodation by its ID
-            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
-
-            // Retrieve the customer user who is performing the cancellation
-            RegisteredUser customer = registeredUserRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Customer not found"));
-
-            // Find the booking to be deleted
-            Book bookToDelete = accommodation.getBooks().stream()
-                    .filter(book -> book.getStartDate().equals(startDate) &&
-                            book.getEndDate().equals(endDate) &&
-                            book.getUsername().equals(username))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Booking not found"));
-
-
-            // Calculate the difference in days between the booking start date and today
-            long daysUntilStart = ChronoUnit.DAYS.between(LocalDate.now(), bookToDelete.getStartDate());
-            System.out.println(daysUntilStart);
-
-            if (daysUntilStart >= 2) {
-                // Remove the booking from the list and update the accommodation
-                accommodation.getBooks().remove(bookToDelete);
-                accommodationRepository.save(accommodation);
-                return true;
-            } else {
-                throw new IllegalArgumentException("Booking cannot be canceled as it exceeds the allowed cancellation period.");
-            }
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Database error occurred while deleting the booking: " + e.getMessage(), e);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Validation error: " + e.getMessage(), e);
-        } catch (Exception e) {
-            throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
-        }
-    }
 
     public List<FacilityRatingDTO> getAverageRatingByFacility(String city) {
         return accommodationRepository.getAverageRatingByFacilityInCity(city);
@@ -333,65 +191,16 @@ public class AccommodationService {
            return  accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
     }
 
-    public Accommodation addReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
-        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-        /*Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, -3); // Sottrarre 3 giorni da oggi
-        LocalDate date = calendar.getTime();
-        System.out.println(date);*/
-        String bozzaTextKey = "review:accId:" + accommodationId + ":username:" + username +":text";
-        String text = (String) redisTemplate.opsForValue().get(bozzaTextKey);
-        String bozzaRatingKey = "review:accId:" + accommodationId + ":username" + username +":rating";
-        String rating = (String) redisTemplate.opsForValue().get(bozzaRatingKey);
-        if(text!=null && rating!=null && review.getReviewText()==null) {
-            review.setReviewText(text);
-            review.setRating(Double.parseDouble(rating));
-        }
-        review.setDate(LocalDate.now());
-        /*LocalDate aux = review.getDate();
-        if(aux.isBefore(LocalDate.now())) {
-            throw new RuntimeException("you cannot review an accommodation before the end of the stay");
-        }*/
-        LocalDate date = review.getDate().minusDays(3);
-        System.out.println(date);
-        LocalDate today = LocalDate.now();
-        if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
-            throw new RuntimeException("User has not booked this accommodation within 3 days before");
-        }
-
-        accommodation.getReviews().add(review);
-        return accommodationRepository.save(accommodation);
-    }
-
-
-    public void addBozzaToAccommodation(String username, ObjectId accommodationId, Review review) {
-        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
-
-        /*LocalDate aux = review.getDate();
-        if(aux.isBefore(LocalDate.now())) {
-            throw new RuntimeException("you cannot review an accommodation before the end of the stay");
-        }*/
-        review.setDate(LocalDate.now());
-        LocalDate date = review.getDate().minusDays(3);
-        System.out.println(date);
-        LocalDate today = LocalDate.now();
-        if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
-            throw new RuntimeException("User has not booked this accommodation within 3 days before");
-        }
-        bookService.addBozza(username,accommodationId,review);
-    }
 
 
 
     //@Scheduled(cron = "0 0 3 * * ?") // Ogni giorno alle 03:00 AM
    // @PostConstruct
     public void updateAverageRates() {
-        List<AccommodationAverageRate> averages = archivedReviewRepository.calculateAverageRatesForAllAccommodations();
+        List<AccommodationAverageRateDTO> averages = archivedReviewRepository.calculateAverageRatesForAllAccommodations();
 
-        for (AccommodationAverageRate avg : averages) {
+        for (AccommodationAverageRateDTO avg : averages) {
 
             Query query = new Query();
             query.addCriteria(Criteria.where("accommodationId").is(avg.get_id()));

@@ -1,6 +1,6 @@
 package com.example.WanderHub.demo.DTO;
 
-public class AccommodationAverageRate {
+public class AccommodationAverageRateDTO {
     private String _id;  // accommodationId
     private double averageRate;
 

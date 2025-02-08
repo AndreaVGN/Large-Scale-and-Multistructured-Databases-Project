@@ -22,7 +22,7 @@ public class InsertAccToMongoService {
         this.objectMapper = objectMapper;
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void insertAccommodationsToMongoAtMidnight() {
         // Prendi tutte le chiavi che corrispondono al pattern "accommodation:*"
         Set<String> keys = redisTemplate.keys("accommodation:*");

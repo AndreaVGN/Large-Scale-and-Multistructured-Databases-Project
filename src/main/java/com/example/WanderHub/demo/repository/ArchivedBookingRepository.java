@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -28,7 +27,7 @@ public interface ArchivedBookingRepository extends MongoRepository<ArchivedBook,
             "{ $group: { _id: '$city', averageDays: { $avg: '$durationInDays' } } }", // Raggruppa per città e calcola la media dei giorni
             "{ $project: { 'city': '$_id', 'averageDays': 1, '_id': 0 } }" // Ripristina il campo 'city' e rimuovi '_id'
     })
-    AverageBookingResult findAverageBookingDurationByCity(String city);
+    AverageBookingResultDTO findAverageBookingDurationByCity(String city);
 
 
     @Aggregation(pipeline = {
@@ -114,7 +113,7 @@ public interface ArchivedBookingRepository extends MongoRepository<ArchivedBook,
             "{ $limit: 1 }", // Limita a 1 il risultato
             "{ $project: { 'birthPlace': '$_id', 'count': 1, '_id': 0 } }" // Proietta i campi per la mappatura
     })
-    BirthPlaceFrequency findMostCommonBirthPlaceByCity(String city);
+    BirthPlaceFrequencyDTO findMostCommonBirthPlaceByCity(String city);
 
 
 
