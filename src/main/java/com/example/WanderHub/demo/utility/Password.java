@@ -26,7 +26,7 @@ public class Password {
             // Restituisce la password hashata come stringa esadecimale
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Errore durante l'hashing della password", e);
+            throw new RuntimeException("Errore with hashing of the password!", e);
         }
     }
 

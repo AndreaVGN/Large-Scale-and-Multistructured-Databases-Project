@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 
 @Document(collection = "archivedReviews") // Nome della collection in MongoDB
+/*
 public class ArchivedReview {
     private String accommodationId; // Aggiunto per mantenere il riferimento all'alloggio
     private String username;
@@ -75,5 +76,45 @@ public class ArchivedReview {
     public void setDate(LocalDate date) {
         this.date = date;
     }
+}*/
+
+public class ArchivedReview extends Review {
+
+    private String accommodationId;  // ID dell'accommodation associata alla recensione
+
+    public ArchivedReview() {
+        super();
+    }
+
+    // Costruttore con parametri per inizializzare tutti i campi
+    public ArchivedReview(String reviewText, double rating, String username, LocalDate date, String accommodationId) {
+        super();
+        this.setReviewText(reviewText);
+        this.setRating(rating);
+        this.setUsername(username);
+        this.setDate(date);
+        this.accommodationId = accommodationId;
+    }
+
+    // Getter e Setter per il nuovo campo
+    public String getAccommodationId() {
+        return accommodationId;
+    }
+
+    public void setAccommodationId(String accommodationId) {
+        this.accommodationId = accommodationId;
+    }
+
+    @Override
+    public String toString() {
+        return "ArchivedReview{" +
+                "accommodationId='" + accommodationId + '\'' +
+                ", reviewText='" + getReviewText() + '\'' +
+                ", rating=" + getRating() +
+                ", username='" + getUsername() + '\'' +
+                ", date=" + getDate() +
+                '}';
+    }
 }
+
 

@@ -1,10 +1,13 @@
 package com.example.WanderHub.demo.model;
 
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Document(collection = "archivedBooks")
+/*
 public class ArchivedBook {
 
     private String accommodationId;
@@ -184,4 +187,80 @@ public class ArchivedBook {
                 ", guestLastNames=" + (guestLastNames != null ? String.join(", ", guestLastNames) : "null") +
                 '}';
     }
+}*/
+
+public class ArchivedBook extends Book {
+
+    private String accommodationId;  // ID della casa associata alla prenotazione
+    private String city;             // Città in cui si trova l'accommodation
+    private String hostUsername;     // Username dell'host che offre l'accommodation
+    private double costPerNight;     // Costo per notte dell'accommodation
+
+    public ArchivedBook() {
+        super();
+    }
+
+    // Costruttore con parametri per inizializzare tutti i campi
+    public ArchivedBook(List<OccupiedPeriod> occupiedDates, String username, String email,
+                        String birthPlace, String address, int addressNumber, String birthDate,
+                        String[] guestFirstNames, String[] guestLastNames, String accommodationId,
+                        String city, String hostUsername, double costPerNight) {
+        super(occupiedDates, username, email, birthPlace, address, addressNumber, birthDate,
+                guestFirstNames, guestLastNames);
+        this.accommodationId = accommodationId;
+        this.city = city;
+        this.hostUsername = hostUsername;
+        this.costPerNight = costPerNight;
+    }
+
+    // Getter e Setter per i nuovi campi
+    public String getAccommodationId() {
+        return accommodationId;
+    }
+
+    public void setAccommodationId(String accommodationId) {
+        this.accommodationId = accommodationId;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getHostUsername() {
+        return hostUsername;
+    }
+
+    public void setHostUsername(String hostUsername) {
+        this.hostUsername = hostUsername;
+    }
+
+    public double getCostPerNight() {
+        return costPerNight;
+    }
+
+    public void setCostPerNight(double costPerNight) {
+        this.costPerNight = costPerNight;
+    }
+
+    @Override
+    public String toString() {
+        return "ArchivedBook{" +
+                "accommodationId='" + accommodationId + '\'' +
+                ", city='" + city + '\'' +
+                ", hostUsername='" + hostUsername + '\'' +
+                ", costPerNight=" + costPerNight +
+                ", username='" + getUsername() + '\'' +
+                ", email='" + getEmail() + '\'' +
+                ", birthPlace='" + getBirthPlace() + '\'' +
+                ", address='" + getAddress() + '\'' +
+                ", addressNumber=" + getAddressNumber() +
+                ", birthDate='" + getBirthDate() + '\'' +
+                '}';
+    }
 }
+
+

@@ -4,6 +4,7 @@ import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.repository.ArchivedReviewRepository;
 import com.example.WanderHub.demo.repository.BookRepository;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
+import com.example.WanderHub.demo.utility.RedisUtility;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +58,11 @@ public class AccommodationService {
     private ReviewService reviewService;
 
     @Autowired
+    private RedisUtility redisUtility;
+
+    private static final long accommodationTTL = 86400;
+
+    @Autowired
     public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
         this.registeredUserRepository = registeredUserRepository;
     }
@@ -64,11 +70,14 @@ public class AccommodationService {
     public void createAccommodation(Accommodation accommodation) {
         try {
 
-            Validator.validateAccommodation(accommodation);
+            //Validator.validateAccommodation(accommodation);
 
             // If all checks pass, save the accommodation in the database
             //return accommodationRepository.save(accommodation);
-             bookService.insertAccommodation(accommodation);
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            String accommodationKey = "accommodation:" + timestamp;
+
+            redisUtility.saveAccommodation(accommodation,accommodationKey,accommodationTTL);
 
         } catch (IllegalArgumentException e) {
             // Re-throw the exception to notify the controller

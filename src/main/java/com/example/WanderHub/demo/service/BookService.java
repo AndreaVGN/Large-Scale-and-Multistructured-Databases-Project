@@ -45,8 +45,6 @@ public class BookService {
     private RegisteredUserRepository registeredUserRepository;
 
     private static final long lockTTL = 1200;
-    private static final long reviewTTL = 21600;
-    private static final long accommodationTTL = 86400;
 
 
     // Creazione di una nuova sistemazione
@@ -222,16 +220,4 @@ public class BookService {
             throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
         }
     }
-
-
-
-    public void insertAccommodation(Accommodation accommodation) {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String accommodationKey = "accommodation:" + timestamp;
-
-        redisUtility.saveAccommodation(accommodation,accommodationKey,accommodationTTL);
-    }
-
-
-
 }

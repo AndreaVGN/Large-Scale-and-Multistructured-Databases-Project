@@ -47,9 +47,6 @@ public class RegisteredUserController {
         }
     }
 
-
-
-
     // Endpoint per il login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequestDTO loginRequest, HttpSession session) {
