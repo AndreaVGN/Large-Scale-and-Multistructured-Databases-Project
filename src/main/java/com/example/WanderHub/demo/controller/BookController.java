@@ -47,7 +47,7 @@ public class BookController {
     }*/
 
     @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
-    public ResponseEntity<?> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable int id, HttpSession session) {
+    public ResponseEntity<?> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable String id, HttpSession session) {
         if (!SessionUtilility.isLogged(session, hostUsername)) {
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
@@ -63,7 +63,7 @@ public class BookController {
     }
 
     // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
-    @PutMapping("/{username}/{accommodationId}/addBook/")
+    @PutMapping("/{username}/{accommodationId}/addBook")
     public ResponseEntity<?> addBookToAccommodationRegistered(
             @PathVariable String username,
             @PathVariable ObjectId accommodationId,

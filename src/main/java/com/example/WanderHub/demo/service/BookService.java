@@ -79,7 +79,8 @@ public class BookService {
         String lockKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
 
         // Tentiamo di acquisire il lock utilizzando SETNX
-        if (redisUtility.lock(lockKey) == null || !redisUtility.lock(lockKey)) {
+        Boolean successLock = redisUtility.lock(lockKey);
+        if (successLock == null || !successLock) {
             return username == null ? null : false; // Restituisce null o false a seconda della modalità
         }
 
@@ -146,6 +147,8 @@ public class BookService {
 
             // Controlla che l'utente non sia il proprietario dell'alloggio
             if (accommodation.getHostUsername().equals(username)) {
+                String lockKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
+                redisUtility.delete(lockKey);
                 throw new RuntimeException("Host cannot book their own accommodation.");
             }
 
@@ -155,7 +158,7 @@ public class BookService {
 
             System.out.println(existingBooking);
             if (!username.equals(existingBooking)) {
-                throw new RuntimeException("pERIODO DIVERSO PER QUESTO UTENTE.");
+                throw new RuntimeException("You have to lock the accommodation before!");
             }
 
             // Imposta il nome utente sulla prenotazione

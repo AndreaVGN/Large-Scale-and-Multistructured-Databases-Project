@@ -5,6 +5,9 @@ import com.example.WanderHub.demo.repository.ArchivedReviewRepository;
 import com.example.WanderHub.demo.repository.BookRepository;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
@@ -98,7 +101,7 @@ public class AccommodationService {
 
 
 
-    public List<AccommodationDTO> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate) {
+    public List<AccommodationDTO> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate, int pageNumber) {
         try {
             // Validazione dei parametri
             if (minGuests <= 0) {
@@ -122,8 +125,10 @@ public class AccommodationService {
                 throw new IllegalArgumentException("endDate cannot be before startDate.");
             }
 
+            Pageable pageable = PageRequest.of(pageNumber, 100, Sort.by(Sort.Direction.DESC, "averageRate"));
+
             // Esegui la query che restituisce le Accommodation
-            List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, start, end);
+            List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, start, end, pageable);
 
             // Mappa le Accommodation in DTO utilizzando il factory method
             return accommodations.stream()
@@ -162,7 +167,7 @@ public class AccommodationService {
     }
 
 
-    public List<Book> viewAccommodationBooks(String hostUsername, int id){
+    public List<Book> viewAccommodationBooks(String hostUsername, String id){
         try {
             List<BookDTO> booksDTOList = accommodationRepository.viewAccommodationBooks(hostUsername, id);
 

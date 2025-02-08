@@ -45,9 +45,12 @@ public class AccommodationController {
             @RequestParam("city") String place,
             @RequestParam("guestSize") int minGuests,
             @RequestParam("startDate") String startDate,
-            @RequestParam("endDate") String endDate) {
+            @RequestParam("endDate") String endDate,
+            @RequestParam("pageNumber") int pageNumber
 
-        return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate);
+    ) {
+
+        return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate, pageNumber);
     }
 
     @GetMapping("/{hostUsername}/viewOwnAccommodations")
