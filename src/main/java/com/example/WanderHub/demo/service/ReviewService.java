@@ -68,55 +68,63 @@ public class ReviewService {
     }
 
     public Accommodation addReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
-        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+        try {
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
+            String draftTextKey = "review:accId:" + accommodationId + ":username:" + username + ":text";
+            String text = redisUtility.getValue(draftTextKey);
 
-        String draftTextKey = "review:accId:" + accommodationId + ":username:" + username +":text";
-        String text = redisUtility.getValue(draftTextKey);
+            String draftRatingKey = "review:accId:" + accommodationId + ":username" + username + ":rating";
+            String rating = redisUtility.getValue(draftRatingKey);
 
-        String draftRatingKey = "review:accId:" + accommodationId + ":username" + username +":rating";
-        String rating = redisUtility.getValue(draftRatingKey);
+            if (text != null && rating != null && review.getReviewText() == null) {
+                review.setReviewText(text);
+                review.setRating(Double.parseDouble(rating));
+            }
 
-        if(text!=null && rating!=null && review.getReviewText()==null) {
-            review.setReviewText(text);
-            review.setRating(Double.parseDouble(rating));
+            review.setDate(LocalDate.now());
+            LocalDate date = review.getDate().minusDays(3);
+            LocalDate today = LocalDate.now();
+
+            if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
+                throw new RuntimeException("User has not booked this accommodation within 3 days before");
+            }
+
+            accommodation.getReviews().add(review);
+            return accommodationRepository.save(accommodation);
+        } catch (RuntimeException e) {
+            // Log error and rethrow or handle accordingly
+            throw e;  // You can handle it or rethrow based on your error handling strategy
         }
-
-        review.setDate(LocalDate.now());
-        LocalDate date = review.getDate().minusDays(3);
-        LocalDate today = LocalDate.now();
-
-        if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
-            throw new RuntimeException("User has not booked this accommodation within 3 days before");
-        }
-
-        accommodation.getReviews().add(review);
-        return accommodationRepository.save(accommodation);
     }
-
 
     public void addDraftReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
-        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+        try {
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
+            review.setDate(LocalDate.now());
+            LocalDate date = review.getDate().minusDays(3);
+            LocalDate today = LocalDate.now();
 
-        review.setDate(LocalDate.now());
-        LocalDate date = review.getDate().minusDays(3);
-        LocalDate today = LocalDate.now();
+            if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
+                throw new RuntimeException("User has not booked this accommodation within 3 days before");
+            }
 
-        if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
-            throw new RuntimeException("User has not booked this accommodation within 3 days before");
+            String text = review.getReviewText();
+            String rating = String.valueOf(review.getRating());
+
+            String draftTextKey = "review:accId:" + accommodationId + ":username:" + username + ":text";
+            String draftRatingKey = "review:accId:" + accommodationId + ":username" + username + ":rating";
+
+            redisUtility.setKey(draftTextKey, text, reviewTTL);
+            redisUtility.setKey(draftRatingKey, rating, reviewTTL);
+        } catch (RuntimeException e) {
+            // Log error and rethrow or handle accordingly
+            throw e;  // You can handle it or rethrow based on your error handling strategy
         }
-
-        String text = review.getReviewText();
-        String rating = String.valueOf(review.getRating());
-
-        String draftTextKey = "review:accId:" + accommodationId + ":username:" + username + ":text";
-        String draftRatingKey = "review:accId:" + accommodationId + ":username" + username + ":rating";
-
-        redisUtility.setKey(draftTextKey, text, reviewTTL);
-        redisUtility.setKey(draftRatingKey, rating, reviewTTL);
-
     }
+
+
 }

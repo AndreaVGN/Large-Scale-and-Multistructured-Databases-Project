@@ -69,4 +69,6 @@ public class RegisteredUserController {
 
         return ResponseEntity.ok("Logged out successfully.");
     }
+
+
 }

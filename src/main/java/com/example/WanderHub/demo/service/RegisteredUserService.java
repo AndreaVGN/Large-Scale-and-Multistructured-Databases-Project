@@ -28,57 +28,100 @@ public class RegisteredUserService {
     }
 
     public RegisteredUser createRegisteredUser(RegisteredUser registerUser) {
-        if (registeredUserRepository.findByUsername(registerUser.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+        try {
+            // Verifica se il nome utente contiene la parola "admin"
+            if (registerUser.getUsername().toLowerCase().contains("admin")) {
+                throw new IllegalArgumentException("Forbidden username!");
+            }
+
+            // Controllo se l'username è già presente nel database
+            if (registeredUserRepository.findByUsername(registerUser.getUsername()).isPresent()) {
+                throw new IllegalArgumentException("Username already exists");
+            }
+
+            // Validazione dell'utente
+            Validator.validateUser(registerUser);
+
+            // Hashing della password
+            String hashedPassword = Password.hashPassword(registerUser.getPassword());
+
+            // Imposto la password hashata
+            registerUser.setPassword(hashedPassword);
+
+            // Salvo l'utente nel database
+            return registeredUserRepository.save(registerUser);
+        } catch (IllegalArgumentException e) {
+            // Log dell'errore, se necessario
+            System.err.println("Error creating user: " + e.getMessage());
+            throw e; // Rilancio l'eccezione o gestisco come necessario
+        } catch (Exception e) {
+            // Catch di altre eccezioni non previste
+            System.err.println("Unexpected error creating user: " + e.getMessage());
+            throw new RuntimeException("Error creating user", e);
         }
-
-        Validator.validateUser(registerUser);
-
-        String hashedPassword = Password.hashPassword(registerUser.getPassword());
-
-        registerUser.setPassword(hashedPassword);
-
-        return registeredUserRepository.save(registerUser);
     }
 
+
     public RegisteredUser getRegisteredUserByUsername(String username) {
-        return registeredUserRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Username not found with username: " + username));
+        try {
+            return registeredUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("Username not found with username: " + username));
+        } catch (ResourceNotFoundException e) {
+            // Log the error if needed
+            System.err.println("Error finding user by username: " + e.getMessage());
+            throw e; // Rethrow or handle as needed
+        } catch (Exception e) {
+            // Catch any other unexpected exceptions
+            System.err.println("Unexpected error finding user: " + e.getMessage());
+            throw new RuntimeException("Error finding user", e);
+        }
     }
 
     public boolean deleteRegisteredUserByUsername(String username) {
-        if (registeredUserRepository.existsByUsername(username)) {
-            registeredUserRepository.deleteByUsername(username);
-            return true;
+        try {
+            if (registeredUserRepository.existsByUsername(username)) {
+                registeredUserRepository.deleteByUsername(username);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            // Log the error if needed
+            System.err.println("Error deleting user by username: " + e.getMessage());
+            throw new RuntimeException("Error deleting user", e);
         }
-        return false;
     }
 
     // Autenticazione dell'utente (login)
     public boolean authenticate(AuthRequestDTO loginRequest, HttpSession session) {
-        Optional<RegisteredUser> userOptional = registeredUserRepository.findByUsername(loginRequest.getUsername());
+        try {
+            Optional<RegisteredUser> userOptional = registeredUserRepository.findByUsername(loginRequest.getUsername());
 
-        if (userOptional.isPresent()) {
-            RegisteredUser user = userOptional.get();
+            if (userOptional.isPresent()) {
+                RegisteredUser user = userOptional.get();
 
-            // Hash della password inserita per il confronto
-            String hashedInputPassword = Password.hashPassword(loginRequest.getPassword());
+                // Hash della password inserita per il confronto
+                String hashedInputPassword = Password.hashPassword(loginRequest.getPassword());
 
-            // Confronta l'hash della password
-            if (user.getPassword().equals(hashedInputPassword)) {
-                // Salva l'utente nella sessione
-                session.setAttribute("user", user.getUsername());
-                session.setAttribute("email",user.getEmail());
-                session.setAttribute("birthDate",user.getBirthDate());
-                session.setAttribute("birthPlace",user.getBirthPlace());
-                session.setAttribute("address",user.getAddress());
-                session.setAttribute("addressNumber",user.getAddressNumber());
-                System.out.println(session.getAttribute("user"));
-                return true;
+                // Confronta l'hash della password
+                if (user.getPassword().equals(hashedInputPassword)) {
+                    // Salva l'utente nella sessione
+                    session.setAttribute("user", user.getUsername());
+                    session.setAttribute("email", user.getEmail());
+                    session.setAttribute("birthDate", user.getBirthDate());
+                    session.setAttribute("birthPlace", user.getBirthPlace());
+                    session.setAttribute("address", user.getAddress());
+                    session.setAttribute("addressNumber", user.getAddressNumber());
+                    System.out.println(session.getAttribute("user"));
+                    return true;
+                }
+                return false;
             }
-            return false;
-        }
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            // Log the error if needed
+            System.err.println("Error during authentication: " + e.getMessage());
+            throw new RuntimeException("Error during authentication", e);
+        }
     }
 }

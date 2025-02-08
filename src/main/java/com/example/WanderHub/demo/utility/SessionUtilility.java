@@ -12,4 +12,14 @@ public class SessionUtilility {
 
         return !(currentUsername == null || !currentUsername.equals(username));
     }
+
+    public static boolean isAdmin(HttpSession session) {
+
+        String currentUsername = (String) session.getAttribute("user");
+
+        if (currentUsername.equals("admin")) {
+            return true;
+        }
+        return false;
+    }
 }

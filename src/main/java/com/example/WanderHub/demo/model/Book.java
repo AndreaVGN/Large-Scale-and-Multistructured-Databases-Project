@@ -27,7 +27,6 @@ public class Book {
     // Costruttore con parametri
     public Book(List<OccupiedPeriod> occupiedDates, String username, String email,
                 String birthPlace, String address, int addressNumber, String birthDate, String[] guestFirstNames, String[] guestLastNames) {
-        //this.bookId = bookId;
         this.occupiedDates = occupiedDates;
         this.username = username;
         this.email = email;
@@ -38,16 +37,6 @@ public class Book {
         this.guestFirstNames = guestFirstNames;
         this.guestLastNames = guestLastNames;
     }
-
-    // Getters and Setters
-
-    /*public int getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(int bookId) {
-        this.bookId = bookId;
-    }*/
 
     public List<OccupiedPeriod> getOccupiedDates() {
         return occupiedDates;
@@ -144,7 +133,6 @@ public class Book {
             occupiedDates.get(0).setEnd(endDate); // Imposta la data di fine del primo periodo
         }
     }
-
 
     // Metodo toString
     @Override

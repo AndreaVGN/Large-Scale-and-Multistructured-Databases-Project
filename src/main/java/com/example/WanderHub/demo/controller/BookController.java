@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/books")
 public class BookController {
@@ -32,19 +31,6 @@ public class BookController {
 
     @Autowired
     private ArchivedBookService archivedBookService;
-
-    @PostMapping
-    public Book createBook(@RequestBody Book book) {
-        return bookService.createBook(book);
-    }
-
-    /*
-    @GetMapping("/filter")
-    public List<Book> getBooksByCityAndPeriod(
-            @RequestParam String city,
-            @RequestParam String period) {
-        return bookService.getBooksByCityAndPeriod(city, period);
-    }*/
 
     @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
     public ResponseEntity<?> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable String id, HttpSession session) {
@@ -152,7 +138,7 @@ public class BookController {
         if (success) {
             return ResponseEntity.ok("Accommodation temporarily booked");
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente. Oppure periodo di tempo non valido");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Accommodation already booked from another user or time period not valid");
         }
     }
 
@@ -165,15 +151,15 @@ public class BookController {
             @CookieValue(value = "bookingTimestamp", required = false) String timestampCookie) {
 
         if (timestampCookie == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nessun timestamp di prenotazione trovato.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No accommodation timestamp found.");
         }
 
         boolean unlocked = bookService.unlockHouse(accommodationId, startDate, endDate, timestampCookie);
 
         if (unlocked) {
-            return ResponseEntity.ok("Casa sbloccata con successo.");
+            return ResponseEntity.ok("Unlocked accommodation successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Errore nello sblocco della casa.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error during unlocking of the accommodation");
         }
     }
 
@@ -219,7 +205,6 @@ public class BookController {
         }
     }
 
-
     @DeleteMapping("/{username}/{accommodationId}/unlock")
     public ResponseEntity<String> unlockHouseRegistered(
             @PathVariable ObjectId accommodationId,
@@ -236,52 +221,89 @@ public class BookController {
         boolean success = bookService.unlockHouse(accommodationId, startDate, endDate, username);
 
         if (success) {
-            return ResponseEntity.ok("Casa sbloccata con successo.");
+            return ResponseEntity.ok("Unlocked accommodation successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Errore nello sblocco della casa o la prenotazione non esiste.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error unlocking of the accommodation or the accommodation does not exist.");
         }
     }
 
-    @GetMapping("/top-cities")
-    public List<CityBookingRankingDTO> getTopCities() {
-
-        return archivedBookService.getTopCities();
-    }
-
-    @GetMapping("/average-age/{city}")
-    public List<CityAverageAgeDTO> getAverageAgeByCity(@PathVariable String city) {
-
-        return archivedBookService.getAverageAgeByCity(city);
-    }
-
-    @GetMapping("/top-cities-price-range")
-    public List<CityBookingRankingDTO> getTopCitiesByPriceRange(
-            @RequestParam double minPrice,
-            @RequestParam double maxPrice) {
+    @GetMapping("/{username}/top-cities")
+    public ResponseEntity<?> getTopCities(@PathVariable String username, HttpSession session) {
+        // Controllo dell'autenticazione e dei permessi
+        if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
 
         // Chiamata al service per ottenere la classifica
-        return archivedBookService.getTopCitiesByPriceRange(minPrice, maxPrice);
+        List<CityBookingRankingDTO> topCities = archivedBookService.getTopCities();
+        return ResponseEntity.ok(topCities);
     }
 
-    @GetMapping("/city/{city}/monthly-visits")
-    public List<CityMonthlyVisitDTO> getMonthlyVisits(@PathVariable String city) {
-
-        return archivedBookService.getMonthlyVisitsByCity(city);
-    }
-
-    @GetMapping("/{city}/avgHolidayDuration")
-    public AverageBookingResultDTO findAverageBookingDurationByCity(@PathVariable String city){
-        if (city == null || city.isEmpty()) {
-            throw new IllegalArgumentException("La città non può essere null o vuota");
+    @GetMapping("/{username}/average-age/{city}")
+    public ResponseEntity<?> getAverageAgeByCity(@PathVariable String username, @PathVariable String city, HttpSession session) {
+        // Controllo dell'autenticazione e dei permessi
+        if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        return archivedBookService.findAverageBookingDurationByCity(city);
+        // Chiamata al service per ottenere l'età media
+        List<CityAverageAgeDTO> avgAge = archivedBookService.getAverageAgeByCity(city);
+        return ResponseEntity.ok(avgAge);
     }
-    @GetMapping("/{city}/mostCommonBirthPlace")
-    public BirthPlaceFrequencyDTO getMostCommonBirthPlaceByCity(@PathVariable String city){
 
-        return archivedBookService.findMostCommonBirthPlaceByCity(city);
+    @GetMapping("/{username}/top-cities-price-range")
+    public ResponseEntity<?> getTopCitiesByPriceRange(@PathVariable String username, @RequestParam double minPrice, @RequestParam double maxPrice, HttpSession session) {
+        // Controllo dell'autenticazione e dei permessi
+        if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        // Chiamata al service per ottenere la classifica delle città per range di prezzo
+        List<CityBookingRankingDTO> topCitiesByPriceRange = archivedBookService.getTopCitiesByPriceRange(minPrice, maxPrice);
+        return ResponseEntity.ok(topCitiesByPriceRange);
     }
+
+    @GetMapping("/{username}/city/{city}/monthly-visits")
+    public ResponseEntity<?> getMonthlyVisits(@PathVariable String username, @PathVariable String city, HttpSession session) {
+        // Controllo dell'autenticazione e dei permessi
+        if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        // Chiamata al service per ottenere le visite mensili per città
+        List<CityMonthlyVisitDTO> monthlyVisits = archivedBookService.getMonthlyVisitsByCity(city);
+        return ResponseEntity.ok(monthlyVisits);
+    }
+
+    @GetMapping("/{username}/{city}/avgHolidayDuration")
+    public ResponseEntity<?> findAverageBookingDurationByCity(@PathVariable String username, @PathVariable String city, HttpSession session) {
+        // Controllo dell'autenticazione e dei permessi
+        if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        // Controllo che la città non sia vuota
+        if (city == null || city.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("City must not be null or empty");
+        }
+
+        // Chiamata al service per ottenere la durata media della prenotazione per città
+        AverageBookingResultDTO avgHolidayDuration = archivedBookService.findAverageBookingDurationByCity(city);
+        return ResponseEntity.ok(avgHolidayDuration);
+    }
+
+    @GetMapping("/{username}/{city}/mostCommonBirthPlace")
+    public ResponseEntity<?> getMostCommonBirthPlaceByCity(@PathVariable String username, @PathVariable String city, HttpSession session) {
+        // Controllo dell'autenticazione e dei permessi
+        if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        // Chiamata al service per ottenere il luogo di nascita più comune per città
+        BirthPlaceFrequencyDTO mostCommonBirthPlace = archivedBookService.findMostCommonBirthPlaceByCity(city);
+        return ResponseEntity.ok(mostCommonBirthPlace);
+    }
+
 
 
 

@@ -4,7 +4,6 @@ import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
-import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.BookRepository;
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;
@@ -14,8 +13,6 @@ import com.example.WanderHub.demo.utility.Validator;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,11 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 
 @Service
 public class BookService {
@@ -46,83 +39,73 @@ public class BookService {
 
     private static final long lockTTL = 1200;
 
-
-    // Creazione di una nuova sistemazione
-
-    public Book createBook(Book book) {
-        return bookRepository.save(book);
-    }
-
-    public List<Book> getBooksByCityAndPeriod(String city, String period) {
-        return bookRepository.findByCityAndPeriod(city, period);
-    }
-
-
     public Object lockHouse(ObjectId accommodationId, String start, String end, String username) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate today = LocalDate.now();
-        LocalDate startDate = LocalDate.parse(start, formatter);
-        LocalDate endDate = LocalDate.parse(end, formatter);
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate today = LocalDate.now();
+            LocalDate startDate = LocalDate.parse(start, formatter);
+            LocalDate endDate = LocalDate.parse(end, formatter);
 
-        if (startDate.isBefore(today) || endDate.isAfter(today.plusYears(1)) || startDate.isAfter(endDate)) {
-            throw new RuntimeException("Periodo di tempo non valido.");
+            if (startDate.isBefore(today) || endDate.isAfter(today.plusYears(1)) || startDate.isAfter(endDate)) {
+                throw new RuntimeException("Periodo di tempo non valido.");
+            }
+
+            // Se è una prenotazione registrata, controlla che l'accommodation esista
+            if (username != null) {
+                accommodationRepository.findByAccommodationId(accommodationId)
+                        .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+            }
+
+            String lockKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
+
+            // Tentiamo di acquisire il lock utilizzando SETNX
+            Boolean successLock = redisUtility.lock(lockKey);
+            if (successLock == null || !successLock) {
+                return username == null ? null : false; // Restituisce null o false a seconda della modalità
+            }
+
+            // Se c'è una sovrapposizione, rilascia subito il lock e ritorna null/false
+            if (redisUtility.isOverlappingBooking(accommodationId, start, end)) {
+                redisUtility.delete(lockKey);
+                return username == null ? null : false;
+            }
+
+            // Se è una prenotazione anonima, salva il timestamp, altrimenti salva lo username
+            String valueToStore = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
+            redisUtility.setKey(lockKey, valueToStore, lockTTL);
+
+            return username == null ? valueToStore : true; // Restituisce il timestamp o true a seconda del caso
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while locking the house: " + e.getMessage(), e);
         }
-
-        // Se è una prenotazione registrata, controlla che l'accommodation esista
-        if (username != null) {
-            accommodationRepository.findByAccommodationId(accommodationId)
-                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
-        }
-
-        String lockKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
-
-        // Tentiamo di acquisire il lock utilizzando SETNX
-        Boolean successLock = redisUtility.lock(lockKey);
-        if (successLock == null || !successLock) {
-            return username == null ? null : false; // Restituisce null o false a seconda della modalità
-        }
-
-        // Se c'è una sovrapposizione, rilascia subito il lock e ritorna null/false
-        if (redisUtility.isOverlappingBooking(accommodationId, start, end)) {
-            redisUtility.delete(lockKey);
-            return username == null ? null : false;
-        }
-
-        // Se è una prenotazione anonima, salva il timestamp, altrimenti salva lo username
-        String valueToStore = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
-        redisUtility.setKey(lockKey, valueToStore, lockTTL);
-
-        return username == null ? valueToStore : true; // Restituisce il timestamp o true a seconda del caso
     }
-
-
 
     public boolean unlockHouse(ObjectId houseId, String start, String end, String userIdentifier) {
-        String lockKey = "booking:accId:" + houseId + ":start:" + start + ":end:" + end;
+        try {
+            String lockKey = "booking:accId:" + houseId + ":start:" + start + ":end:" + end;
 
-        String storedValue = redisUtility.getValue(lockKey);
+            String storedValue = redisUtility.getValue(lockKey);
 
-        if (storedValue != null && storedValue.equals(userIdentifier)) {
-            redisUtility.delete(lockKey);
-            return true;
+            if (storedValue != null && storedValue.equals(userIdentifier)) {
+                redisUtility.delete(lockKey);
+                return true;
+            }
+
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while unlocking the house: " + e.getMessage(), e);
         }
-
-        return false;
     }
 
     public List<AccommodationDTO> getPendingBookings(String username) {
         try {
-            // Ottieni BookDTO dal repository
-            //return accommodationRepository.findPendingBookingsByUsername(username);
             List<Accommodation> books = accommodationRepository.findPendingBookingsByUsername(username);
             return books.stream()
                     .map(AccommodationDTO::fromSomeInfo)
                     .collect(Collectors.toList());
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException("Error while retrieving pending bookings from the database: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
         }
     }
@@ -154,7 +137,6 @@ public class BookService {
             String bookingKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
             String existingBooking = redisUtility.getValue(bookingKey);
 
-            System.out.println(existingBooking);
             if (!username.equals(existingBooking)) {
                 throw new RuntimeException("You have to lock the accommodation before!");
             }
@@ -179,8 +161,6 @@ public class BookService {
         }
     }
 
-
-
     public boolean deleteBook(String username, ObjectId accommodationId, LocalDate startDate, LocalDate endDate) {
         try {
             // Retrieve the accommodation by its ID
@@ -199,10 +179,8 @@ public class BookService {
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-
             // Calculate the difference in days between the booking start date and today
             long daysUntilStart = ChronoUnit.DAYS.between(LocalDate.now(), bookToDelete.getStartDate());
-            System.out.println(daysUntilStart);
 
             if (daysUntilStart >= 2) {
                 // Remove the booking from the list and update the accommodation

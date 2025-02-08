@@ -34,6 +34,7 @@ public class ArchivedBookTransferService {
     private MongoTemplate mongoTemplate;
 
     @Scheduled(cron = "0 0 3 1 */3 ?") // Esegui ogni 3 mesi alle 3 di notte
+    @Transactional
     public void archiveOldBooks() {
         logger.info("Inizio archiviazione prenotazioni scadute...");
         LocalDate oneMonthAgo = LocalDate.now().plusMonths(10);
@@ -64,7 +65,6 @@ public class ArchivedBookTransferService {
         }
     }
 
-    @Transactional
     public void removeArchivedBooks(LocalDate oneMonthAgo) {
         // 3️⃣ Rimuovere le prenotazioni archiviate da 'Accommodation'
         Query query = new Query();

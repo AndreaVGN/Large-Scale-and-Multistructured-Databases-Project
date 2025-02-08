@@ -70,7 +70,7 @@ public class AccommodationService {
     public void createAccommodation(Accommodation accommodation) {
         try {
 
-            //Validator.validateAccommodation(accommodation);
+            Validator.validateAccommodation(accommodation);
 
             // If all checks pass, save the accommodation in the database
             //return accommodationRepository.save(accommodation);
@@ -192,39 +192,22 @@ public class AccommodationService {
         }
     }
 
-
-
-
-
-
     public List<FacilityRatingDTO> getAverageRatingByFacility(String city) {
-        return accommodationRepository.getAverageRatingByFacilityInCity(city);
+        try {
+            return accommodationRepository.getAverageRatingByFacilityInCity(city);
+        } catch (Exception e) {
+            // Gestione dell'errore
+            throw new RuntimeException("Error occurred while fetching average rating by facility for city: " + city, e);
+        }
     }
 
     public List<AverageCostDTO> viewAvgCostPerNight(String city) {
-           return  accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
-    }
-
-
-
-
-
-    //@Scheduled(cron = "0 0 3 * * ?") // Ogni giorno alle 03:00 AM
-   // @PostConstruct
-    public void updateAverageRates() {
-        List<AccommodationAverageRateDTO> averages = archivedReviewRepository.calculateAverageRatesForAllAccommodations();
-
-        for (AccommodationAverageRateDTO avg : averages) {
-
-            Query query = new Query();
-            query.addCriteria(Criteria.where("accommodationId").is(avg.get_id()));
-
-            Update update = new Update().set("averageRate", avg.getAverageRate());
-
-            mongoTemplate.updateFirst(query, update, Accommodation.class);
+        try {
+            return accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
+        } catch (Exception e) {
+            // Gestione dell'errore
+            throw new RuntimeException("Error occurred while fetching average cost per night for city: " + city, e);
         }
-
-        System.out.println("Aggiornamento completato.");
     }
 
 

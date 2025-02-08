@@ -46,11 +46,6 @@ public class Validator {
             throw new IllegalArgumentException("Latitude and longitude out of range");
         }
 
-        // Check if occupied dates are not empty
-        if (!accommodation.getOccupiedDates().isEmpty()) {
-            throw new IllegalArgumentException("Occupied date must be empty.");
-        }
-
         // Check if max guest size is not empty or zero
         if (accommodation.getMaxGuestSize() <= 0) {
             throw new IllegalArgumentException("Max guest size must be greater than zero.");
