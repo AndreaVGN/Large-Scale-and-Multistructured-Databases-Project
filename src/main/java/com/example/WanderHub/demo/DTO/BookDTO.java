@@ -7,9 +7,8 @@ import lombok.*;
 
 public class BookDTO {
 
-    private List<Book> books;  // Lista di recensioni
+    private List<Book> books;
 
-    // Getter e setter
     public List<Book> getBooks() {
         return books;
     }
@@ -18,7 +17,6 @@ public class BookDTO {
         this.books = books;
     }
 
-    // Costruttore
     public BookDTO(List<Book> books) {
         this.books = books;
     }

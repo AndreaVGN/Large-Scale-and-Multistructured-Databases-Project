@@ -13,7 +13,7 @@ import java.util.Map;
 
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 
-@Document(collection = "accommodations")  // La collezione in MongoDB
+@Document(collection = "accommodations")
 public class Accommodation {
     @Id
     private String accommodationId;
@@ -27,22 +27,20 @@ public class Accommodation {
     private String hostUsername;
     private double latitude;
     private double longitude;
-    private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
+    private List<OccupiedPeriod> occupiedDates;
     private int maxGuestSize;
     private int costPerNight;
     private double averageRate;
     private String[] photos;
 
-    @Field("books") // Embedding the books array inside Accommodation
+    @Field("books")
     private List<Book> books;
 
-    @Field("reviews") // Embedding the reviews array inside Accommodation
+    @Field("reviews")
     private List<Review> reviews;
 
-    // Costruttore senza parametri
     public Accommodation() {}
 
-    // Costruttore con parametri
     public Accommodation(String description, String type, Map<String, Integer> facilities, String place,
                          String city, String address, String hostUsername, double latitude, double longitude,
                          List<OccupiedPeriod> occupiedDates, int maxGuestSize, int costPerNight, double averageRate,
@@ -67,7 +65,7 @@ public class Accommodation {
 
     public String getAccommodationId() { return accommodationId; }
     public void setAccommodationId(String accommodationId) { this.accommodationId = accommodationId; }
-    // Getter e Setter
+
     public String getDescription() {
         return description;
     }
@@ -196,7 +194,6 @@ public class Accommodation {
         this.reviews = reviews;
     }
 
-    // Metodo toString
     @Override
     public String toString() {
         return "Accommodation{" +

@@ -9,23 +9,22 @@ import com.example.WanderHub.demo.model.Review;
 import java.util.Arrays;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)  // Include solo campi non nulli
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccommodationDTO {
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)  // Ignora se vale 0
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String accommodationId;
     private String description;
     private String type;
     private String city;
     private String hostUsername;
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT) // Esclude numeri se valgono 0 o 0.0
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private int costPerNight;
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT) // Esclude numeri se valgono 0 o 0.0
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private double averageRate;
-    private List<String> photos;  // Cambiato per supportare sia una singola foto che una lista di foto
+    private List<String> photos;
     private List<Book> books;
-    private List<Review> reviews;  // Aggiunto campo reviews
+    private List<Review> reviews;
 
-    // Costruttore privato per forzare l'uso dei metodi factory
     private AccommodationDTO(String accommodationId, String description, String type, String city, String hostUsername,
                             int costPerNight, double averageRate, List<String> photos, List<Review> reviews) {
         this.accommodationId = accommodationId;
@@ -39,7 +38,6 @@ public class AccommodationDTO {
         this.reviews = reviews;
     }
 
-    // Costruttore per il caso con informazioni limitate (senza ID e reviews)
     private AccommodationDTO(String accommodationId, String description, String type, String city, String hostUsername, int costPerNight, double averageRate, List<String> photos) {
         this.accommodationId = accommodationId;
         this.description = description;
@@ -62,20 +60,19 @@ public class AccommodationDTO {
         return new AccommodationDTO(
                 accommodation.getAccommodationId(),
                 accommodation.getDescription(),
-                null, // Non necessario per il caso basic
-                null, // Non necessario per il caso basic
-                null, // Non necessario per il caso basic
-                0,   // Non necessario per il caso basic
-                0.0, // Non necessario per il caso basic
-                null, // Non necessario per il caso basic
-                null  // Non necessario per il caso basic
+                null,
+                null,
+                null,
+                0,
+                0.0,
+                null,
+                null
         );
     }
 
-    // 🔹 Factory method per dati completi (tranne books)
     public static AccommodationDTO fromFullDetails(Accommodation accommodation) {
         List<String> allPhotos = (accommodation.getPhotos() != null && accommodation.getPhotos().length > 0) ?
-                Arrays.asList(accommodation.getPhotos()) : null;  // Restituisce tutte le foto come lista
+                Arrays.asList(accommodation.getPhotos()) : null;
         return new AccommodationDTO(
                 accommodation.getAccommodationId(),
                 accommodation.getDescription(),
@@ -89,10 +86,9 @@ public class AccommodationDTO {
         );
     }
 
-    // 🔹 Factory method per il caso con solo alcuni dati
     public static AccommodationDTO fromLimitedInfo(Accommodation accommodation) {
         String firstPhoto = (accommodation.getPhotos() != null && accommodation.getPhotos().length > 0) ?
-                accommodation.getPhotos()[0] : null; // Restituisce la prima foto o null
+                accommodation.getPhotos()[0] : null;
         return new AccommodationDTO(
                 accommodation.getAccommodationId(),
                 accommodation.getDescription(),
@@ -101,7 +97,7 @@ public class AccommodationDTO {
                 accommodation.getHostUsername(),
                 accommodation.getCostPerNight(),
                 accommodation.getAverageRate(),
-                firstPhoto != null ? Arrays.asList(firstPhoto) : null  // Converte la singola foto in lista
+                firstPhoto != null ? Arrays.asList(firstPhoto) : null
         );
     }
     public static AccommodationDTO idDescriptionBooks(Accommodation accommodation){
@@ -122,7 +118,6 @@ public class AccommodationDTO {
         );
     }
 
-    // Getter e Setter
     public String getAccommodationId() { return accommodationId; }
     public void setAccommodationId(String accommodationId) { this.accommodationId = accommodationId; }
 

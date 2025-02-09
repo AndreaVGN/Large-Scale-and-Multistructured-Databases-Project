@@ -18,18 +18,13 @@ import java.util.List;
 
 @Repository
 public interface AccommodationRepository extends MongoRepository<Accommodation, Integer> {
-    // Trova una sistemazione per ID
     @Query("{ '_id': ?0 }")
     Optional<Accommodation> findByAccommodationId(ObjectId _id);
-
-
-
 
     @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
             fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
     List<Accommodation> findAvailableAccommodations(String city, int minGuests, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-    // Recupera tutte le recensioni dell'accommodation dato un accommodationId
     @Query("{ '_id': ?0 }")
     Accommodation findReviewsByAccommodationId(String description);
 
@@ -39,18 +34,13 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     @Query("{'hostUsername':  ?0}")
     List<Accommodation> findByHostUsername(String hostUsername);
 
-
-
     @Query(value = "{ '_id': ?2, 'books': { '$elemMatch': { 'username': ?0, 'occupiedDates.start': ?1 } } }",
             fields = "{ '_id': 1, 'description': 1, 'books.$': 1 }")
     Accommodation findPendingBookingByUsername(String username, LocalDate startDate, String accommodationId);
 
-
     @Query(value = "{'hostUsername': ?0}", fields = "{'_id': 1, 'description': 1}")
     List<Accommodation> findOwnAccommodations(String username);
 
-    /*@Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'books.bookId': 1,'books.occupiedDates': 1,'books.username': 1,'books.email': 1,'books.birthPlace': 1,'books.address': 1,'books.addressNumber': 1,'books.birthDate': 1,'books.guestFirstNames': 1, 'books.guestLastNames': 1}")
-    List<BookDTO> viewAccommodationBooks(String username,int id);*/
     @Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'books': 1}")
     List<BookDTO> viewAccommodationBooks(String username, String id);
 
@@ -58,35 +48,28 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<ReviewDTO> viewAccommodationReviews(String username,int id);
 
     @Aggregation(pipeline = {
-            // Filtro per città e per valutazione maggiore di 0
             "{ $match: { 'city': ?0, 'averageRate': { $gt: 0 } } }",
-            // Converte l'oggetto facilities in un array di key-value
             "{ $project: { " +
-                    "city: 1, " +  // Mantieni la città
-                    "facilities: { $objectToArray: '$facilities' }, " +  // Converte l'oggetto 'facilities' in un array
-                    "averageRate: 1 " +  // Mantieni il campo averageRate
+                    "city: 1, " +
+                    "facilities: { $objectToArray: '$facilities' }, " +
+                    "averageRate: 1 " +
                     "} }",
-            // Filtro per facilitazioni con valore uguale a 1 (attivo)
-            "{ $unwind: '$facilities' }",  // Scompone l'array di facilitazioni
-            "{ $match: { 'facilities.v': 1 } }",  // Filtra solo le facilitazioni con valore uguale a 1
-            // Raggruppa per facilità e città, calcolando la valutazione media
+
+            "{ $unwind: '$facilities' }",
+            "{ $match: { 'facilities.v': 1 } }",
             "{ $group: { " +
-                    "_id: { 'facility': '$facilities.k', 'city': '$city' }, " +  // Raggruppa per nome facilità (facilities.k) e città
-                    "averageRating: { $avg: '$averageRate' } " +  // Calcola la valutazione media
+                    "_id: { 'facility': '$facilities.k', 'city': '$city' }, " +
+                    "averageRating: { $avg: '$averageRate' } " +
                     "} }",
-            // Proietta il risultato finale
+
             "{ $project: { " +
-                    "facility: '$_id.facility', " +  // Estrai il nome della facilità
-                    "city: '$_id.city', " +  // Estrai la città
-                    "averageRating: 1, " +  // La valutazione media
-                    "_id: 0 " +  // Rimuove il campo _id
+                    "facility: '$_id.facility', " +
+                    "city: '$_id.city', " +
+                    "averageRating: 1, " +
+                    "_id: 0 " +
                     "} }"
     })
     List<FacilityRatingDTO> getAverageRatingByFacilityInCity(String city);
-
-
-
-
 
     @Aggregation(pipeline = {
             "{ $match: { 'city': ?0 } }",
@@ -99,12 +82,12 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     int checkAvailability(ObjectId accommodationId, LocalDate startDate, LocalDate endDate);
 
     @Aggregation(pipeline = {
-            "{ $unwind: '$books' }",  // Scompatta l'array 'books'
-            "{ $unwind: '$books.occupiedDates' }",  // Scompatta l'array 'occupiedDates'
-            "{ $match: { 'books.occupiedDates.end': { $lt: ?0 } } }",  // Filtra le prenotazioni concluse
-            "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$books', { accommodationId: '$_id' } ] } } }",  // Combina 'books' con 'accommodationId'
+            "{ $unwind: '$books' }",
+            "{ $unwind: '$books.occupiedDates' }",
+            "{ $match: { 'books.occupiedDates.end': { $lt: ?0 } } }",
+            "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$books', { accommodationId: '$_id' } ] } } }",
             "{ $project: { " +
-                    "accommodationId: 1, " +  // Aggiungi l'accommodationId che è già presente in 'books'
+                    "accommodationId: 1, " +
                     "hostUsername: '$hostUsername', " +
                     "city: '$city', " +
                     "country: '$place', " +
@@ -113,7 +96,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
                     "nights: { $dateDiff: { startDate: '$books.occupiedDates.start', endDate: '$books.occupiedDates.end', unit: 'day' } }, " +
                     "totalCost: { $multiply: [ { $dateDiff: { startDate: '$books.occupiedDates.start', endDate: '$books.occupiedDates.end', unit: 'day' } }, '$costPerNight'] }, " +
                     "username: '$books.username', " +
-                    "guestCount: { $size: { $ifNull: [ '$books.guestFirstNames', [] ] } } " +  // Se 'guestFirstNames' è mancante o null, usa un array vuoto
+                    "guestCount: { $size: { $ifNull: [ '$books.guestFirstNames', [] ] } } " +
                     "} }"
     })
     List<ArchivedBook> findCompletedBookings(LocalDate today);
@@ -124,7 +107,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
         "{ $match: { 'reviews.date': { $lt: ?0 } } }",
         "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$reviews', { accommodationId: '$_id' } ] } } }"
     })
-List<ArchivedReview> findOldReviews(LocalDate oneMonthAgo);
+    List<ArchivedReview> findOldReviews(LocalDate oneMonthAgo);
 
 
     @Aggregation(pipeline = {

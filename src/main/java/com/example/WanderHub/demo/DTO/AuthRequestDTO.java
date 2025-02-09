@@ -7,7 +7,6 @@ public class AuthRequestDTO {
     private String username;
     private String password;
 
-    // Getter e Setter
     public String getUsername() {
         return username;
     }

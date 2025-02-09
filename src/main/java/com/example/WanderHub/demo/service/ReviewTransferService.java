@@ -34,36 +34,35 @@ public class ReviewTransferService {
     @Autowired
     private AccommodationRepository accommodationRepository;
 
-    @Scheduled(cron = "0 0 3 1 */3 ?")// Esegue ogni 3 mesi alle 3 di notte
+    // Move reviews with date older than 3 months from accommodations collection
+    // to archivedReviews collection
+    @Scheduled(cron = "0 0 3 1 */3 ?")
     //@PostConstruct
     @Transactional
     public void archiveOldReviews() {
-        logger.info("Inizio archiviazione recensioni scadute...");
+        logger.info("Start archiving old reviews");
         LocalDate oneMonthAgo = LocalDate.now().minusMonths(3);
 
         try {
-            // Estrarre le recensioni più vecchie di un mese
             List<ArchivedReview> oldReviews = accommodationRepository.findOldReviews(oneMonthAgo);
             if (oldReviews.isEmpty()) {
-                logger.info("Nessuna recensione da archiviare.");
+                logger.info("No old review to archive.");
                 return;
             }
 
-            // Salvare le recensioni archiviate in batch
             int batchSize = 500;
             for (int i = 0; i < oldReviews.size(); i += batchSize) {
                 int end = Math.min(i + batchSize, oldReviews.size());
                 archivedReviewRepository.saveAll(oldReviews.subList(i, end));
-                logger.info("Batch recensioni archiviato: {} - {}", i, end);
+                logger.info("Batch archived review: {} - {}", i, end);
             }
 
-            // Rimuovere le recensioni archiviate da 'Accommodation'
             removeArchivedReviews(oneMonthAgo);
 
-            logger.info("Transazione completata con successo!");
+            logger.info("Transaction successful!");
         } catch (Exception e) {
-            logger.error("Errore durante l'archiviazione delle recensioni: ", e);
-            throw e; // La transazione verrà annullata automaticamente in caso di errore
+            logger.error("Error during transfer of old reviews ", e);
+            throw e;
         }
     }
 
@@ -71,10 +70,8 @@ public class ReviewTransferService {
         Query query = new Query();
         Update update = new Update().pull("reviews", Query.query(Criteria.where("date").lt(oneMonthAgo)));
 
-        // Esegue la rimozione delle recensioni scadute
         mongoTemplate.updateMulti(query, update, Accommodation.class);
 
-        // Se una accommodation non ha più recensioni, assicuriamo che rimanga un array vuoto
         Update setEmptyArray = new Update().set("reviews", new ArrayList<>());
         mongoTemplate.updateMulti(new Query(Criteria.where("reviews").exists(false)), setEmptyArray, Accommodation.class);
     }

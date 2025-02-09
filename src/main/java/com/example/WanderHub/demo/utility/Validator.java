@@ -10,7 +10,6 @@ import java.util.Set;
 
 public class Validator {
 
-    // Metodo per validare un oggetto di tipo Accommodation
     public static void validateAccommodation(Accommodation accommodation) {
         // Check if description is not empty
         if (accommodation.getDescription() == null || accommodation.getDescription().trim().isEmpty()) {
@@ -94,9 +93,7 @@ public class Validator {
         }
     }
 
-    // Metodo per validare un oggetto di tipo Book
     public static void validateBook(Book book) {
-        // Validate the fields of the Book
 
         // Check if the occupiedDates is null
         if (book.getOccupiedDates() == null) {

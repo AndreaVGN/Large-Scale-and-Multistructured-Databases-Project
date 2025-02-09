@@ -8,7 +8,6 @@ public class ReviewDTO {
 
     private List<Review> reviews;  // Lista di recensioni
 
-    // Getter e setter
     public List<Review> getReviews() {
         return reviews;
     }
@@ -17,7 +16,6 @@ public class ReviewDTO {
         this.reviews = reviews;
     }
 
-    // Costruttore
     public ReviewDTO(List<Review> reviews) {
         this.reviews = reviews;
     }

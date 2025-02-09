@@ -30,18 +30,15 @@ public class ReviewService {
     @Autowired
     private RedisUtility redisUtility;
 
-    private static final long reviewTTL = 21600;
+    private static final long reviewTTL = 21600; // 6 hours
 
-    // Creazione di una nuova sistemazione
     public Review createReview(Review review) {
         return ReviewRepository.save(review);
     }
 
-
-
+    // Return the accommodation reviews selected by the correspondent host username
     public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
         try {
-            // Recupera la lista di Accommodation corrispondente alla query
             return accommodationRepository.viewAccommodationReviews(hostUsername, id);
         }
         catch(DataAccessException e){
@@ -52,6 +49,8 @@ public class ReviewService {
         }
     }
 
+    // Insert a new review to a specified accommodation: if a draft review were previously written it will be send as the review
+    // Note: an username can write a review within 3 days after the finish of the book.
     public Accommodation addReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
         try {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
@@ -79,11 +78,13 @@ public class ReviewService {
             accommodation.getReviews().add(review);
             return accommodationRepository.save(accommodation);
         } catch (RuntimeException e) {
-            // Log error and rethrow or handle accordingly
-            throw e;  // You can handle it or rethrow based on your error handling strategy
+            throw e;
         }
     }
 
+    // Insert a draft review in Redis
+    // Note: an username can write a draft review within 3 days after the finish of the book.
+    // The draft review lasts 6 hours in Redis.
     public void addDraftReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
         try {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)

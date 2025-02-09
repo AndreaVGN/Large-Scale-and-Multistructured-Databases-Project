@@ -11,7 +11,6 @@ import java.util.List;
 
 public class Book {
 
-    //private int bookId;
     private List<OccupiedPeriod> occupiedDates; // Elenco dei periodi occupati
     private String username;
     private String email;
@@ -22,15 +21,11 @@ public class Book {
     private String[] guestFirstNames; // Array dei nomi degli ospiti
     private String[] guestLastNames; // Array dei cognomi degli ospiti
 
-    // Costruttore senza parametri
     public Book() {}
 
-    // **Costruttore di copia**
     public Book(Book other) {
-        // Copia profonda della lista (deep copy)
         this.occupiedDates = other.occupiedDates != null ? new ArrayList<>(other.occupiedDates) : null;
 
-        // Copia dei campi primitivi (String e int)
         this.username = other.username;
         this.email = other.email;
         this.birthPlace = other.birthPlace;
@@ -38,12 +33,10 @@ public class Book {
         this.addressNumber = other.addressNumber;
         this.birthDate = other.birthDate;
 
-        // Copia profonda degli array di stringhe
         this.guestFirstNames = other.guestFirstNames != null ? other.guestFirstNames.clone() : null;
         this.guestLastNames = other.guestLastNames != null ? other.guestLastNames.clone() : null;
     }
 
-    // Costruttore con parametri
     public Book(List<OccupiedPeriod> occupiedDates, String username, String email,
                 String birthPlace, String address, int addressNumber, String birthDate, String[] guestFirstNames, String[] guestLastNames) {
         this.occupiedDates = occupiedDates;
@@ -131,29 +124,28 @@ public class Book {
 
     public LocalDate getStartDate() {
         if (occupiedDates != null && !occupiedDates.isEmpty()) {
-            return occupiedDates.get(0).getStart(); // Restituisce la data di inizio del primo periodo
+            return occupiedDates.get(0).getStart();
         }
-        return null; // Se non ci sono periodi, restituisci null
+        return null;
     }
     public LocalDate getEndDate() {
         if (occupiedDates != null && !occupiedDates.isEmpty()) {
-            return occupiedDates.get(0).getEnd(); // Restituisce la data di inizio del primo periodo
+            return occupiedDates.get(0).getEnd();
         }
-        return null; // Se non ci sono periodi, restituisci null
+        return null;
     }
     public void setStartDate(LocalDate startDate) {
         if (occupiedDates != null && !occupiedDates.isEmpty()) {
-            occupiedDates.get(0).setStart(startDate); // Imposta la data di inizio del primo periodo
+            occupiedDates.get(0).setStart(startDate);
         }
     }
 
     public void setEndDate(LocalDate endDate) {
         if (occupiedDates != null && !occupiedDates.isEmpty()) {
-            occupiedDates.get(0).setEnd(endDate); // Imposta la data di fine del primo periodo
+            occupiedDates.get(0).setEnd(endDate);
         }
     }
 
-    // Metodo toString
     @Override
     public String toString() {
         return "Book{" +

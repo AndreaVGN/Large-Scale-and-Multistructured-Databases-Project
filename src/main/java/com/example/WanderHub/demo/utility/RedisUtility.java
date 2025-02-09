@@ -54,7 +54,6 @@ public class RedisUtility {
     public void saveAccommodation(Accommodation accommodation, String baseKey, Long TTL) {
         ValueOperations<String, Object> ops = redisTemplate.opsForValue();
 
-        // Serializzazione dei campi di tipo String
         ops.set(baseKey + ":description", accommodation.getDescription(), TTL, TimeUnit.SECONDS);
         ops.set(baseKey + ":type", accommodation.getType(), TTL, TimeUnit.SECONDS);
         ops.set(baseKey + ":place", accommodation.getPlace(), TTL, TimeUnit.SECONDS);
@@ -66,13 +65,11 @@ public class RedisUtility {
         ops.set(baseKey + ":maxGuestSize", String.valueOf(accommodation.getMaxGuestSize()), TTL, TimeUnit.SECONDS);
         ops.set(baseKey + ":costPerNight", String.valueOf(accommodation.getCostPerNight()), TTL, TimeUnit.SECONDS);
 
-        // Salvataggio delle foto come chiavi separate
         String[] photos = accommodation.getPhotos();
         for (int i = 0; i < photos.length; i++) {
             ops.set(baseKey + ":photo:" + i, photos[i], TTL, TimeUnit.SECONDS);
         }
 
-        // Salvataggio delle facilities come chiavi separate
         Map<String, Integer> facilities = accommodation.getFacilities();
         for (Map.Entry<String, Integer> entry : facilities.entrySet()) {
             ops.set(baseKey + ":facility:" + entry.getKey(), String.valueOf(entry.getValue()), TTL, TimeUnit.SECONDS);
@@ -100,7 +97,7 @@ public class RedisUtility {
                 boolean isNotTheSame = !(newStart.isEqual(existingStart) && newEnd.isEqual(existingEnd));
 
                 if (isOverlapping && isNotTheSame) {
-                    return true;  // Sovrapposizione trovata
+                    return true;
                 }
 
             }
@@ -111,27 +108,19 @@ public class RedisUtility {
     }
 
 
-
     public static long evaluateTTL(String dataFutura) {
-        System.out.println(dataFutura);
-        // Definiamo il formatter per il formato "yyyy-MM-dd"
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        // Converti la stringa in LocalDate
         LocalDate futureDate = LocalDate.parse(dataFutura, formatter);
 
-        // Converti LocalDate in LocalDateTime impostando l'orario a mezzanotte
         LocalDateTime futureDateTime = futureDate.atStartOfDay();
 
-        System.out.println("Data convertita: " + futureDateTime); // Debug
+        System.out.println("Data convertita: " + futureDateTime);
 
-        // Ottieni il timestamp attuale in secondi
         long currentTimestamp = Instant.now().getEpochSecond();
 
-        // Converte la data futura in timestamp in secondi
         long futureTimestamp = futureDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
 
-        // Calcola il TTL (tempo rimanente in secondi)
         return Math.max(0, futureTimestamp - currentTimestamp);
     }
 }

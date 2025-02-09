@@ -6,14 +6,12 @@ public class PendingBooksDTO {
         private String accommodationId;
         private LocalDate startDate;
 
-        // Costruttore
         public PendingBooksDTO(String username, String accommodationId, LocalDate startDate) {
             this.username = username;
             this.accommodationId = accommodationId;
             this.startDate = startDate;
         }
 
-        // Getters e Setters
         public String getUsername() {
             return username;
         }
@@ -38,7 +36,6 @@ public class PendingBooksDTO {
             this.startDate = startDate;
         }
 
-        // Metodo toString() (opzionale, utile per debugging)
         @Override
         public String toString() {
             return "BookingDTO{" +

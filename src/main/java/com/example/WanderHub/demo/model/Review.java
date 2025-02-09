@@ -11,10 +11,8 @@ public class Review {
     private String username;
     private LocalDate date;
 
-    // Costruttore senza parametri
     public Review() {}
 
-    // Costruttore con parametri
     public Review( String reviewText, double rating, String username, LocalDate reviewDate) {
         this.reviewText = reviewText;
         this.rating = rating;
@@ -53,7 +51,6 @@ public class Review {
         this.date = reviewDate;
     }
 
-    // Metodo toString
     @Override
     public String toString() {
         return "Review{" +

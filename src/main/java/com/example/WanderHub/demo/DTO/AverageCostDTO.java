@@ -6,7 +6,6 @@ public class AverageCostDTO {
     private int guestCount;
     private double averageCostPerNight;
 
-    // Costruttore di default
     public AverageCostDTO() {
     }
 
@@ -16,7 +15,7 @@ public class AverageCostDTO {
         this.averageCostPerNight = averageCostPerNight;
     }
 
-    // Getter e Setter per city
+
     public String getCity() {
         return city;
     }
@@ -25,7 +24,6 @@ public class AverageCostDTO {
         this.city = city;
     }
 
-    // Getter e Setter per guestCount
     public int getGuestCount() {
         return guestCount;
     }
@@ -34,7 +32,6 @@ public class AverageCostDTO {
         this.guestCount = guestCount;
     }
 
-    // Getter e Setter per averageCostPerNight
     public double getAverageCostPerNight() {
         return averageCostPerNight;
     }

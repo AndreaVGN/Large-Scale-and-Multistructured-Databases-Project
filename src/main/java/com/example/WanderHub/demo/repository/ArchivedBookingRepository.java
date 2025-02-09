@@ -11,107 +11,95 @@ import java.util.List;
 
 @Repository
 public interface ArchivedBookingRepository extends MongoRepository<ArchivedBook, String> {
-    // Metodo per salvare in batch (viene già gestito da `saveAll()`)
 
     @Aggregation(pipeline = {
-            "{ $unwind: '$occupiedDates' }", // Unwind per esplodere i periodi di occupazione
-            "{ $match: { 'city': ?0 } }", // Filtro per la città passata come parametro (ad esempio, 'Paris')
+            "{ $unwind: '$occupiedDates' }",
+            "{ $match: { 'city': ?0 } }",
             "{ $project: { " +
                     "'accommodationId': 1, " +
                     "'hostUsername': 1, " +
                     "'city': 1, " +
                     "'startDate': '$occupiedDates.start', " +
                     "'endDate': '$occupiedDates.end', " +
-                    "'durationInDays': { $divide: [ { $subtract: [ '$occupiedDates.end', '$occupiedDates.start' ] }, 86400000 ] } " + // Calcolo della durata in giorni (86400000 ms = 1 giorno)
+                    "'durationInDays': { $divide: [ { $subtract: [ '$occupiedDates.end', '$occupiedDates.start' ] }, 86400000 ] } " +
                     "} }",
-            "{ $group: { _id: '$city', averageDays: { $avg: '$durationInDays' } } }", // Raggruppa per città e calcola la media dei giorni
-            "{ $project: { 'city': '$_id', 'averageDays': 1, '_id': 0 } }" // Ripristina il campo 'city' e rimuovi '_id'
+            "{ $group: { _id: '$city', averageDays: { $avg: '$durationInDays' } } }",
+            "{ $project: { 'city': '$_id', 'averageDays': 1, '_id': 0 } }"
     })
     AverageBookingResultDTO findAverageBookingDurationByCity(String city);
 
 
     @Aggregation(pipeline = {
-            // Filtro per le prenotazioni negli ultimi 12 mesi
             "{ $match: { 'occupiedDates.end': { $gte: ?0 } } }",
-            // Decomponiamo l'array di occupiedDates
+
             "{ $unwind: '$occupiedDates' }",
-            // Raggruppiamo per città e contiamo il numero di prenotazioni per ogni città
+
             "{ $group: { '_id': '$city', 'bookingCount': { $sum: 1 } } }",
-            // Ordiniamo in base al numero di prenotazioni (bookingCount) in modo decrescente
+
             "{ $sort: { 'bookingCount': -1 } }",
-            // Limitiamo il risultato alle prime 10 città
+
             "{ $limit: 10 }"
     })
     List<CityBookingRankingDTO> findTopCitiesByBookings(LocalDate lastYearStart);
 
     @Aggregation(pipeline = {
-            // Filtro per la città
             "{ $match: { 'city': ?0 } }",
 
-            // Decomponiamo l'array 'occupiedDates' per ogni prenotazione
             "{ $unwind: '$occupiedDates' }",
 
-            // Proiettiamo i dati necessari per il calcolo dell'età (conversione del birthDate da stringa)
             "{ $project: { " +
-                    "birthDate: '$birthDate', " +  // Visualizziamo la data di nascita
+                    "birthDate: '$birthDate', " +
                     "age: { " +
                     "$subtract: [ " +
-                    "{ $literal: ?1 }, " +  // Usa l'anno passato come parametro (CurrentYear)
-                    "{ $year: { $dateFromString: { 'dateString': '$birthDate' } } }" +  // Anno di nascita
+                    "{ $literal: ?1 }, " +
+                    "{ $year: { $dateFromString: { 'dateString': '$birthDate' } } }" +
                     "] " +
                     "}, " +
-                    "city: 1 " +  // Manteniamo il campo city
+                    "city: 1 " +
                     "} }",
 
-            // Raggruppa per città e calcola l'età media
             "{ $group: { _id: '$city', averageAge: { $avg: '$age' } } } ",
 
-            // Proiettiamo il risultato finale
             "{ $project: { city: '$_id', averageAge: 1, _id: 0 } }"
     })
     List<CityAverageAgeDTO> findAverageAgeByCity(String city, int currentYear);
 
     @Aggregation(pipeline = {
-            // Filtro per la fascia di prezzo
-            "{ $match: { 'costPerNight': { $gte: ?0, $lte: ?1 } } }",  // Minimo e massimo prezzo
+            "{ $match: { 'costPerNight': { $gte: ?0, $lte: ?1 } } }",
 
-            // Raggruppa per città e calcola il numero di prenotazioni per città
             "{ $group: { _id: '$city', bookingCount: { $sum: 1 } } }",
 
-            // Ordiniamo per numero di prenotazioni (bookingCount) in modo decrescente
             "{ $sort: { bookingCount: -1 } }",
 
-            // Limitiamo il risultato alle prime 10 città
             "{ $limit: 10 }",
 
-            // Proiettiamo il risultato finale
             "{ $project: { city: '$_id', bookingCount: 1, _id: 0 } }"
     })
     List<CityBookingRankingDTO> findTopCitiesByPriceRange(double minPrice, double maxPrice);
 
     @Aggregation(pipeline = {
-            "{ $match: { 'city': ?0 } }",  // Filtro per la città
-            "{ $unwind: '$occupiedDates' }",  // Decomponiamo l'array 'occupiedDates'
+            "{ $match: { 'city': ?0 } }",
+            "{ $unwind: '$occupiedDates' }",
             "{ $project: { " +
-                    "month: { $month: '$occupiedDates.start' }, " +  // Estraiamo il mese
-                    "city: 1 " +  // Manteniamo il campo city
+                    "month: { $month: '$occupiedDates.start' }, " +
+                    "city: 1 " +
                     "} }",
             "{ $group: { " +
                     "_id: { city: '$city', month: '$month' }, " +
-                    "visitCount: { $sum: 1 } " +  // Conta le visite
+                    "visitCount: { $sum: 1 } " +
                     "} }",
             "{ $project: { city: '$_id.city', month: '$_id.month', visitCount: 1, _id: 0 } }",
-            "{ $sort: { 'month': 1 } }"  // Ordina per mese
+            "{ $sort: { 'month': 1 } }"
     })
     List<CityMonthlyVisitDTO> findMonthlyVisitsByCity(String city);
 
 
     @Aggregation(pipeline = {
-            "{ $match: { 'city': ?0 } }", // Filtra per la città
-            "{ $group: { '_id': '$birthPlace', 'count': { $sum: 1 } } }", // Raggruppa per 'birthPlace' e conta
-            "{ $sort: { 'count': -1 } }", // Ordina per il conteggio
-            "{ $limit: 1 }", // Limita a 1 il risultato
-            "{ $project: { 'birthPlace': '$_id', 'count': 1, '_id': 0 } }" // Proietta i campi per la mappatura
+            "{ $match: { 'city': ?0 } }",
+            "{ $group: { '_id': '$birthPlace', 'count': { $sum: 1 } } }",
+            "{ $sort: { 'count': -1 } }",
+            "{ $limit: 1 }",
+            "{ $project: { 'birthPlace': '$_id', 'count': 1, '_id': 0 } }"
     })
     BirthPlaceFrequencyDTO findMostCommonBirthPlaceByCity(String city);
 

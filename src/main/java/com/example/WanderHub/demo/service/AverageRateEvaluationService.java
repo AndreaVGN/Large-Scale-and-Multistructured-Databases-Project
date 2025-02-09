@@ -22,6 +22,8 @@ public class AverageRateEvaluationService {
     @Autowired
     private ArchivedReviewRepository archivedReviewRepository;
 
+    // Evaluate the new average rate of each accommodation from archivedReviews collection
+    // and then update the accommodations collection
     @Scheduled(cron = "0 0 3 * * ?") // Ogni giorno alle 03:00 AM
     //@PostConstruct
     public void updateAverageRates() {
@@ -29,7 +31,7 @@ public class AverageRateEvaluationService {
             List<AccommodationAverageRateDTO> averages = archivedReviewRepository.calculateAverageRatesForAllAccommodations();
 
             if (averages == null || averages.isEmpty()) {
-                throw new Exception("Problema nella query: nessun dato restituito per i tassi medi.");
+                throw new Exception("Problem: no reviews found!");
             }
 
             for (AccommodationAverageRateDTO avg : averages) {
@@ -41,14 +43,14 @@ public class AverageRateEvaluationService {
 
                     mongoTemplate.updateFirst(query, update, Accommodation.class);
                 } catch (Exception e) {
-                    System.err.println("Errore nell'aggiornamento della casa con ID " + avg.get_id() + ": " + e.getMessage());
+                    System.err.println("Error with update of accommodation with ID " + avg.get_id() + ": " + e.getMessage());
                 }
             }
 
-            System.out.println("Aggiornamento completato.");
+            System.out.println("Update completed.");
 
         } catch (Exception e) {
-            System.err.println("Errore nell'aggiornamento dei tassi medi: " + e.getMessage());
+            System.err.println("Error in the updating of the average rate: " + e.getMessage());
         }
     }
 }

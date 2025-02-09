@@ -80,13 +80,12 @@ public class ArchivedReview {
 
 public class ArchivedReview extends Review {
 
-    private String accommodationId;  // ID dell'accommodation associata alla recensione
+    private String accommodationId;
 
     public ArchivedReview() {
         super();
     }
 
-    // Costruttore con parametri per inizializzare tutti i campi
     public ArchivedReview(String reviewText, double rating, String username, LocalDate date, String accommodationId) {
         super();
         this.setReviewText(reviewText);
@@ -96,7 +95,6 @@ public class ArchivedReview extends Review {
         this.accommodationId = accommodationId;
     }
 
-    // Getter e Setter per il nuovo campo
     public String getAccommodationId() {
         return accommodationId;
     }

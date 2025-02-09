@@ -7,7 +7,6 @@ public class CityAverageAgeDTO {
     private String city;
     private Double averageAge;
 
-    // Costruttori, getter e setter
     public CityAverageAgeDTO(String city, Double averageAge) {
         this.city = city;
         this.averageAge = averageAge;

@@ -14,8 +14,6 @@ import java.util.Optional;
 
 @Repository
 public interface RegisteredUserRepository extends MongoRepository<RegisteredUser, String> {
-    // Metodi per interrogare il database, se necessari
-    // Puoi aggiungere metodi di ricerca personalizzati, se necessario
     @Query("{ 'username': ?0 }")
     Optional<RegisteredUser> findByUsername(String username);
 
@@ -23,19 +21,19 @@ public interface RegisteredUserRepository extends MongoRepository<RegisteredUser
     void deleteByUsername(String Username);
 
     @Aggregation(pipeline = {
-            "{ '$match': { 'username': ?0 } }", // Filtra per username
-            "{ '$unwind': '$books' }", // Scompatta l'array books
-            "{ '$match': { 'books.transactionState': false } }", // Filtra i libri con transactionState: false
-            "{ '$replaceRoot': { 'newRoot': '$books' } }" // Ritorna solo il contenuto del libro
+            "{ '$match': { 'username': ?0 } }",
+            "{ '$unwind': '$books' }",
+            "{ '$match': { 'books.transactionState': false } }",
+            "{ '$replaceRoot': { 'newRoot': '$books' } }"
     })
     List<Book> findPendingBooksByUsername(String username);
 
 
 
     @Aggregation(pipeline = {
-            "{ '$match': { 'username': ?0 } }",  // Filtra per username
-            "{ '$unwind': '$accommodations' }",  // Scomponi l'array accommodations in singoli elementi
-            "{ '$project': { 'accommodations': 1, '_id': 0 } }"  // Proietta solo i valori di accommodations
+            "{ '$match': { 'username': ?0 } }",
+            "{ '$unwind': '$accommodations' }",
+            "{ '$project': { 'accommodations': 1, '_id': 0 } }"
     })
     List<Integer> findAccommodationByUsername(String username);
 

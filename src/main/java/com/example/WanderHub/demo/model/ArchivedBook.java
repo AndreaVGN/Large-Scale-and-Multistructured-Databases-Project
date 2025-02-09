@@ -191,16 +191,15 @@ public class ArchivedBook {
 
 public class ArchivedBook extends Book {
 
-    private String accommodationId;  // ID della casa associata alla prenotazione
-    private String city;             // Città in cui si trova l'accommodation
-    private String hostUsername;     // Username dell'host che offre l'accommodation
-    private double costPerNight;     // Costo per notte dell'accommodation
+    private String accommodationId;
+    private String city;
+    private String hostUsername;
+    private double costPerNight;
 
     public ArchivedBook() {
         super();
     }
 
-    // Costruttore con parametri per inizializzare tutti i campi
     public ArchivedBook(List<OccupiedPeriod> occupiedDates, String username, String email,
                         String birthPlace, String address, int addressNumber, String birthDate,
                         String[] guestFirstNames, String[] guestLastNames, String accommodationId,
@@ -213,7 +212,6 @@ public class ArchivedBook extends Book {
         this.costPerNight = costPerNight;
     }
 
-    // Getter e Setter per i nuovi campi
     public String getAccommodationId() {
         return accommodationId;
     }

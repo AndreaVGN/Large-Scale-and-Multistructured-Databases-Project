@@ -5,7 +5,6 @@ public class BirthPlaceFrequencyDTO {
     private String birthPlace;
     private int count;
 
-    // Costruttore, getter, setter e toString
     public BirthPlaceFrequencyDTO(String birthPlace, int count) {
         this.birthPlace = birthPlace;
         this.count = count;

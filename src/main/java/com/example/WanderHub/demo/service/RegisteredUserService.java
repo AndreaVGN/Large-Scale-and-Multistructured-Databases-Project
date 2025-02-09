@@ -27,35 +27,29 @@ public class RegisteredUserService {
         this.registeredUserRepository = registeredUserRepository;
     }
 
+    // Users cannot use admin as their username!
     public RegisteredUser createRegisteredUser(RegisteredUser registerUser) {
         try {
-            // Verifica se il nome utente contiene la parola "admin"
             if (registerUser.getUsername().toLowerCase().contains("admin")) {
                 throw new IllegalArgumentException("Forbidden username!");
             }
 
-            // Controllo se l'username è già presente nel database
             if (registeredUserRepository.findByUsername(registerUser.getUsername()).isPresent()) {
                 throw new IllegalArgumentException("Username already exists");
             }
 
-            // Validazione dell'utente
             Validator.validateUser(registerUser);
 
-            // Hashing della password
             String hashedPassword = Password.hashPassword(registerUser.getPassword());
 
-            // Imposto la password hashata
             registerUser.setPassword(hashedPassword);
 
-            // Salvo l'utente nel database
             return registeredUserRepository.save(registerUser);
+
         } catch (IllegalArgumentException e) {
-            // Log dell'errore, se necessario
             System.err.println("Error creating user: " + e.getMessage());
-            throw e; // Rilancio l'eccezione o gestisco come necessario
+            throw e;
         } catch (Exception e) {
-            // Catch di altre eccezioni non previste
             System.err.println("Unexpected error creating user: " + e.getMessage());
             throw new RuntimeException("Error creating user", e);
         }
@@ -67,11 +61,9 @@ public class RegisteredUserService {
             return registeredUserRepository.findByUsername(username)
                     .orElseThrow(() -> new ResourceNotFoundException("Username not found with username: " + username));
         } catch (ResourceNotFoundException e) {
-            // Log the error if needed
             System.err.println("Error finding user by username: " + e.getMessage());
-            throw e; // Rethrow or handle as needed
+            throw e;
         } catch (Exception e) {
-            // Catch any other unexpected exceptions
             System.err.println("Unexpected error finding user: " + e.getMessage());
             throw new RuntimeException("Error finding user", e);
         }
@@ -85,13 +77,12 @@ public class RegisteredUserService {
             }
             return false;
         } catch (Exception e) {
-            // Log the error if needed
             System.err.println("Error deleting user by username: " + e.getMessage());
             throw new RuntimeException("Error deleting user", e);
         }
     }
 
-    // Autenticazione dell'utente (login)
+    // Login
     public boolean authenticate(AuthRequestDTO loginRequest, HttpSession session) {
         try {
             Optional<RegisteredUser> userOptional = registeredUserRepository.findByUsername(loginRequest.getUsername());
@@ -99,10 +90,8 @@ public class RegisteredUserService {
             if (userOptional.isPresent()) {
                 RegisteredUser user = userOptional.get();
 
-                // Hash della password inserita per il confronto
                 String hashedInputPassword = Password.hashPassword(loginRequest.getPassword());
 
-                // Confronta l'hash della password
                 if (user.getPassword().equals(hashedInputPassword)) {
                     // Salva l'utente nella sessione
                     session.setAttribute("user", user.getUsername());
@@ -119,7 +108,6 @@ public class RegisteredUserService {
 
             return false;
         } catch (Exception e) {
-            // Log the error if needed
             System.err.println("Error during authentication: " + e.getMessage());
             throw new RuntimeException("Error during authentication", e);
         }

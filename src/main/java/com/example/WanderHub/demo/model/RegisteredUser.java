@@ -24,16 +24,13 @@ public class RegisteredUser {
     private String address;
     private int addressNumber;
 
-    // Costruttore vuoto
     public RegisteredUser() {
     }
 
-    // Costruttore con un parametro (esempio)
     public RegisteredUser(String username) {
         this.username = username;
     }
 
-    // Costruttore completo
     public RegisteredUser(String username, String password, String name, String surname, String birthPlace, String email,
                           String birthDate, String address, int addressNumber) {
         this.username = username;
@@ -47,7 +44,6 @@ public class RegisteredUser {
         this.addressNumber = addressNumber;
     }
 
-    // Getters e Setters
     public String getUsername() {
         return username;
     }
@@ -120,7 +116,6 @@ public class RegisteredUser {
         this.addressNumber = addressNumber;
     }
 
-    // Override del metodo toString
     @Override
     public String toString() {
         return "RegisteredUser{" +

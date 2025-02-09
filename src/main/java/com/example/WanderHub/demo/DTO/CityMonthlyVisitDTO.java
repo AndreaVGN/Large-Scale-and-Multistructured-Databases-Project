@@ -6,7 +6,6 @@ public class CityMonthlyVisitDTO {
     private int month;
     private long visitCount;
 
-    // Getters and Setters
     public String getCity() {
         return city;
     }

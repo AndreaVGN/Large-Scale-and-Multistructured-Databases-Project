@@ -7,11 +7,10 @@ import java.time.LocalDate;
 
 public class OccupiedPeriod {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate start; // Data di inizio occupazione
+    private LocalDate start;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate end;   // Data di fine occupazione
+    private LocalDate end;
 
-    // Costruttori
     public OccupiedPeriod() {}
 
     public OccupiedPeriod(LocalDate start, LocalDate end) {
