@@ -34,8 +34,6 @@ public class ReviewController {
     }
 
 
-
-
     @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
     public ResponseEntity<?> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id, HttpSession session) {
         if (!SessionUtilility.isLogged(session, hostUsername)) {
@@ -55,14 +53,12 @@ public class ReviewController {
 
     @PostMapping("/{username}/{accommodationId}/writeDraftReview")
     public ResponseEntity<?> writeDraftReview(@PathVariable String username, @PathVariable ObjectId accommodationId, @RequestBody Review review, HttpSession session) {
-        String usernam = (String) session.getAttribute("user");
-        System.out.println(usernam);
+        if (!SessionUtilility.isLogged(session, username)) {
 
-        if (usernam == null || !usernam.equals(username)) {
-            // Se l'utente non è loggato o non corrisponde, restituisci un errore
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
-        review.setUsername(usernam);
+
+        review.setUsername(username);
         review.setDate(LocalDate.now());
 
         reviewService.addDraftReviewToAccommodation(username,accommodationId,review);

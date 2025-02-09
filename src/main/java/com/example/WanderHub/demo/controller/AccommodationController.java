@@ -73,31 +73,27 @@ public class AccommodationController {
 
     @GetMapping("/{username}/average-rating/{city}")
     public ResponseEntity<?> getAverageRatingByFacility(@PathVariable String city, @PathVariable String username, HttpSession session) {
-        // Verifica se l'utente è loggato e ha il ruolo di admin
+
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
-            // Restituisce un errore 403 (Forbidden) se l'utente non è autorizzato
+
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        // Recupera la lista delle valutazioni medie per le strutture
         List<FacilityRatingDTO> ratings = accommodationService.getAverageRatingByFacility(city);
 
-        // Restituisce la lista con stato 200 (OK)
         return ResponseEntity.ok(ratings);
     }
 
     @GetMapping("/{username}/{city}/viewAvgCostPerNight")
     public ResponseEntity<?> viewAvgCostPerNight(@PathVariable String city, @PathVariable String username, HttpSession session) {
-        // Verifica se l'utente è loggato e ha il ruolo di admin
+
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
-            // Restituisce un errore 403 (Forbidden) se l'utente non è autorizzato
+
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        // Recupera la lista dei costi medi per notte
         List<AverageCostDTO> avgCostList = accommodationService.viewAvgCostPerNight(city);
 
-        // Restituisce la lista con stato 200 (OK)
         return ResponseEntity.ok(avgCostList);
     }
 

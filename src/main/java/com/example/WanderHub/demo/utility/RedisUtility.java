@@ -35,9 +35,9 @@ public class RedisUtility {
 
     }
 
-    public void delete(String pattern) {
+    public Boolean delete(String pattern) {
 
-        redisTemplate.delete(pattern);
+        return redisTemplate.delete(pattern);
 
     }
 

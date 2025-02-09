@@ -4,6 +4,7 @@ import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,24 @@ public class Book {
 
     // Costruttore senza parametri
     public Book() {}
+
+    // **Costruttore di copia**
+    public Book(Book other) {
+        // Copia profonda della lista (deep copy)
+        this.occupiedDates = other.occupiedDates != null ? new ArrayList<>(other.occupiedDates) : null;
+
+        // Copia dei campi primitivi (String e int)
+        this.username = other.username;
+        this.email = other.email;
+        this.birthPlace = other.birthPlace;
+        this.address = other.address;
+        this.addressNumber = other.addressNumber;
+        this.birthDate = other.birthDate;
+
+        // Copia profonda degli array di stringhe
+        this.guestFirstNames = other.guestFirstNames != null ? other.guestFirstNames.clone() : null;
+        this.guestLastNames = other.guestLastNames != null ? other.guestLastNames.clone() : null;
+    }
 
     // Costruttore con parametri
     public Book(List<OccupiedPeriod> occupiedDates, String username, String email,

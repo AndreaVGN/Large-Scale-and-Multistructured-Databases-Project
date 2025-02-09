@@ -203,6 +203,7 @@ public class BookService {
         }
     }
 
+    /*
     public boolean deleteBook(String username, ObjectId accommodationId, LocalDate startDate, LocalDate endDate) {
         try {
             // Retrieve the accommodation by its ID
@@ -243,5 +244,59 @@ public class BookService {
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
         }
+    }*/
+
+    public boolean deleteBook(String username, ObjectId accommodationId, LocalDate startDate, LocalDate endDate) {
+        try {
+            // Recupera l'accommodation e il booking da eliminare
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+
+            Book bookToDelete = accommodation.getBooks().stream()
+                    .filter(book -> book.getStartDate().equals(startDate) &&
+                            book.getEndDate().equals(endDate) &&
+                            book.getUsername().equals(username))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+            // Controllo sulla cancellazione
+            long daysUntilStart = ChronoUnit.DAYS.between(LocalDate.now(), bookToDelete.getStartDate());
+            if (daysUntilStart < 2) {
+                throw new IllegalArgumentException("Booking cannot be canceled as it exceeds the allowed cancellation period.");
+            }
+
+            // **Backup del booking in caso di rollback**
+            Book backupBook = new Book(bookToDelete);
+
+            // **Rimuovi il periodo occupato da `occupiedDates`**
+            accommodation.getOccupiedDates().removeIf(period -> period.getStart().equals(startDate) &&
+                    period.getEnd().equals(endDate));
+
+            // **Elimina il booking da MongoDB**
+            accommodation.getBooks().remove(bookToDelete);
+            accommodationRepository.save(accommodation); // Operazione su MongoDB
+
+            // **Elimina da Redis**
+            String key = "username:" + username + ":accId:" + accommodationId + ":startDate:" + startDate;
+            if (!redisUtility.delete(key)) {  // Supponiamo che `delete()` restituisca `false` se fallisce
+                // **Se Redis fallisce, ripristina il booking su MongoDB**
+                accommodation.getBooks().add(backupBook);
+                // Ripristina il periodo occupato
+                accommodation.getOccupiedDates().addAll(bookToDelete.getOccupiedDates());
+                accommodationRepository.save(accommodation);
+                throw new RuntimeException("Failed to delete booking from Redis, rollback executed.");
+            }
+
+            return true; // Eliminazione riuscita
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Database error occurred while deleting the booking: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Validation error: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
+        }
     }
+
+
 }
