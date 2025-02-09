@@ -140,7 +140,7 @@ public class BookService {
     }
 
 
-    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook, boolean isLogged) {
+   /* public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook, boolean isLogged) {
         try {
             LocalDate start = newBook.getStartDate();
             LocalDate end = newBook.getEndDate();
@@ -193,7 +193,7 @@ public class BookService {
                 String formattedDateStart = start.format(formatterStart);
                 String key = "username:" + username + ":accId:" + accommodationId+":startDate:"+formattedDateStart;
                 DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                String formattedDateEnd = start.format(formatterEnd);
+                String formattedDateEnd = end.format(formatterEnd);
                 redisUtility.setKey(key, formattedDateEnd, evaluateTTL(formattedDateStart));
             }
             return aux1;
@@ -201,7 +201,85 @@ public class BookService {
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
         }
+    }*/
+
+    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook, boolean isLogged) {
+        try {
+            LocalDate start = newBook.getStartDate();
+            LocalDate end = newBook.getEndDate();
+
+            // Verifica la disponibilità dell'alloggio
+            int aux = accommodationRepository.checkAvailability(accommodationId, start, end);
+            System.out.println(aux);
+            if (aux > 0) {
+                throw new IllegalArgumentException("Accommodation " + accommodationId + " is not available for the selected period.");
+            }
+
+            // Validazione della prenotazione
+            Validator.validateBook(newBook);
+
+            // Recupera l'accommodation dal database
+            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
+
+            // Controlla che l'utente non sia il proprietario dell'alloggio
+            if (accommodation.getHostUsername().equals(username)) {
+                String lockKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
+                redisUtility.delete(lockKey);
+                throw new RuntimeException("Host cannot book their own accommodation.");
+            }
+
+            // Controlla se l'utente ha già una prenotazione nello stesso periodo
+            String bookingKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
+            String existingBooking = redisUtility.getValue(bookingKey);
+
+            if (!username.equals(existingBooking)) {
+                throw new RuntimeException("You have to lock the accommodation before!");
+            }
+
+            // Imposta il nome utente sulla prenotazione
+            newBook.setUsername(username);
+
+            // **1. Aggiungi la prenotazione alla lista delle books dell'accommodation**
+            accommodation.getBooks().add(newBook);
+
+            // **2. Aggiorna il campo occupiedDates dell'accommodation con il nuovo periodo occupato**
+            if (accommodation.getOccupiedDates() == null) {
+                accommodation.setOccupiedDates(new ArrayList<>());
+            }
+            accommodation.getOccupiedDates().add(new OccupiedPeriod(start, end));
+
+            // Salva l'accommodation nel database MongoDB
+            Accommodation savedAccommodation = accommodationRepository.save(accommodation);
+            System.out.println("MongoDB: Accommodation saved!");
+
+            // **3. Se la scrittura su MongoDB è andata a buon fine, scrivi su Redis**
+            if (isLogged) {
+                DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String formattedDateStart = start.format(formatterStart);
+                String key = "username:" + username + ":accId:" + accommodationId + ":startDate:" + formattedDateStart;
+                DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String formattedDateEnd = start.format(formatterEnd);
+
+                try {
+                    redisUtility.setKey(key, formattedDateEnd, evaluateTTL(formattedDateStart));
+                } catch (Exception redisException) {
+                    // **Rollback su MongoDB se la scrittura su Redis fallisce**
+                    accommodation.getBooks().remove(newBook);
+                    accommodation.getOccupiedDates().removeIf(period -> period.getStart().equals(start) && period.getEnd().equals(end));
+                    accommodationRepository.save(accommodation); // Ripristina lo stato di MongoDB
+                    throw new RuntimeException("Failed to write booking to Redis, rollback MongoDB changes: " + redisException.getMessage(), redisException);
+                }
+            }
+
+            return savedAccommodation;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);
+        }
     }
+
+
 
     /*
     public boolean deleteBook(String username, ObjectId accommodationId, LocalDate startDate, LocalDate endDate) {

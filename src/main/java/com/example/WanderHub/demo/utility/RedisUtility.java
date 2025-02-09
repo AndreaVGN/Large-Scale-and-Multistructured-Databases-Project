@@ -42,10 +42,9 @@ public class RedisUtility {
     }
 
     public void setKey(String key, String value, Long ttl) {
-
         redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
-
     }
+
 
     public String getValue(String key){
 
