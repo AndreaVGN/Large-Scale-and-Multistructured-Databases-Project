@@ -67,52 +67,44 @@ public class AccommodationService {
         this.registeredUserRepository = registeredUserRepository;
     }
 
+    // Insert new accommodation into Redis
     public void createAccommodation(Accommodation accommodation) {
         try {
 
             Validator.validateAccommodation(accommodation);
 
-            // If all checks pass, save the accommodation in the database
-            //return accommodationRepository.save(accommodation);
             String timestamp = String.valueOf(System.currentTimeMillis());
             String accommodationKey = "accommodation:" + timestamp;
 
             redisUtility.saveAccommodation(accommodation,accommodationKey,accommodationTTL);
 
         } catch (IllegalArgumentException e) {
-            // Re-throw the exception to notify the controller
             throw e;
         } catch (DataAccessException e) {
-            // Handle database-related errors (connection, query, etc.)
             throw new RuntimeException("Error while saving accommodation to the database: " + e.getMessage(), e);
         } catch (Exception e) {
-            // Handle other generic errors
             throw new RuntimeException("Error while creating accommodation: " + e.getMessage(), e);
         }
     }
 
+    // Return the correspondent accommodation if exists
     public AccommodationDTO getAccommodationById(ObjectId accommodationId) {
         try {
-            // Trova la sistemazione esistente
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
 
-            // Use the factory method to create a DTO with complete data (excluding books)
             return AccommodationDTO.fromFullDetails(accommodation);
         } catch (DataAccessException e) {
-            // Handles database-related errors (connection, query, etc.)
             throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
         } catch (Exception e) {
-            // Handles other generic errors
             throw new RuntimeException("Error while retrieving accommodation: " + e.getMessage(), e);
         }
     }
 
 
-
+    // Return the accommodations which fullfill the parameters
     public List<AccommodationDTO> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate, int pageNumber) {
         try {
-            // Validazione dei parametri
             if (minGuests <= 0) {
                 throw new IllegalArgumentException("guestSize must be greater than zero.");
             }
@@ -136,19 +128,17 @@ public class AccommodationService {
 
             Pageable pageable = PageRequest.of(pageNumber, 100, Sort.by(Sort.Direction.DESC, "averageRate"));
 
-            // Esegui la query che restituisce le Accommodation
             List<Accommodation> accommodations = accommodationRepository.findAvailableAccommodations(place, minGuests, start, end, pageable);
 
-            // Mappa le Accommodation in DTO utilizzando il factory method
             return accommodations.stream()
                     .map(AccommodationDTO::fromLimitedInfo)
                     .collect(Collectors.toList());
+
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format. Use YYYY-MM-DD format", e);
         }catch (DataAccessException e) {
-            // Handle database-related errors (connection, query, etc.)
             throw new RuntimeException("Error while getting available accommodations from database: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new RuntimeException("An error occurred while searching for available accommodations.", e);
@@ -156,13 +146,11 @@ public class AccommodationService {
     }
 
 
-
+    // Return the accommodations possessed by a host
     public List<AccommodationDTO> findOwnAccommodations(String hostUsername) {
         try {
-            // Esegui la query per ottenere le accommodations del proprietario
             List<Accommodation> accommodations = accommodationRepository.findOwnAccommodations(hostUsername);
 
-            // Mappa le accommodations in DTO utilizzando il factory method
             return accommodations.stream()
                     .map(AccommodationDTO::idDescription)
                     .collect(Collectors.toList());
@@ -175,7 +163,7 @@ public class AccommodationService {
         }
     }
 
-
+    // Return the corresponding books given an accommodation ID e a host username
     public List<Book> viewAccommodationBooks(String hostUsername, String id){
         try {
             List<BookDTO> booksDTOList = accommodationRepository.viewAccommodationBooks(hostUsername, id);
@@ -192,20 +180,23 @@ public class AccommodationService {
         }
     }
 
+
+    // Analytic: For each facility, return the average rate of accommodations which have that facility
     public List<FacilityRatingDTO> getAverageRatingByFacility(String city) {
         try {
             return accommodationRepository.getAverageRatingByFacilityInCity(city);
         } catch (Exception e) {
-            // Gestione dell'errore
             throw new RuntimeException("Error occurred while fetching average rating by facility for city: " + city, e);
         }
     }
 
+
+    // Analytic: Groups accommodations in a given city based on their guest capacity
+    //           and returns the average cost per night for each accommodation type.
     public List<AverageCostDTO> viewAvgCostPerNight(String city) {
         try {
             return accommodationRepository.findAverageCostPerNightByCityAndGuests(city);
         } catch (Exception e) {
-            // Gestione dell'errore
             throw new RuntimeException("Error occurred while fetching average cost per night for city: " + city, e);
         }
     }

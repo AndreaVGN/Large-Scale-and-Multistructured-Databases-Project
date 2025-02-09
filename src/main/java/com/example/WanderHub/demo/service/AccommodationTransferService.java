@@ -21,11 +21,12 @@ public class AccommodationTransferService {
         this.accommodationRepository = accommodationRepository;
     }
 
+    // Insert the new accommodations from Redis to MongoDB (every nigth at 03:00)
     @Scheduled(cron = "0 0 3 * * ?") // Every night at 03:00
     //@PostConstruct
     @Transactional
     public void insertAccommodationsToMongoAtMidnight() {
-        // Prendi tutte le chiavi che corrispondono al pattern "accommodation:*"
+
         Set<String> keys = redisTemplate.keys("accommodation:*");
         if (keys == null || keys.isEmpty()) {
             return;
@@ -33,22 +34,18 @@ public class AccommodationTransferService {
 
         Map<String, Accommodation> accommodationsMap = new HashMap<>();
 
-        // Itera su tutte le chiavi di Redis
         for (String key : keys) {
             String[] parts = key.split(":");
             if (parts.length < 3) continue;
 
-            String timestamp = parts[1]; // L'elemento temporale
-            String field = parts[2];     // Il campo specifico (description, type, etc.)
+            String timestamp = parts[1];
+            String field = parts[2];     // Specific field (description, type, etc.)
 
-            // Se la mappa non contiene già una entry per il timestamp, creala
             Accommodation accommodation = accommodationsMap.computeIfAbsent(timestamp, k -> new Accommodation());
 
-            // Ottieni il valore da Redis per la chiave
             Object value = redisTemplate.opsForValue().get(key);
 
             if (value != null) {
-                // Gestisci ciascun campo separatamente, assicurandosi che il tipo sia trattato correttamente
                 switch (field) {
                     case "description":
                         if (value instanceof String) {
@@ -102,10 +99,8 @@ public class AccommodationTransferService {
                         break;
                     case "photos":
                         if (value instanceof String) {
-                            // Se il valore è un URL, trattalo come una stringa
                             accommodation.setPhotos(new String[]{(String) value});
                         } else if (value instanceof String[]) {
-                            // Se è un array di URL, trattalo come un array di stringhe
                             accommodation.setPhotos((String[]) value);
                         }
                         break;
@@ -115,7 +110,6 @@ public class AccommodationTransferService {
             }
         }
 
-        // Carica le foto da Redis
         accommodationsMap.forEach((timestamp, accommodation) -> {
             Set<String> photoKeys = redisTemplate.keys("accommodation:" + timestamp + ":photo:*");
             if (photoKeys != null) {
@@ -130,7 +124,6 @@ public class AccommodationTransferService {
             }
         });
 
-        // Carica le facilities da Redis
         accommodationsMap.forEach((timestamp, accommodation) -> {
             Set<String> facilityKeys = redisTemplate.keys("accommodation:" + timestamp + ":facility:*");
             if (facilityKeys != null) {
@@ -147,20 +140,16 @@ public class AccommodationTransferService {
             }
         });
 
-        // Verifica se le informazioni vengono caricate correttamente
         accommodationsMap.values().forEach(accommodation -> {
             System.out.println("Accommodation loaded: " + accommodation.getDescription());
             System.out.println("Facilities: " + accommodation.getFacilities());
             System.out.println("Photos: " + Arrays.toString(accommodation.getPhotos()));
         });
 
-        // Converti la mappa in una lista di oggetti da salvare
         List<Accommodation> accommodations = new ArrayList<>(accommodationsMap.values());
 
-        // Salva tutte le informazioni in MongoDB
         accommodationRepository.saveAll(accommodations);
 
-        // Elimina le chiavi da Redis dopo averle salvate in MongoDB
         redisTemplate.delete(keys);
     }
 }
