@@ -180,6 +180,17 @@ public class BookController {
 
         return ResponseEntity.ok(pendingBookings);
     }
+    @GetMapping("/{username}/{accommodationId}/{startDate}/pendingBook")
+    public ResponseEntity<?> getPendingBook(@PathVariable String username, @PathVariable String accommodationId, @PathVariable String startDate, HttpSession session) {
+        if (!SessionUtilility.isLogged(session, username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+        AccommodationDTO book = bookService.viewPendingBooking(username, accommodationId, startDate);
+        if (book == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Booking not found");
+        }
+        return ResponseEntity.ok(book);
+    }
 
     @DeleteMapping("/{username}/accommodation/{accommodationId}/deleteBook")
     public ResponseEntity<String> deleteBook(

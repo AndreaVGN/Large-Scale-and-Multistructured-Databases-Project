@@ -229,6 +229,7 @@ public class BookService {
                 // Remove the booking from the list and update the accommodation
                 accommodation.getBooks().remove(bookToDelete);
                 accommodationRepository.save(accommodation);
+
                 return true;
             } else {
                 throw new IllegalArgumentException("Booking cannot be canceled as it exceeds the allowed cancellation period.");
