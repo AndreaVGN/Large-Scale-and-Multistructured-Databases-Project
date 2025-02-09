@@ -59,9 +59,10 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<Accommodation> findReviewsByUsername(String username);
 
 
-    @Query(value = "{ 'accommodationId': ?2, 'books.username': ?0, 'books.occupiedDates.start': ?1 }",
-            fields = "{ 'accommodationId': 1, 'description': 1, 'books.$': 1 }")
+    @Query(value = "{ '_id': ?2, 'books': { '$elemMatch': { 'username': ?0, 'occupiedDates.start': ?1 } } }",
+            fields = "{ '_id': 1, 'description': 1, 'books.$': 1 }")
     Accommodation findPendingBookingByUsername(String username, LocalDate startDate, String accommodationId);
+
 
     @Query(value = "{'hostUsername': ?0}", fields = "{'_id': 1, 'description': 1}")
     List<Accommodation> findOwnAccommodations(String username);
