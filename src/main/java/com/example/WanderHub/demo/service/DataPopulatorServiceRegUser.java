@@ -1,4 +1,4 @@
-/*
+
 package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.RegisteredUser;  // Modifica il nome del modello
@@ -44,7 +44,7 @@ public class DataPopulatorServiceRegUser {
     @Autowired
     private RegisteredUserRepository registeredUserRepository;
 
-    @PostConstruct
+    //@PostConstruct
     public void populateData() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -90,6 +90,6 @@ public class DataPopulatorServiceRegUser {
             e.printStackTrace();  // Log dettagliato dell'errore
         }
     }
-}*/
+}
 
 
