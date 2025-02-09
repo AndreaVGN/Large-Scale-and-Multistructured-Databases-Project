@@ -3,43 +3,20 @@ package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.RegisteredUser;  // Modifica il nome del modello
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;  // Modifica il nome del repository
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.FileReader;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;  // Importa il modulo per il supporto delle date Java 8
 
-import java.util.List;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.example.WanderHub.demo.model.RegisteredUser;
-import com.example.WanderHub.demo.repository.RegisteredUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.io.FileReader;
-import java.util.List;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.example.WanderHub.demo.model.RegisteredUser;
-import com.example.WanderHub.demo.repository.RegisteredUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.io.FileReader;
-import java.util.List;
 import java.util.ArrayList;
 
 @Service
-public class DataPopulatorServiceRegUser {
+public class DataPopulatorServiceRegUsers {
 
     @Autowired
     private RegisteredUserRepository registeredUserRepository;
@@ -55,7 +32,7 @@ public class DataPopulatorServiceRegUser {
 
             // Carica il file JSON e mappa correttamente in una lista di oggetti RegisteredUser
             List<RegisteredUser> users = objectMapper.readValue(
-                    new FileReader("C:/Users/franc/Downloads/popolamentoUsernamesFinale.json"),
+                    new FileReader("C:/Users/andre/Downloads/popolamentoUsernamesFinale.json"),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, RegisteredUser.class));
 
             System.out.println("Totale utenti letti dal file: " + users.size());

@@ -29,10 +29,6 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
             fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
     List<Accommodation> findAvailableAccommodations(String city, int minGuests, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-
-
-
-
     // Recupera tutte le recensioni dell'accommodation dato un accommodationId
     @Query("{ '_id': ?0 }")
     Accommodation findReviewsByAccommodationId(String description);

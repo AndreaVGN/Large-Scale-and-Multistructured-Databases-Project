@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +35,11 @@ public class ArchivedBookTransferService {
     private MongoTemplate mongoTemplate;
 
     @Scheduled(cron = "0 0 3 1 */3 ?") // Esegui ogni 3 mesi alle 3 di notte
+    //@PostConstruct
     @Transactional
     public void archiveOldBooks() {
         logger.info("Inizio archiviazione prenotazioni scadute...");
-        LocalDate oneMonthAgo = LocalDate.now().plusMonths(10);
+        LocalDate oneMonthAgo = LocalDate.now().minusMonths(3);
 
         try {
             // 1️⃣ Estrai le prenotazioni scadute

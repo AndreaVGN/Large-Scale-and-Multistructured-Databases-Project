@@ -2,6 +2,7 @@ package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,7 +21,7 @@ public class AccommodationTransferService {
         this.accommodationRepository = accommodationRepository;
     }
 
-    //@Scheduled(cron = "0 0 3 * * ?") // Every night at 03:00
+    @Scheduled(cron = "0 0 3 * * ?") // Every night at 03:00
     //@PostConstruct
     @Transactional
     public void insertAccommodationsToMongoAtMidnight() {

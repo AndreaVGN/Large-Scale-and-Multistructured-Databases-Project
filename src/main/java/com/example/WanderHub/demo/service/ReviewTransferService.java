@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +34,12 @@ public class ReviewTransferService {
     @Autowired
     private AccommodationRepository accommodationRepository;
 
-    @Scheduled(cron = "0 0 3 1 */3 ?") // Esegue ogni 3 mesi alle 3 di notte
+    @Scheduled(cron = "0 0 3 1 */3 ?")// Esegue ogni 3 mesi alle 3 di notte
+    //@PostConstruct
     @Transactional
     public void archiveOldReviews() {
         logger.info("Inizio archiviazione recensioni scadute...");
-        LocalDate oneMonthAgo = LocalDate.now().minusMonths(1);
+        LocalDate oneMonthAgo = LocalDate.now().minusMonths(3);
 
         try {
             // 1️⃣ Estrarre le recensioni più vecchie di un mese
