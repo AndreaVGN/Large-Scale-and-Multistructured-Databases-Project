@@ -1,6 +1,7 @@
 package com.example.WanderHub.demo.service;
 
 import com.example.WanderHub.demo.DTO.AccommodationDTO;
+import com.example.WanderHub.demo.DTO.PendingBooksDTO;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
@@ -15,12 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.example.WanderHub.demo.utility.RedisUtility.evaluateTTL;
 
 @Service
 public class BookService {
@@ -97,7 +102,7 @@ public class BookService {
         }
     }
 
-    public List<AccommodationDTO> getPendingBookings(String username) {
+    public List<AccommodationDTO> viewPendingBooking(String username) {
         try {
             List<Accommodation> books = accommodationRepository.findPendingBookingsByUsername(username);
             return books.stream()
@@ -109,13 +114,36 @@ public class BookService {
             throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
         }
     }
+    public List<PendingBooksDTO> getPendingBookings(String username) {
+        Set<String> existingKeys = redisUtility.getKeys("username:"+username+":accId:*");
+        List<PendingBooksDTO> pendingBookings = new ArrayList<>();
+        if (existingKeys != null) {
+            for (String key : existingKeys) {
+                LocalDate startDate = LocalDate.parse(redisUtility.getValue(key));
+                String[] parts = null;
+                for(int i =0;i<6;i++) {
+                     parts = key.split(":");
+                }
 
-    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook) {
+                String user = parts[1];
+                String accommodationId = parts[3];
+                // Creiamo un nuovo DTO e lo aggiungiamo alla lista
+                pendingBookings.add(new PendingBooksDTO(user, accommodationId, startDate));
+
+            }
+        }
+
+        return pendingBookings;
+    }
+
+
+    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook, boolean isLogged) {
         try {
             LocalDate start = newBook.getStartDate();
             LocalDate end = newBook.getEndDate();
 
             int aux = accommodationRepository.checkAvailability(accommodationId, start, end);
+            System.out.println(aux);
             if (aux > 0) {
                 throw new IllegalArgumentException("Accommodation " + accommodationId + " is not available for the selected period.");
             }
@@ -154,7 +182,20 @@ public class BookService {
             accommodation.getOccupiedDates().add(new OccupiedPeriod(start, end));
 
             // Salva l'accommodation aggiornata nel database
-            return accommodationRepository.save(accommodation);
+            Accommodation aux1 =  accommodationRepository.save(accommodation);
+            System.out.println("Sei arrivato qui!!!!");
+
+            if(isLogged) {
+                long timestamp = Instant.now().getEpochSecond();
+
+                // Converti il timestamp in una stringa
+                String timestampString = String.valueOf(timestamp);
+                String key = "username:" + username + ":accId:" + accommodationId+":timestamp:"+timestampString;
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String formattedDate = start.format(formatter);
+                redisUtility.setKey(key, formattedDate, evaluateTTL(formattedDate));
+            }
+            return aux1;
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while adding the booking: " + e.getMessage(), e);

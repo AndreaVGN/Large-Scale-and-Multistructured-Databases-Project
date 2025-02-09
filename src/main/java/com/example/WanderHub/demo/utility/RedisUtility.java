@@ -7,7 +7,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -105,6 +109,31 @@ public class RedisUtility {
         }
 
         return false;
+    }
+
+
+
+    public static long evaluateTTL(String dataFutura) {
+        System.out.println(dataFutura);
+        // Definiamo il formatter per il formato "yyyy-MM-dd"
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Converti la stringa in LocalDate
+        LocalDate futureDate = LocalDate.parse(dataFutura, formatter);
+
+        // Converti LocalDate in LocalDateTime impostando l'orario a mezzanotte
+        LocalDateTime futureDateTime = futureDate.atStartOfDay();
+
+        System.out.println("Data convertita: " + futureDateTime); // Debug
+
+        // Ottieni il timestamp attuale in secondi
+        long currentTimestamp = Instant.now().getEpochSecond();
+
+        // Converte la data futura in timestamp in secondi
+        long futureTimestamp = futureDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+
+        // Calcola il TTL (tempo rimanente in secondi)
+        return Math.max(0, futureTimestamp - currentTimestamp);
     }
 }
 

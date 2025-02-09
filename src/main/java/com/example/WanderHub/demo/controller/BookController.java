@@ -68,7 +68,7 @@ public class BookController {
         newBook.setAddressNumber((int) session.getAttribute("addressNumber"));
         newBook.setBirthDate((String) session.getAttribute("birthDate"));
 
-        bookService.addBookToAccommodation(username, accommodationId, newBook);
+        bookService.addBookToAccommodation(username, accommodationId, newBook,true);
 
         return new ResponseEntity<>("Booking successfully completed!", HttpStatus.OK);
 
@@ -101,7 +101,7 @@ public class BookController {
         }
 
         // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
-        bookService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook);
+        bookService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook,false);
 
         return new ResponseEntity<>("Prenotazione avvenuta con successo!", HttpStatus.OK);
     }
@@ -172,7 +172,7 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        List<AccommodationDTO> pendingBookings = bookService.getPendingBookings(username);
+        List<PendingBooksDTO> pendingBookings = bookService.getPendingBookings(username);
 
         if (pendingBookings.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No pending books found for this username");

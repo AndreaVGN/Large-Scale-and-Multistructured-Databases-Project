@@ -28,7 +28,7 @@ public class AccommodationTransferService {
     }
 
     //@Scheduled(cron = "0 0 3 * * ?") // Every night at 03:00
-    @PostConstruct
+    //@PostConstruct
     @Transactional(rollbackFor = Exception.class) // Transactional ensures rollback on failure
     public void insertAccommodationsToMongoAtMidnight() {
         // Iniziamo la sessione MongoDB per la transazione
