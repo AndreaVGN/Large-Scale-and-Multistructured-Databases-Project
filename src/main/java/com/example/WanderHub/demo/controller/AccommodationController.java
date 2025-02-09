@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/accommodations")
+@RequestMapping("/api/accommodations")
 public class AccommodationController {
 
     @Autowired
@@ -40,7 +40,7 @@ public class AccommodationController {
         return accommodationService.getAccommodationById(id);
    }
 
-    @GetMapping("/findAccommodations")
+    @GetMapping("/availableAccommodations")
     public List<AccommodationDTO> findAccommodations(
             @RequestParam("city") String place,
             @RequestParam("guestSize") int minGuests,
@@ -53,7 +53,7 @@ public class AccommodationController {
         return accommodationService.findAvailableAccommodations(place, minGuests, startDate, endDate, pageNumber);
     }
 
-    @GetMapping("/{hostUsername}/viewOwnAccommodations")
+    @GetMapping("/{hostUsername}/myAccommodations")
     public ResponseEntity<?> viewOwnAccommodations(@PathVariable String hostUsername, HttpSession session) {
 
         if (!SessionUtilility.isLogged(session, hostUsername)) {
@@ -71,7 +71,7 @@ public class AccommodationController {
         return ResponseEntity.ok(accommodations);
     }
 
-    @GetMapping("/{username}/average-rating/{city}")
+    @GetMapping("/{username}/{city}/average-rating")
     public ResponseEntity<?> getAverageRatingByFacility(@PathVariable String city, @PathVariable String username, HttpSession session) {
 
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
@@ -84,7 +84,7 @@ public class AccommodationController {
         return ResponseEntity.ok(ratings);
     }
 
-    @GetMapping("/{username}/{city}/viewAvgCostPerNight")
+    @GetMapping("/{username}/{city}/AvgCostPerNight")
     public ResponseEntity<?> viewAvgCostPerNight(@PathVariable String city, @PathVariable String username, HttpSession session) {
 
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {

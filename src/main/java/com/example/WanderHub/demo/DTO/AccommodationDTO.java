@@ -13,7 +13,6 @@ import java.util.List;
 public class AccommodationDTO {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)  // Ignora se vale 0
     private String accommodationId;
-    //private ObjectId accommodationId;
     private String description;
     private String type;
     private String city;
@@ -59,7 +58,7 @@ public class AccommodationDTO {
         this.reviews = reviews;
     }
 
-    public static AccommodationDTO fromBasicInfo(Accommodation accommodation) {
+    public static AccommodationDTO idDescription(Accommodation accommodation) {
         return new AccommodationDTO(
                 accommodation.getAccommodationId(),
                 accommodation.getDescription(),
@@ -105,7 +104,7 @@ public class AccommodationDTO {
                 firstPhoto != null ? Arrays.asList(firstPhoto) : null  // Converte la singola foto in lista
         );
     }
-    public static AccommodationDTO fromSomeInfo(Accommodation accommodation){
+    public static AccommodationDTO idDescriptionBooks(Accommodation accommodation){
         return new AccommodationDTO(
                 accommodation.getAccommodationId(),
                 accommodation.getDescription(),

@@ -106,8 +106,8 @@ public class ReviewService {
             redisUtility.setKey(draftTextKey, text, reviewTTL);
             redisUtility.setKey(draftRatingKey, rating, reviewTTL);
         } catch (RuntimeException e) {
-            // Log error and rethrow or handle accordingly
-            throw e;  // You can handle it or rethrow based on your error handling strategy
+
+            throw e;
         }
     }
 

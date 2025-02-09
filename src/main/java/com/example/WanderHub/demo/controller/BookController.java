@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 public class BookController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class BookController {
     @Autowired
     private ArchivedBookService archivedBookService;
 
-    @GetMapping("/{hostUsername}/viewAccommodationBooks/{id}")
+    @GetMapping("/{hostUsername}/{id}/myBooks")
     public ResponseEntity<?> viewAccommodationBooks(@PathVariable String hostUsername, @PathVariable String id, HttpSession session) {
         if (!SessionUtilility.isLogged(session, hostUsername)) {
 
@@ -49,7 +49,7 @@ public class BookController {
     }
 
     // Endpoint per aggiungere una prenotazione a un'accommodation scelta dal cliente
-    @PutMapping("/{username}/{accommodationId}/addBook")
+    @PutMapping("/{username}/{accommodationId}/newBook")
     public ResponseEntity<?> addBookToAccommodationRegistered(
             @PathVariable String username,
             @PathVariable ObjectId accommodationId,
@@ -74,7 +74,7 @@ public class BookController {
 
     }
 
-    @PutMapping("/{accommodationId}/addBook")
+    @PutMapping("/{accommodationId}/newBook")
     public ResponseEntity<?> addBookToAccommodationUnregistered(
             @PathVariable ObjectId accommodationId,
             @RequestBody Book newBook,
@@ -192,7 +192,7 @@ public class BookController {
         return ResponseEntity.ok(book);
     }
 
-    @DeleteMapping("/{username}/accommodation/{accommodationId}/deleteBook")
+    @DeleteMapping("/{username}/accommodation/{accommodationId}/Book")
     public ResponseEntity<String> deleteBook(
             @PathVariable String username,
             @PathVariable ObjectId accommodationId,
@@ -250,7 +250,7 @@ public class BookController {
         return ResponseEntity.ok(topCities);
     }
 
-    @GetMapping("/{username}/average-age/{city}")
+    @GetMapping("/{username}/{city}/average-age")
     public ResponseEntity<?> getAverageAgeByCity(@PathVariable String username, @PathVariable String city, HttpSession session) {
         // Controllo dell'autenticazione e dei permessi
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
@@ -274,7 +274,7 @@ public class BookController {
         return ResponseEntity.ok(topCitiesByPriceRange);
     }
 
-    @GetMapping("/{username}/city/{city}/monthly-visits")
+    @GetMapping("/{username}/{city}/monthly-visits")
     public ResponseEntity<?> getMonthlyVisits(@PathVariable String username, @PathVariable String city, HttpSession session) {
         // Controllo dell'autenticazione e dei permessi
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {

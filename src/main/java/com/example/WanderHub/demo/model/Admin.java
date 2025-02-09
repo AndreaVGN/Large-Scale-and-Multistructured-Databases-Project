@@ -1,6 +1,5 @@
 package com.example.WanderHub.demo.model;
 
-import lombok.*;
 
 
 public class Admin {

@@ -42,14 +42,14 @@ public class ReviewTransferService {
         LocalDate oneMonthAgo = LocalDate.now().minusMonths(3);
 
         try {
-            // 1️⃣ Estrarre le recensioni più vecchie di un mese
+            // Estrarre le recensioni più vecchie di un mese
             List<ArchivedReview> oldReviews = accommodationRepository.findOldReviews(oneMonthAgo);
             if (oldReviews.isEmpty()) {
                 logger.info("Nessuna recensione da archiviare.");
                 return;
             }
 
-            // 2️⃣ Salvare le recensioni archiviate in batch
+            // Salvare le recensioni archiviate in batch
             int batchSize = 500;
             for (int i = 0; i < oldReviews.size(); i += batchSize) {
                 int end = Math.min(i + batchSize, oldReviews.size());
@@ -57,7 +57,7 @@ public class ReviewTransferService {
                 logger.info("Batch recensioni archiviato: {} - {}", i, end);
             }
 
-            // 3️⃣ Rimuovere le recensioni archiviate da 'Accommodation'
+            // Rimuovere le recensioni archiviate da 'Accommodation'
             removeArchivedReviews(oneMonthAgo);
 
             logger.info("Transazione completata con successo!");

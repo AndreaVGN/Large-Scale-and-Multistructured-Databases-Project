@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class RegisteredUserController {
 
     // Iniezione del servizio tramite @Autowired

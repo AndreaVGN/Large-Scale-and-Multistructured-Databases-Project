@@ -1,7 +1,5 @@
 package com.example.WanderHub.demo.DTO;
 
-import lombok.*;
-
 
 public class BirthPlaceFrequencyDTO {
     private String birthPlace;

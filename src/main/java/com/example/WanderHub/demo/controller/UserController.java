@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/auth") // Percorso per tutte le operazioni di autenticazione
+@RequestMapping("/api/auth") // Percorso per tutte le operazioni di autenticazione
 public class UserController {
 
     @Autowired

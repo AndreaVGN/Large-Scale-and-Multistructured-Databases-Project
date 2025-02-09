@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 public class ReviewController {
 
     @Autowired
@@ -34,7 +34,7 @@ public class ReviewController {
     }
 
 
-    @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
+    @GetMapping("/{hostUsername}/{id}/AccommodationReviews")
     public ResponseEntity<?> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id, HttpSession session) {
         if (!SessionUtilility.isLogged(session, hostUsername)) {
 
@@ -51,7 +51,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    @PostMapping("/{username}/{accommodationId}/writeDraftReview")
+    @PostMapping("/{username}/{accommodationId}/newDraftReview")
     public ResponseEntity<?> writeDraftReview(@PathVariable String username, @PathVariable ObjectId accommodationId, @RequestBody Review review, HttpSession session) {
         if (!SessionUtilility.isLogged(session, username)) {
 
@@ -65,7 +65,7 @@ public class ReviewController {
         return new ResponseEntity<>("Bozza aggiunta con successo!", HttpStatus.OK);
     }
 
-    @PutMapping("/{username}/{accommodationId}/writeReview")
+    @PutMapping("/{username}/{accommodationId}/newReview")
     public ResponseEntity<?> writeReview(@PathVariable String username, @PathVariable ObjectId accommodationId, @RequestBody Review review, HttpSession session) {
 
         if (!SessionUtilility.isLogged(session, username)) {

@@ -164,7 +164,7 @@ public class AccommodationService {
 
             // Mappa le accommodations in DTO utilizzando il factory method
             return accommodations.stream()
-                    .map(AccommodationDTO::fromBasicInfo)
+                    .map(AccommodationDTO::idDescription)
                     .collect(Collectors.toList());
         }
         catch(DataAccessException e){
