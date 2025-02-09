@@ -1,27 +1,16 @@
 package com.example.WanderHub.demo.service;
 import com.example.WanderHub.demo.DTO.*;
-import com.example.WanderHub.demo.model.RegisteredUser;
-import com.example.WanderHub.demo.repository.ArchivedReviewRepository;
-import com.example.WanderHub.demo.repository.BookRepository;
-import com.example.WanderHub.demo.utility.OccupiedPeriod;
+
+
 import com.example.WanderHub.demo.utility.RedisUtility;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Update;
-//import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.mongodb.core.query.Query;
-
-import org.springframework.data.redis.core.RedisTemplate;
-import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.exception.ResourceNotFoundException;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
-import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.utility.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -30,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,32 +28,15 @@ public class AccommodationService {
     @Autowired
     private AccommodationRepository accommodationRepository;
 
-    private final RegisteredUserRepository registeredUserRepository;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
-    @Autowired
-    private BookService bookService;
-
-    @Autowired
-    private ArchivedReviewRepository archivedReviewRepository;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @Autowired
-    private ReviewService reviewService;
 
     @Autowired
     private RedisUtility redisUtility;
 
     private static final long accommodationTTL = 86400;
 
-    @Autowired
-    public AccommodationService(AccommodationRepository accommodationRepository, RegisteredUserRepository registeredUserRepository) {
-        this.registeredUserRepository = registeredUserRepository;
-    }
+
 
     // Insert new accommodation into Redis
     public void createAccommodation(Accommodation accommodation) {

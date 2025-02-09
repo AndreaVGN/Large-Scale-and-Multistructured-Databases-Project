@@ -1,7 +1,5 @@
 package com.example.WanderHub.demo.service;
 
-
-import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Review;
@@ -15,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 
 @Service
@@ -87,7 +85,7 @@ public class ReviewService {
     // The draft review lasts 6 hours in Redis.
     public void addDraftReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
         try {
-            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
+              accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
             review.setDate(LocalDate.now());

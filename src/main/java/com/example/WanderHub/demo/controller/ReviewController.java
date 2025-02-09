@@ -1,10 +1,7 @@
 package com.example.WanderHub.demo.controller;
 
-import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.ReviewDTO;
-import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.model.Review;
-import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.ReviewService;
 import com.example.WanderHub.demo.utility.SessionUtilility;
 import jakarta.servlet.http.HttpSession;
@@ -25,8 +22,7 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
-    @Autowired
-    private AccommodationService accommodationService;
+
 
     @PostMapping
     public Review createReview(@RequestBody Review review) {

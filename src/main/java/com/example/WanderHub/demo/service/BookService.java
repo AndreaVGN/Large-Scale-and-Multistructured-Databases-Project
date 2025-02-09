@@ -4,10 +4,7 @@ import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.PendingBooksDTO;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
-import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
-import com.example.WanderHub.demo.repository.BookRepository;
-import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import com.example.WanderHub.demo.utility.RedisUtility;
 import com.example.WanderHub.demo.utility.Validator;
@@ -15,24 +12,19 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 import static com.example.WanderHub.demo.utility.RedisUtility.evaluateTTL;
 
 @Service
 public class BookService {
 
-    @Autowired
-    private BookRepository bookRepository;
 
     @Autowired
     private AccommodationRepository accommodationRepository;
@@ -40,8 +32,6 @@ public class BookService {
     @Autowired
     private RedisUtility redisUtility;
 
-    @Autowired
-    private RegisteredUserRepository registeredUserRepository;
 
     private static final long lockTTL = 600; // 10 minutes for complete the book process
 

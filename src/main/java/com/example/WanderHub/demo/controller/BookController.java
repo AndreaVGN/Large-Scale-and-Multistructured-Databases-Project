@@ -80,27 +80,26 @@ public class BookController {
             @RequestBody Book newBook,
             HttpServletRequest request) {
 
-        // Recupera i cookie dalla richiesta
+
         Cookie[] cookies = request.getCookies();
         String bookingTimestamp = null;
 
-        // Cerca il cookie con il nome "bookingTimestamp"
+
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("bookingTimestamp".equals(cookie.getName())) {
-                    bookingTimestamp = cookie.getValue(); // Ottieni il valore del bookingTimestamp dal cookie
+                    bookingTimestamp = cookie.getValue();
                     break;
                 }
             }
         }
 
-        // Verifica se il cookie è stato trovato
+
         if (bookingTimestamp == null) {
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Se non trovato, restituisci un errore
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        // Aggiungi la nuova prenotazione alla casa selezionata dall'utente
         bookService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook,false);
 
         return new ResponseEntity<>("Prenotazione avvenuta con successo!", HttpStatus.OK);
@@ -112,13 +111,12 @@ public class BookController {
         String timestamp = (String) bookService.lockHouse(accommodationId, startDate, endDate, null);
 
         if (timestamp != null) {
-            // Crea il cookie con il timestamp
             Cookie timestampCookie = new Cookie("bookingTimestamp", timestamp);
-            timestampCookie.setMaxAge(3600); // Imposta un tempo di vita del cookie (modifica a seconda delle necessità)
-            timestampCookie.setHttpOnly(true); // Sicurezza per evitare l'accesso tramite JavaScript
-            timestampCookie.setPath("/"); // Può essere modificato a seconda delle necessità
+            timestampCookie.setMaxAge(3600);
+            timestampCookie.setHttpOnly(true);
+            timestampCookie.setPath("/");
 
-            // Aggiungi il cookie alla risposta
+
             response.addCookie(timestampCookie);
 
             return ResponseEntity.ok("Casa prenotata temporaneamente!");
@@ -240,77 +238,67 @@ public class BookController {
 
     @GetMapping("/{username}/top-cities")
     public ResponseEntity<?> getTopCities(@PathVariable String username, HttpSession session) {
-        // Controllo dell'autenticazione e dei permessi
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        // Chiamata al service per ottenere la classifica
         List<CityBookingRankingDTO> topCities = archivedBookService.getTopCities();
         return ResponseEntity.ok(topCities);
     }
 
     @GetMapping("/{username}/{city}/average-age")
     public ResponseEntity<?> getAverageAgeByCity(@PathVariable String username, @PathVariable String city, HttpSession session) {
-        // Controllo dell'autenticazione e dei permessi
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        // Chiamata al service per ottenere l'età media
         List<CityAverageAgeDTO> avgAge = archivedBookService.getAverageAgeByCity(city);
         return ResponseEntity.ok(avgAge);
     }
 
     @GetMapping("/{username}/top-cities-price-range")
     public ResponseEntity<?> getTopCitiesByPriceRange(@PathVariable String username, @RequestParam double minPrice, @RequestParam double maxPrice, HttpSession session) {
-        // Controllo dell'autenticazione e dei permessi
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        // Chiamata al service per ottenere la classifica delle città per range di prezzo
         List<CityBookingRankingDTO> topCitiesByPriceRange = archivedBookService.getTopCitiesByPriceRange(minPrice, maxPrice);
         return ResponseEntity.ok(topCitiesByPriceRange);
     }
 
     @GetMapping("/{username}/{city}/monthly-visits")
     public ResponseEntity<?> getMonthlyVisits(@PathVariable String username, @PathVariable String city, HttpSession session) {
-        // Controllo dell'autenticazione e dei permessi
+
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        // Chiamata al service per ottenere le visite mensili per città
         List<CityMonthlyVisitDTO> monthlyVisits = archivedBookService.getMonthlyVisitsByCity(city);
         return ResponseEntity.ok(monthlyVisits);
     }
 
     @GetMapping("/{username}/{city}/avgHolidayDuration")
     public ResponseEntity<?> findAverageBookingDurationByCity(@PathVariable String username, @PathVariable String city, HttpSession session) {
-        // Controllo dell'autenticazione e dei permessi
+
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        // Controllo che la città non sia vuota
         if (city == null || city.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("City must not be null or empty");
         }
 
-        // Chiamata al service per ottenere la durata media della prenotazione per città
         AverageBookingResultDTO avgHolidayDuration = archivedBookService.findAverageBookingDurationByCity(city);
         return ResponseEntity.ok(avgHolidayDuration);
     }
 
     @GetMapping("/{username}/{city}/mostCommonBirthPlace")
     public ResponseEntity<?> getMostCommonBirthPlaceByCity(@PathVariable String username, @PathVariable String city, HttpSession session) {
-        // Controllo dell'autenticazione e dei permessi
+
         if (!SessionUtilility.isLogged(session, username) || !SessionUtilility.isAdmin(session)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        // Chiamata al service per ottenere il luogo di nascita più comune per città
         BirthPlaceFrequencyDTO mostCommonBirthPlace = archivedBookService.findMostCommonBirthPlaceByCity(city);
         return ResponseEntity.ok(mostCommonBirthPlace);
     }

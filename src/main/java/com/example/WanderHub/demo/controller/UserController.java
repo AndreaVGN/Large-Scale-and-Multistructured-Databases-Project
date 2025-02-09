@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/auth") // Percorso per tutte le operazioni di autenticazione
+@RequestMapping("/api/auth")
 public class UserController {
 
     @Autowired
-    private RegisteredUserService registeredUserService; // Servizio che gestisce la logica di login, logout e registrazione
+    private RegisteredUserService registeredUserService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody RegisteredUser registerUser) {

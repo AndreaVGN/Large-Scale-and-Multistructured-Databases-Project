@@ -3,10 +3,7 @@ package com.example.WanderHub.demo.utility;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
 import com.example.WanderHub.demo.model.RegisteredUser;
-import org.bson.types.ObjectId;
 
-import java.time.LocalDate;
-import java.util.Set;
 
 public class Validator {
 
@@ -101,7 +98,7 @@ public class Validator {
         }
 
         // Check that the start date is before the end date
-        OccupiedPeriod period = book.getOccupiedDates().get(0);; // Assuming there’s only one period
+        OccupiedPeriod period = book.getOccupiedDates().get(0); // Assuming there’s only one period
         if (period.getStart() == null || period.getEnd() == null) {
             throw new IllegalArgumentException("Start and end dates cannot be null.");
         }

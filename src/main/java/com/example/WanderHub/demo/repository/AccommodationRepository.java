@@ -1,18 +1,15 @@
 package com.example.WanderHub.demo.repository;
 import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.*;
-import jakarta.transaction.Transactional;
-import org.bson.Document;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.mongodb.repository.Aggregation;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Optional;
 import java.util.List;
 
@@ -25,14 +22,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
             fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
     List<Accommodation> findAvailableAccommodations(String city, int minGuests, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-    @Query("{ '_id': ?0 }")
-    Accommodation findReviewsByAccommodationId(String description);
 
-    @Query("{'city':  ?0}")
-    List<Accommodation> findAccommodationsByCity(String city);
-
-    @Query("{'hostUsername':  ?0}")
-    List<Accommodation> findByHostUsername(String hostUsername);
 
     @Query(value = "{ '_id': ?2, 'books': { '$elemMatch': { 'username': ?0, 'occupiedDates.start': ?1 } } }",
             fields = "{ '_id': 1, 'description': 1, 'books.$': 1 }")
@@ -81,25 +71,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     @Query(value = "{ '_id': ?0, 'books.occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
     int checkAvailability(ObjectId accommodationId, LocalDate startDate, LocalDate endDate);
 
-    @Aggregation(pipeline = {
-            "{ $unwind: '$books' }",
-            "{ $unwind: '$books.occupiedDates' }",
-            "{ $match: { 'books.occupiedDates.end': { $lt: ?0 } } }",
-            "{ $replaceRoot: { newRoot: { $mergeObjects: [ '$books', { accommodationId: '$_id' } ] } } }",
-            "{ $project: { " +
-                    "accommodationId: 1, " +
-                    "hostUsername: '$hostUsername', " +
-                    "city: '$city', " +
-                    "country: '$place', " +
-                    "startDate: '$books.occupiedDates.start', " +
-                    "endDate: '$books.occupiedDates.end', " +
-                    "nights: { $dateDiff: { startDate: '$books.occupiedDates.start', endDate: '$books.occupiedDates.end', unit: 'day' } }, " +
-                    "totalCost: { $multiply: [ { $dateDiff: { startDate: '$books.occupiedDates.start', endDate: '$books.occupiedDates.end', unit: 'day' } }, '$costPerNight'] }, " +
-                    "username: '$books.username', " +
-                    "guestCount: { $size: { $ifNull: [ '$books.guestFirstNames', [] ] } } " +
-                    "} }"
-    })
-    List<ArchivedBook> findCompletedBookings(LocalDate today);
+
 
 
     @Aggregation(pipeline = {

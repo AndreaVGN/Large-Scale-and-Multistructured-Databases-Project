@@ -19,8 +19,7 @@ public class RegisteredUserService {
 
     @Autowired
     private RegisteredUserRepository registeredUserRepository;
-    @Autowired
-    private AccommodationService accommodationService;
+
 
     @Autowired
     public RegisteredUserService(RegisteredUserRepository registeredUserRepository) {

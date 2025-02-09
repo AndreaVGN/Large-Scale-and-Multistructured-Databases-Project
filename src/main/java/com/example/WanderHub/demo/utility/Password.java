@@ -25,8 +25,4 @@ public class Password {
         }
     }
 
-    public static boolean matches(String rawPassword, String storedPassword) {
-        String hashedPassword = hashPassword(rawPassword);
-        return hashedPassword.equals(storedPassword);
-    }
 }

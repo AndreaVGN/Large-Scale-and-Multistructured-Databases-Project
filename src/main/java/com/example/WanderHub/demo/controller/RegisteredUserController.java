@@ -1,8 +1,6 @@
 package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.DTO.AuthRequestDTO;
 import com.example.WanderHub.demo.model.RegisteredUser;
-import com.example.WanderHub.demo.service.AccommodationService;
-import com.example.WanderHub.demo.service.BookService;
 import com.example.WanderHub.demo.service.RegisteredUserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 public class RegisteredUserController {
 
-    // Iniezione del servizio tramite @Autowired
+
     @Autowired
     private RegisteredUserService registeredUserService;
-    @Autowired
-    private AccommodationService accommodationService;
-    @Autowired
-    private BookService bookService;
+
 
     @PostMapping
     public RegisteredUser createRegisteredUser(@RequestBody RegisteredUser registeredUser) {
