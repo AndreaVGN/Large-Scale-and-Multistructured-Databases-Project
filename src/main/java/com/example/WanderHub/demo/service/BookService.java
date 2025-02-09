@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -102,18 +103,19 @@ public class BookService {
         }
     }
 
-    public List<AccommodationDTO> viewPendingBooking(String username) {
+    public AccommodationDTO viewPendingBooking(String username, String accommodationId, String startDate) {
         try {
-            List<Accommodation> books = accommodationRepository.findPendingBookingsByUsername(username);
-            return books.stream()
-                    .map(AccommodationDTO::fromSomeInfo)
-                    .collect(Collectors.toList());
+            LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE);
+            Accommodation book = accommodationRepository.findPendingBookingByUsername(username, start, accommodationId);
+            return AccommodationDTO.fromSomeInfo(book);
+
         } catch (DataAccessException e) {
             throw new RuntimeException("Error while retrieving pending bookings from the database: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
         }
     }
+
     public List<PendingBooksDTO> getPendingBookings(String username) {
         Set<String> existingKeys = redisUtility.getKeys("username:"+username+":accId:*");
         List<PendingBooksDTO> pendingBookings = new ArrayList<>();
