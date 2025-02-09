@@ -22,8 +22,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     @Query("{ '_id': ?0 }")
     Optional<Accommodation> findByAccommodationId(ObjectId _id);
 
-    boolean existsByDescription(ObjectId accommodationId);
-    void deleteByDescription(ObjectId accommodationId);
+
 
 
     @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
@@ -44,19 +43,6 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     @Query("{'hostUsername':  ?0}")
     List<Accommodation> findByHostUsername(String hostUsername);
 
-    @Aggregation(pipeline = {
-            "{ $match: { 'reviews.username': ?0 } }",
-            "{ $project: { " +
-                    "'accommodationId': 1, " +   // Includi accommodationId
-                    "'description': 1, " +       // Includi description
-                    "'reviews': { $filter: { " +
-                    "input: '$reviews', " +
-                    "as: 'review', " +
-                    "cond: { $eq: ['$$review.username', ?0] } " +
-                    "} } " +
-                    "} }"
-    })
-    List<Accommodation> findReviewsByUsername(String username);
 
 
     @Query(value = "{ '_id': ?2, 'books': { '$elemMatch': { 'username': ?0, 'occupiedDates.start': ?1 } } }",

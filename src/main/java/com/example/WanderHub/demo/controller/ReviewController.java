@@ -34,22 +34,7 @@ public class ReviewController {
     }
 
 
-    @GetMapping("/{username}/getReviews")
-    public ResponseEntity<?> getReviewsByUsername(@PathVariable String username, HttpSession session) {
 
-        if (!SessionUtilility.isLogged(session, username)) {
-
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
-        }
-
-        List<AccommodationDTO> reviews = reviewService.getReviewsByUsername(username);
-
-        if (reviews.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No reviews found for this username");
-        }
-
-        return ResponseEntity.ok(reviews);
-    }
 
     @GetMapping("/{hostUsername}/viewAccommodationReviews/{id}")
     public ResponseEntity<?> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id, HttpSession session) {

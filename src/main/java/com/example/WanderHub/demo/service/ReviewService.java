@@ -37,22 +37,7 @@ public class ReviewService {
         return ReviewRepository.save(review);
     }
 
-    public List<AccommodationDTO> getReviewsByUsername(String username) {
-        try {
-            List<Accommodation> reviews = accommodationRepository.findReviewsByUsername(username);
-            return reviews.stream()
-                    .map(AccommodationDTO::withReviews)
-                    .collect(Collectors.toList());
-        }
-        catch (DataAccessException e) {
-            throw new RuntimeException("Error while retrieving reviews from the database: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Error while retrieving reviews from the database: ", e);
-        }
 
-
-    }
 
     public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
         try {
