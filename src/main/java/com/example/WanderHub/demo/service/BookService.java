@@ -121,7 +121,7 @@ public class BookService {
         List<PendingBooksDTO> pendingBookings = new ArrayList<>();
         if (existingKeys != null) {
             for (String key : existingKeys) {
-                LocalDate startDate = LocalDate.parse(redisUtility.getValue(key));
+                //LocalDate startDate = LocalDate.parse(redisUtility.getValue(key));
                 String[] parts = null;
                 for(int i =0;i<6;i++) {
                      parts = key.split(":");
@@ -129,6 +129,7 @@ public class BookService {
 
                 String user = parts[1];
                 String accommodationId = parts[3];
+                LocalDate startDate = LocalDate.parse(parts[5]);
                 // Creiamo un nuovo DTO e lo aggiungiamo alla lista
                 pendingBookings.add(new PendingBooksDTO(user, accommodationId, startDate));
 
@@ -188,14 +189,12 @@ public class BookService {
             System.out.println("Sei arrivato qui!!!!");
 
             if(isLogged) {
-                long timestamp = Instant.now().getEpochSecond();
-
-                // Converti il timestamp in una stringa
-                String timestampString = String.valueOf(timestamp);
-                String key = "username:" + username + ":accId:" + accommodationId+":timestamp:"+timestampString;
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                String formattedDate = start.format(formatter);
-                redisUtility.setKey(key, formattedDate, evaluateTTL(formattedDate));
+                DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String formattedDateStart = start.format(formatterStart);
+                String key = "username:" + username + ":accId:" + accommodationId+":startDate:"+formattedDateStart;
+                DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String formattedDateEnd = start.format(formatterEnd);
+                redisUtility.setKey(key, formattedDateEnd, evaluateTTL(formattedDateStart));
             }
             return aux1;
 
@@ -229,7 +228,10 @@ public class BookService {
                 // Remove the booking from the list and update the accommodation
                 accommodation.getBooks().remove(bookToDelete);
                 accommodationRepository.save(accommodation);
-
+                DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String formattedDateStart = startDate.format(formatterStart);
+                String key = "username:" + username + ":accId:" + accommodationId+":startDate:"+formattedDateStart;
+                redisUtility.delete(key);
                 return true;
             } else {
                 throw new IllegalArgumentException("Booking cannot be canceled as it exceeds the allowed cancellation period.");
