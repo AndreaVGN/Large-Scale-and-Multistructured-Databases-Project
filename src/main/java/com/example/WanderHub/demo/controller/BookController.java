@@ -102,7 +102,7 @@ public class BookController {
 
         bookService.addBookToAccommodation(bookingTimestamp, accommodationId, newBook,false);
 
-        return new ResponseEntity<>("Prenotazione avvenuta con successo!", HttpStatus.OK);
+        return new ResponseEntity<>("Successfully book!", HttpStatus.OK);
     }
 
     @PostMapping("/{accommodationId}/lock")
@@ -119,9 +119,9 @@ public class BookController {
 
             response.addCookie(timestampCookie);
 
-            return ResponseEntity.ok("Casa prenotata temporaneamente!");
+            return ResponseEntity.ok("Lock successful");
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Casa già prenotata da un altro utente.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Accommodation already booked from an other user or time periodo not valid");
         }
     }
 

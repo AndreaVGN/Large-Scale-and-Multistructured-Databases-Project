@@ -73,7 +73,7 @@ public class BookService {
 
             String valueToStore = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
             redisUtility.setKey(lockKey, valueToStore, lockTTL);
-            redisUtility.setKey( "booking" + lockKey + ":" + username, startFormatted + endFormatted, lockTTL);
+            redisUtility.setKey( "booking" + lockKey + ":" + valueToStore, startFormatted + endFormatted, lockTTL);
 
             return username == null ? valueToStore : true;
         } catch (Exception e) {

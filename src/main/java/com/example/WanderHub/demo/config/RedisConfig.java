@@ -11,7 +11,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
-/*
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         // Configura Redis Sentinel con Lettuce
@@ -22,7 +22,7 @@ public class RedisConfig {
                 .sentinel("10.1.1.74", 26379); // Terzo Sentinel, se lo hai
 
         return new LettuceConnectionFactory(sentinelConfig);
-    }*/
+    }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
