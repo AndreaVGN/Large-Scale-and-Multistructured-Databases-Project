@@ -54,7 +54,9 @@ public class BookService {
                         .orElseThrow(() -> new RuntimeException("Accommodation not found"));
             }
 
-            String lockKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
+            String startFormatted = start.replaceAll("-", "");
+            String endFormatted = end.replaceAll("-", "");
+            String lockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
 
             Boolean successLock = redisUtility.lock(lockKey);
 
@@ -63,7 +65,7 @@ public class BookService {
             }
 
 
-            if (redisUtility.isOverlappingBooking(accommodationId, start, end)) {
+            if (redisUtility.isOverlappingBooking(accommodationId, startFormatted, endFormatted)) {
                 redisUtility.delete(lockKey);
                 return username == null ? null : false;
             }
@@ -71,6 +73,8 @@ public class BookService {
 
             String valueToStore = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
             redisUtility.setKey(lockKey, valueToStore, lockTTL);
+
+            redisUtility.setKey( "booking" + lockKey + ":" + username, start, lockTTL);
 
             return username == null ? valueToStore : true;
         } catch (Exception e) {
@@ -81,12 +85,17 @@ public class BookService {
     // Unlock a previously locked accommodation (both for registered and unregistered users)
     public boolean unlockHouse(ObjectId houseId, String start, String end, String userIdentifier) {
         try {
-            String lockKey = "booking:accId:" + houseId + ":start:" + start + ":end:" + end;
+            String startFormatted = start.replaceAll("-", "");
+            String endFormatted = end.replaceAll("-", "");
+            String lockKey = "lock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
+            String username = redisUtility.getValue(lockKey);
+            String bookingLockKey = "booking" + lockKey + ":" + username;
 
             String storedValue = redisUtility.getValue(lockKey);
 
-            if (storedValue != null && storedValue.equals(userIdentifier)) {
+            if (username != null && username.equals(userIdentifier)) {
                 redisUtility.delete(lockKey);
+                redisUtility.delete(bookingLockKey);
                 return true;
             }
 
@@ -143,12 +152,15 @@ public class BookService {
     // 4 - If 1) success but 2) not success rollback 1)
    public Accommodation addBookToAccommodation(String username, ObjectId accommodationId, Book newBook, boolean isLogged) {
         try {
-            LocalDate start = newBook.getStartDate();
-            LocalDate end = newBook.getEndDate();
+            LocalDate startDate = newBook.getStartDate();
+            LocalDate endDate = newBook.getEndDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            String startFormatted = startDate.format(formatter);
+            String endFormatted = endDate.format(formatter);
 
-            int aux = accommodationRepository.checkAvailability(accommodationId, start, end);
-            System.out.println(aux);
-            if (aux > 0) {
+            int overlappingPeriodCount = accommodationRepository.checkAvailability(accommodationId, startDate, endDate);
+
+            if (overlappingPeriodCount > 0) {
                 throw new IllegalArgumentException("Accommodation " + accommodationId + " is not available for the selected period.");
             }
 
@@ -157,14 +169,16 @@ public class BookService {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
+            String lockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
             if (accommodation.getHostUsername().equals(username)) {
-                String lockKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
                 redisUtility.delete(lockKey);
+                String userIdentifier = redisUtility.getValue(lockKey);
+                String bookingLockKey = "booking" + lockKey + ":" + userIdentifier;
+                redisUtility.delete(bookingLockKey);
                 throw new RuntimeException("Host cannot book their own accommodation.");
             }
 
-            String bookingKey = "booking:accId:" + accommodationId + ":start:" + start + ":end:" + end;
-            String existingBooking = redisUtility.getValue(bookingKey);
+            String existingBooking = redisUtility.getValue(lockKey);
 
             if (!username.equals(existingBooking)) {
                 throw new RuntimeException("You have to lock the accommodation before!");
@@ -177,23 +191,23 @@ public class BookService {
             if (accommodation.getOccupiedDates() == null) {
                 accommodation.setOccupiedDates(new ArrayList<>());
             }
-            accommodation.getOccupiedDates().add(new OccupiedPeriod(start, end));
+            accommodation.getOccupiedDates().add(new OccupiedPeriod(startDate, endDate));
 
             Accommodation savedAccommodation = accommodationRepository.save(accommodation);
             System.out.println("MongoDB: Accommodation saved!");
 
             if (isLogged) {
                 DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                String formattedDateStart = start.format(formatterStart);
+                String formattedDateStart = startDate.format(formatterStart);
                 String key = "username:" + username + ":accId:" + accommodationId + ":startDate:" + formattedDateStart;
                 DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                String formattedDateEnd = start.format(formatterEnd);
+                String formattedDateEnd = startDate.format(formatterEnd);
 
                 try {
                     redisUtility.setKey(key, formattedDateEnd, evaluateTTL(formattedDateStart));
                 } catch (Exception redisException) {
                     accommodation.getBooks().remove(newBook);
-                    accommodation.getOccupiedDates().removeIf(period -> period.getStart().equals(start) && period.getEnd().equals(end));
+                    accommodation.getOccupiedDates().removeIf(period -> period.getStart().equals(startDate) && period.getEnd().equals(endDate));
                     accommodationRepository.save(accommodation);
                     throw new RuntimeException("Failed to write booking to Redis, rollback MongoDB changes: " + redisException.getMessage(), redisException);
                 }

@@ -93,8 +93,8 @@ public class AccommodationService {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
 
-            if (end.isBefore(start)) {
-                throw new IllegalArgumentException("endDate cannot be before startDate.");
+            if (end.isBefore(start) || end.isBefore(LocalDate.now()) || start.isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("endDate cannot be before startDate or selected bad dates.");
             }
 
             Pageable pageable = PageRequest.of(pageNumber, 100, Sort.by(Sort.Direction.DESC, "averageRate"));

@@ -76,25 +76,20 @@ public class RedisUtility {
         }
     }
 
-    public boolean isOverlappingBooking(ObjectId accommodationId, String start, String end) {
+    public boolean isOverlappingBooking(ObjectId accommodationId, String newStart, String newEnd) {
 
-        Set<String> existingKeys = getKeys("booking:accId:" + accommodationId + ":*");
+        Set<String> existingKeys = getKeys("bookinglock:accId:" + accommodationId + ":*");
 
         if (existingKeys != null) {
-            LocalDate newStart = LocalDate.parse(start);
-            LocalDate newEnd = LocalDate.parse(end);
 
             for (String key : existingKeys) {
 
-                String[] parts = key.split(":");
+                String datesFormatted = getValue(key);
+                String oldStart = datesFormatted.substring(0, 8);
+                String oldEnd = datesFormatted.substring(8, 16);
 
-                if (parts.length < 7) continue;
-
-                LocalDate existingStart = LocalDate.parse(parts[4]);
-                LocalDate existingEnd = LocalDate.parse(parts[6]);
-
-                boolean isOverlapping = !(newEnd.isBefore(existingStart) || newStart.isAfter(existingEnd));
-                boolean isNotTheSame = !(newStart.isEqual(existingStart) && newEnd.isEqual(existingEnd));
+                boolean isOverlapping = !(newEnd.compareTo(oldStart) < 0 || newStart.compareTo(oldEnd) > 0);
+                boolean isNotTheSame = !(newStart.equals(oldStart) && newEnd.equals(oldEnd));
 
                 if (isOverlapping && isNotTheSame) {
                     return true;
