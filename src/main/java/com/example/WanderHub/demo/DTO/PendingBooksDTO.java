@@ -5,11 +5,13 @@ public class PendingBooksDTO {
         private String username;
         private String accommodationId;
         private LocalDate startDate;
+        private LocalDate endDate;
 
-        public PendingBooksDTO(String username, String accommodationId, LocalDate startDate) {
+        public PendingBooksDTO(String username, String accommodationId, LocalDate startDate, LocalDate endDate) {
             this.username = username;
             this.accommodationId = accommodationId;
             this.startDate = startDate;
+            this.endDate = endDate;
         }
 
         public String getUsername() {
@@ -35,6 +37,10 @@ public class PendingBooksDTO {
         public void setStartDate(LocalDate startDate) {
             this.startDate = startDate;
         }
+        public LocalDate getEndDate() {
+            return endDate;
+        }
+        public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
 
         @Override
         public String toString() {
@@ -42,6 +48,7 @@ public class PendingBooksDTO {
                     "username='" + username + '\'' +
                     ", accommodationId=" + accommodationId +
                     ", startDate=" + startDate +
+                    ", endDate=" + endDate +
                     '}';
         }
     }

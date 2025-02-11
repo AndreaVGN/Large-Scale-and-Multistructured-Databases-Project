@@ -85,6 +85,7 @@ public class RedisUtility {
             for (String key : existingKeys) {
 
                 String datesFormatted = getValue(key);
+                System.out.println("Siamo qui" + datesFormatted);
                 String oldStart = datesFormatted.substring(0, 8);
                 String oldEnd = datesFormatted.substring(8, 16);
 

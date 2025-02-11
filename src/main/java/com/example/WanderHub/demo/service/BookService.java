@@ -73,8 +73,7 @@ public class BookService {
 
             String valueToStore = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
             redisUtility.setKey(lockKey, valueToStore, lockTTL);
-
-            redisUtility.setKey( "booking" + lockKey + ":" + username, start, lockTTL);
+            redisUtility.setKey( "booking" + lockKey + ":" + username, startFormatted + endFormatted, lockTTL);
 
             return username == null ? valueToStore : true;
         } catch (Exception e) {
@@ -120,29 +119,59 @@ public class BookService {
     }
 
     // Return all the future books (basic informations) of a accommodation done by a registered user
+
     public List<PendingBooksDTO> getPendingBookings(String username) {
-        Set<String> existingKeys = redisUtility.getKeys("username:"+username+":accId:*");
-
         List<PendingBooksDTO> pendingBookings = new ArrayList<>();
-        if (existingKeys != null) {
-            for (String key : existingKeys) {
 
-                String[] parts = null;
-                for(int i =0;i<6;i++) {
-                     parts = key.split(":");
+        try {
+            Set<String> existingKeys = redisUtility.getKeys("username:" + username + ":accId:*");
+
+            if (existingKeys != null) {
+                for (String key : existingKeys) {
+                    try {
+                        String accommodationId = redisUtility.getValue(key);
+
+                        if (accommodationId == null) {
+                            continue;
+                        }
+
+                        Set<String> bookingKeys = redisUtility.getKeys("book:username:" + username + ":accId:" + accommodationId + ":*");
+
+                        if (bookingKeys != null) {
+                            for (String bookingKey : bookingKeys) {
+                                try {
+                                    String dateRange = redisUtility.getValue(bookingKey);
+
+                                    if (dateRange == null || dateRange.length() < 16) {
+                                        continue;
+                                    }
+
+                                    String startDateStr = dateRange.substring(0, 8);
+                                    String endDateStr = dateRange.substring(8, 16);
+
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                                    LocalDate startDate = LocalDate.parse(startDateStr, formatter);
+                                    LocalDate endDate = LocalDate.parse(endDateStr, formatter);
+
+                                    pendingBookings.add(new PendingBooksDTO(username, accommodationId, startDate, endDate));
+                                } catch (Exception e) {
+                                    System.err.println("Error reading booking data for key " + bookingKey + ": " + e.getMessage());
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error retrieving accommodationId for key " + key + ": " + e.getMessage());
+                    }
                 }
-
-                String user = parts[1];
-                String accommodationId = parts[3];
-                LocalDate startDate = LocalDate.parse(parts[5]);
-
-                pendingBookings.add(new PendingBooksDTO(user, accommodationId, startDate));
-
             }
+        } catch (Exception e) {
+            System.err.println("General error while retrieving pending bookings for user " + username + ": " + e.getMessage());
         }
 
         return pendingBookings;
     }
+
+
 
     // Add a new book for both registered and unregistered users to an accommodation.
     // SCHEME:
@@ -199,12 +228,18 @@ public class BookService {
             if (isLogged) {
                 DateTimeFormatter formatterStart = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 String formattedDateStart = startDate.format(formatterStart);
-                String key = "username:" + username + ":accId:" + accommodationId + ":startDate:" + formattedDateStart;
-                DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                String formattedDateEnd = startDate.format(formatterEnd);
+                String DateStart = formattedDateStart.replaceAll("-","");
 
+                DateTimeFormatter formatterEnd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String formattedDateEnd = endDate.format(formatterEnd);
+                String DateEnd = formattedDateEnd.replaceAll("-","");
+
+                String keyAcc = "username:" + username + ":accId:" + accommodationId + ":period:" + DateStart+ DateEnd;
+                String keyPeriod = "book:"+keyAcc;
                 try {
-                    redisUtility.setKey(key, formattedDateEnd, evaluateTTL(formattedDateStart));
+                    redisUtility.setKey(keyAcc, accommodationId.toHexString(), evaluateTTL(formattedDateStart));
+                    redisUtility.setKey(keyPeriod,DateStart+DateEnd, evaluateTTL(formattedDateStart));
+
                 } catch (Exception redisException) {
                     accommodation.getBooks().remove(newBook);
                     accommodation.getOccupiedDates().removeIf(period -> period.getStart().equals(startDate) && period.getEnd().equals(endDate));
