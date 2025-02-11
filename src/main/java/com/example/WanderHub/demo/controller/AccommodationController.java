@@ -28,7 +28,7 @@ public class AccommodationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        accommodationService.createAccommodation(accommodation);
+        accommodationService.createAccommodation(accommodation, username);
 
         return ResponseEntity.ok("Accommodation created successfully");
     }

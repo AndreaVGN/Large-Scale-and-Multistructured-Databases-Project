@@ -58,7 +58,7 @@ public class BookService {
             String endFormatted = end.replaceAll("-", "");
             String lockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
 
-            Boolean successLock = redisUtility.lock(lockKey);
+            Boolean successLock = redisUtility.lock(lockKey, lockTTL);
 
             if (successLock == null || !successLock) {
                 return username == null ? null : false;

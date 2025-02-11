@@ -39,15 +39,19 @@ public class AccommodationService {
 
 
     // Insert new accommodation into Redis
-    public void createAccommodation(Accommodation accommodation) {
+    public void createAccommodation(Accommodation accommodation, String username) {
         try {
 
             Validator.validateAccommodation(accommodation);
 
-            String timestamp = String.valueOf(System.currentTimeMillis());
-            String accommodationKey = "accommodation:" + timestamp;
+            String accommodationKey = "newAcc:user:" + username + ":hostUsername";
+            boolean success = redisUtility.lock(accommodationKey, accommodationTTL);
+            if (!success) {
+                throw new RuntimeException("You cannot register more than 1 accommodation per day!");
+            }
 
-            redisUtility.saveAccommodation(accommodation,accommodationKey,accommodationTTL);
+            redisUtility.setKey(accommodationKey,username,accommodationTTL);
+            redisUtility.saveAccommodation(accommodation, "newAccDetails:user:" + username,accommodationTTL);
 
         } catch (IllegalArgumentException e) {
             throw e;

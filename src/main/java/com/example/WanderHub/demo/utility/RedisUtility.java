@@ -29,9 +29,9 @@ public class RedisUtility {
 
     }
 
-    public Boolean lock(String pattern) {
+    public Boolean lock(String pattern, long TTL) {
 
-        return redisTemplate.opsForValue().setIfAbsent(pattern, "locked", lock_TTL, TimeUnit.SECONDS);
+        return redisTemplate.opsForValue().setIfAbsent(pattern, "locked", TTL, TimeUnit.SECONDS);
 
     }
 
@@ -59,7 +59,7 @@ public class RedisUtility {
         ops.set(baseKey + ":place", accommodation.getPlace(), TTL, TimeUnit.SECONDS);
         ops.set(baseKey + ":city", accommodation.getCity(), TTL, TimeUnit.SECONDS);
         ops.set(baseKey + ":address", accommodation.getAddress(), TTL, TimeUnit.SECONDS);
-        ops.set(baseKey + ":hostUsername", accommodation.getHostUsername(), TTL, TimeUnit.SECONDS);
+        //ops.set(baseKey + ":hostUsername", accommodation.getHostUsername(), TTL, TimeUnit.SECONDS);
         ops.set(baseKey + ":latitude", String.valueOf(accommodation.getLatitude()), TTL, TimeUnit.SECONDS);
         ops.set(baseKey + ":longitude", String.valueOf(accommodation.getLongitude()), TTL, TimeUnit.SECONDS);
         ops.set(baseKey + ":maxGuestSize", String.valueOf(accommodation.getMaxGuestSize()), TTL, TimeUnit.SECONDS);
