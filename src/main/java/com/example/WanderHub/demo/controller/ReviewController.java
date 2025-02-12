@@ -57,6 +57,7 @@ public class ReviewController {
         review.setUsername(username);
         review.setDate(LocalDate.now());
 
+
         reviewService.addDraftReviewToAccommodation(username,accommodationId,review);
         return new ResponseEntity<>("Bozza aggiunta con successo!", HttpStatus.OK);
     }

@@ -162,7 +162,7 @@ public class BookService {
                             continue;
                         }
 
-                        Set<String> bookingKeys = redisUtility.getKeys("book:username:" + username + ":accId:" + accommodationId + ":*");
+                        Set<String> bookingKeys = redisUtility.getKeys("pendingbook:username:" + username + ":accId:" + accommodationId + ":*");
 
                         if (bookingKeys != null) {
                             for (String bookingKey : bookingKeys) {
@@ -262,7 +262,7 @@ public class BookService {
                 String dateEndWithoutDashes = DateFormatterUtil.formatWithoutDashes(endDate); // yyyymmdd
 
                 String keyAcc = "username:" + username + ":accId:" + accommodationId + ":period:" + dateStartWithoutDashes + dateEndWithoutDashes;
-                String keyPeriod = "book:" + keyAcc;
+                String keyPeriod = "pendingbook:" + keyAcc;
 
                 try {
                     // Prima setKey
@@ -331,7 +331,7 @@ public class BookService {
             String dateStart = DateFormatterUtil.formatWithoutDashes(startDate);
             String dateEnd = DateFormatterUtil.formatWithoutDashes(endDate);
             String keyAcc = "username:" + username + ":accId:" + accommodationId + ":period:" + dateStart + dateEnd;
-            String keyPeriod = "book:" + keyAcc;
+            String keyPeriod = "pendingbook:" + keyAcc;
 
             // Tentiamo di eliminare entrambe le chiavi Redis
             boolean deletedKeyAcc = redisUtility.delete(keyAcc);

@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
+
 import java.util.*;
 
 @Service

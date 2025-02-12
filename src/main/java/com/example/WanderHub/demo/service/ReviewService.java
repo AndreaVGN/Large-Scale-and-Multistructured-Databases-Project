@@ -102,8 +102,14 @@ public class ReviewService {
             String draftTextKey = "review:accId:" + accommodationId + ":username:" + username + ":text";
             String draftRatingKey = "review:accId:" + accommodationId + ":username" + username + ":rating";
 
-            redisUtility.setKey(draftTextKey, text, reviewTTL);
-            redisUtility.setKey(draftRatingKey, rating, reviewTTL);
+            //redisUtility.setKey(draftTextKey, text, reviewTTL);
+            //redisUtility.setKey(draftRatingKey, rating, reviewTTL);
+
+
+                redisUtility.setKey(draftTextKey, text, reviewTTL);
+                redisUtility.setKey(draftRatingKey, rating, reviewTTL);
+
+
         } catch (RuntimeException e) {
 
             throw e;

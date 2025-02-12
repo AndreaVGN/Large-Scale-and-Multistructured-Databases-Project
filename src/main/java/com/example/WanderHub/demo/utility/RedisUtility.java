@@ -3,6 +3,7 @@ package com.example.WanderHub.demo.utility;
 import com.example.WanderHub.demo.model.Accommodation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
@@ -20,18 +21,45 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtility {
 
     @Autowired
+    @Qualifier("redisTemplateNearest")
     private RedisTemplate<String, Object> redisTemplate;
     private static final long lock_TTL = 1200;
+    @Qualifier("redisTemplateNearest")
+    @Autowired
+    private RedisTemplate redisTemplateNearest;
+    @Qualifier("redisTemplateMasterPreferred")
+    @Autowired
+    private RedisTemplate redisTemplateMasterPreferred;
+    @Qualifier("redisTemplateReplica")
+    @Autowired
+    private RedisTemplate redisTemplateReplica;
+
+
+    public void setKey(String key, String value, Long ttl) {
+        // Scrive il valore con TTL usando RedisTemplate
+        redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
+
+    }
 
     public Set<String> getKeys(String pattern) {
 
-        return redisTemplate.keys(pattern);
+        if(pattern.startsWith("lock") || pattern.startsWith("booking")){
+            return redisTemplate.keys(pattern);
+        } else if (pattern.startsWith("username") || pattern.startsWith("pendingbook")) {
+            return redisTemplateNearest.keys(pattern);
+        } else if (pattern.startsWith("newAcc")) {
+            return redisTemplateMasterPreferred.keys(pattern);
+        } else if (pattern.startsWith("spring")) {
+            return redisTemplate.keys(pattern);
+        } else {
+            return redisTemplateReplica.keys(pattern);
+        }
 
     }
 
     public Boolean lock(String pattern, long TTL) {
 
-        return redisTemplate.opsForValue().setIfAbsent(pattern, "locked", TTL, TimeUnit.SECONDS);
+        return  redisTemplate.opsForValue().setIfAbsent(pattern, "locked", TTL, TimeUnit.SECONDS);
 
     }
 
@@ -41,16 +69,22 @@ public class RedisUtility {
 
     }
 
-    public void setKey(String key, String value, Long ttl) {
-        redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
-    }
-
 
     public String getValue(String key){
 
-        return (String) redisTemplate.opsForValue().get(key);
-
+        if(key.startsWith("lock") || key.startsWith("booking")){
+            return (String) redisTemplate.opsForValue().get(key);
+        } else if (key.startsWith("username") || key.startsWith("book")) {
+            return (String) redisTemplateNearest.opsForValue().get(key);
+        } else if (key.startsWith("newAcc")) {
+            return (String) redisTemplateMasterPreferred.opsForValue().get(key);
+        } else if (key.startsWith("spring")) {
+            return (String) redisTemplate.opsForValue().get(key);
+        } else {
+            return (String) redisTemplateReplica.opsForValue().get(key);
+        }
     }
+
     public void saveAccommodation(Accommodation accommodation, String baseKey, Long TTL) {
         ValueOperations<String, Object> ops = redisTemplate.opsForValue();
 
@@ -119,5 +153,9 @@ public class RedisUtility {
 
         return Math.max(0, futureTimestamp - currentTimestamp);
     }
+
+
+
+
 }
 
