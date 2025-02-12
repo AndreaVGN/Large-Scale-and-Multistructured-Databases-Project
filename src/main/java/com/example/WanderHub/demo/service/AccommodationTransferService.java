@@ -25,8 +25,8 @@ public class AccommodationTransferService {
     }
 
     // Insert the new accommodations from Redis to MongoDB (every nigth at 03:00)
-    //@Scheduled(cron = "0 0 3 * * ?") // Every night at 03:00
-    @PostConstruct
+    @Scheduled(cron = "0 0 3 * * ?") // Every night at 03:00
+    //@PostConstruct
     @Transactional
     public void insertAccommodationsToMongoAtMidnight() {
 
