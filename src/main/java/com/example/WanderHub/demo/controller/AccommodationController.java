@@ -60,7 +60,7 @@ public class AccommodationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        List<AccommodationDTO> accommodations = accommodationService.findOwnAccommodations(hostUsername);
+        List<Accommodation> accommodations = accommodationService.findOwnAccommodations(hostUsername);
 
         if (accommodations.isEmpty()) {
 

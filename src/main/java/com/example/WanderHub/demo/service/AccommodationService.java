@@ -122,13 +122,10 @@ public class AccommodationService {
 
 
     // Return the accommodations possessed by a host
-    public List<AccommodationDTO> findOwnAccommodations(String hostUsername) {
+    public List<Accommodation> findOwnAccommodations(String hostUsername) {
         try {
-            List<Accommodation> accommodations = accommodationRepository.findOwnAccommodations(hostUsername);
+            return accommodationRepository.findOwnAccommodations(hostUsername);
 
-            return accommodations.stream()
-                    .map(AccommodationDTO::idDescription)
-                    .collect(Collectors.toList());
         }
         catch(DataAccessException e){
             throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);

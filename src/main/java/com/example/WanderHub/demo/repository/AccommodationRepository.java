@@ -22,13 +22,11 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
             fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
     List<Accommodation> findAvailableAccommodations(String city, int minGuests, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-
-
     @Query(value = "{ '_id': ?2, 'books': { '$elemMatch': { 'username': ?0, 'occupiedDates.start': ?1 } } }",
             fields = "{ '_id': 1, 'description': 1, 'books.$': 1 }")
     Accommodation findPendingBookingByUsername(String username, LocalDate startDate, String accommodationId);
 
-    @Query(value = "{'hostUsername': ?0}", fields = "{'_id': 1, 'description': 1}")
+    @Query(value = "{'hostUsername': ?0}")
     List<Accommodation> findOwnAccommodations(String username);
 
     @Query(value="{'hostUsername':  ?0, '_id': ?1}",fields="{'books': 1}")

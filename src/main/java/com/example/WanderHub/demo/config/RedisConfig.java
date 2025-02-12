@@ -20,18 +20,6 @@ import java.time.Duration;
 @Configuration
 public class RedisConfig {
 
-    @Bean
-    public RedisClient redisClient() {
-        RedisURI redisURI = RedisURI.Builder.sentinel("10.1.1.9", 26379, "mymaster")
-                .withSentinel("10.1.1.71", 26379)
-                .withSentinel("10.1.1.74", 26379)
-                .build();
-
-
-
-        return RedisClient.create(redisURI);
-    }
-
 
     @Bean
     public RedisConnectionFactory redisConnectionFactoryMasterPreferred() {
