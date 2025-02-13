@@ -51,8 +51,8 @@ public class AccommodationService {
                 throw new RuntimeException("You cannot register more than 1 accommodation per day!");
             }
 
-            redisUtility.setKey(accommodationKey,username,accommodationTTL);
-            redisUtility.saveAccommodation(accommodation, "newAccDetails:user:" + username,accommodationTTL);
+          //  redisUtility.setKey(accommodationKey,username,accommodationTTL);
+            redisUtility.saveAccommodation(accommodation, accommodationKey, username, "newAccDetails:user:" + username,accommodationTTL);
 
         } catch (IllegalArgumentException e) {
             throw e;
@@ -154,7 +154,8 @@ public class AccommodationService {
     }
 
 
-    // Analytic: For each facility, return the average rate of accommodations which have that facility
+    // Analytic: For each facility, return the average rate of accommodations which have that facility given
+    // a city in input
     public List<FacilityRatingDTO> getAverageRatingByFacility(String city) {
         try {
             return accommodationRepository.getAverageRatingByFacilityInCity(city);

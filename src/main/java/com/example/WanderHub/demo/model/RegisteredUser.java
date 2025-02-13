@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Document(collection = "registeredUsers")
@@ -24,6 +26,8 @@ public class RegisteredUser {
     private String address;
     private int addressNumber;
 
+    private List<PendingBook> books;
+
     public RegisteredUser() {
     }
 
@@ -32,7 +36,7 @@ public class RegisteredUser {
     }
 
     public RegisteredUser(String username, String password, String name, String surname, String birthPlace, String email,
-                          String birthDate, String address, int addressNumber) {
+                          String birthDate, String address, int addressNumber, List<PendingBook> books) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -42,6 +46,7 @@ public class RegisteredUser {
         this.birthDate = birthDate;
         this.address = address;
         this.addressNumber = addressNumber;
+        this.books = books;
     }
 
     public String getUsername() {
@@ -116,6 +121,14 @@ public class RegisteredUser {
         this.addressNumber = addressNumber;
     }
 
+    public List<PendingBook> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<PendingBook> books) {
+        this.books = books;
+    }
+
     @Override
     public String toString() {
         return "RegisteredUser{" +
@@ -128,6 +141,7 @@ public class RegisteredUser {
                 ", birthDate=" + birthDate +
                 ", address='" + address + '\'' +
                 ", addressNumber=" + addressNumber +
+                ", books=" + books +
                 '}';
     }
 }

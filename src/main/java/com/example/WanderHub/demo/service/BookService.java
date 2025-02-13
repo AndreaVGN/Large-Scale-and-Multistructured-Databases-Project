@@ -4,11 +4,15 @@ import com.example.WanderHub.demo.DTO.AccommodationDTO;
 import com.example.WanderHub.demo.DTO.PendingBooksDTO;
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Book;
+import com.example.WanderHub.demo.model.PendingBook;
+import com.example.WanderHub.demo.model.RegisteredUser;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
+import com.example.WanderHub.demo.repository.RegisteredUserRepository;
 import com.example.WanderHub.demo.utility.DateFormatterUtil;
 import com.example.WanderHub.demo.utility.OccupiedPeriod;
 import com.example.WanderHub.demo.utility.RedisUtility;
 import com.example.WanderHub.demo.utility.Validator;
+import jakarta.transaction.Transactional;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -19,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 import static com.example.WanderHub.demo.utility.RedisUtility.evaluateTTL;
@@ -33,6 +38,9 @@ public class BookService {
     @Autowired
     private RedisUtility redisUtility;
 
+    @Autowired
+    private RegisteredUserRepository registeredUserRepository;
+
 
     private static final long lockTTL = 600; // 10 minutes for complete the book process
 
@@ -40,7 +48,7 @@ public class BookService {
     // (both for registered (return boolean) and unregistered users (return String))
     public Object lockHouse(ObjectId accommodationId, String start, String end, String username) {
         try {
-            // Utilizzo di DateFormatterUtil per il parsing delle date
+
             LocalDate today = LocalDate.now();
             LocalDate startDate = DateFormatterUtil.parseWithDashes(start);  // yyyy-MM-dd
             LocalDate endDate = DateFormatterUtil.parseWithDashes(end);  // yyyy-MM-dd
@@ -54,7 +62,6 @@ public class BookService {
                         .orElseThrow(() -> new RuntimeException("Accommodation not found"));
             }
 
-            // Utilizzo di DateFormatterUtil per formattare la data senza trattini
             String startFormatted = DateFormatterUtil.formatWithoutDashes(startDate);  // yyyymmdd
             String endFormatted = DateFormatterUtil.formatWithoutDashes(endDate);  // yyyymmdd
             String lockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted;
@@ -127,78 +134,23 @@ public class BookService {
         }
     }
 
-
-
-    // Return a specific detailed future book of a accommodation done by a registered user
-    public AccommodationDTO viewPendingBooking(String username, String accommodationId, String startDate) {
-        try {
-            LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE);
-            Accommodation book = accommodationRepository.findPendingBookingByUsername(username, start, accommodationId);
-            return AccommodationDTO.idDescriptionBooks(book);
-
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error while retrieving pending bookings from the database: " + e.getMessage(), e);
-        } catch (Exception e) {
-            throw new RuntimeException("Error while retrieving pending bookings from the database: ", e);
-        }
-    }
-
     // Return all the future books (basic informations) of a accommodation done by a registered user
+    public List<PendingBook> getPendingBookings(String username) {
+        // Recupera l'utente tramite username
+        RegisteredUser user = registeredUserRepository.findById(username).orElse(null);
 
-    public List<PendingBooksDTO> getPendingBookings(String username) {
-        List<PendingBooksDTO> pendingBookings = new ArrayList<>();
-
-        try {
-            Set<String> existingKeys = redisUtility.getKeys("username:" + username + ":accId:*");
-
-            if (existingKeys != null) {
-                for (String key : existingKeys) {
-                    try {
-                        String accommodationId = redisUtility.getValue(key);
-
-                        if (accommodationId == null) {
-                            continue;
-                        }
-
-                        Set<String> bookingKeys = redisUtility.getKeys("pendingbook:username:" + username + ":accId:" + accommodationId + ":*");
-
-                        if (bookingKeys != null) {
-                            for (String bookingKey : bookingKeys) {
-                                try {
-                                    String dateRange = redisUtility.getValue(bookingKey);
-
-                                    if (dateRange == null || dateRange.length() < 16) {
-                                        continue;
-                                    }
-
-                                    // Utilizzo di DateFormatterUtil per ottenere le date di inizio e fine
-                                    String startDateStr = dateRange.substring(0, 8);
-                                    String endDateStr = dateRange.substring(8, 16);
-
-                                    // Parsing delle date usando DateFormatterUtil
-                                    LocalDate startDate = DateFormatterUtil.parseWithoutDashes(startDateStr);
-                                    LocalDate endDate = DateFormatterUtil.parseWithoutDashes(endDateStr);
-
-                                    // Aggiungi la prenotazione alla lista
-                                    pendingBookings.add(new PendingBooksDTO(username, accommodationId, startDate, endDate));
-                                } catch (Exception e) {
-                                    System.err.println("Error reading booking data for key " + bookingKey + ": " + e.getMessage());
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.err.println("Error retrieving accommodationId for key " + key + ": " + e.getMessage());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("General error while retrieving pending bookings for user " + username + ": " + e.getMessage());
+        System.out.println(user);
+        // Se l'utente non esiste, ritorna una lista vuota
+        if (user == null) {
+            return List.of();
         }
 
-        return pendingBookings;
+        // Filtra tutte le PendingBook future (startDate > oggi)
+        LocalDate today = LocalDate.now();
+        return user.getBooks().stream()
+                .filter(pendingBook -> pendingBook.getStartDate().isAfter(today))
+                .collect(Collectors.toList());
     }
-
-
 
 
     // Add a new book for both registered and unregistered users to an accommodation.
@@ -229,11 +181,8 @@ public class BookService {
 
             String lockKey = "bookinglock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
 
+
             if (accommodation.getHostUsername().equals(username)) {
-                redisUtility.delete(lockKey);
-                //String userIdentifier = redisUtility.getValue(lockKey);
-                String bookingLockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted;
-                redisUtility.delete(bookingLockKey);
                 throw new RuntimeException("Host cannot book their own accommodation.");
             }
 
@@ -244,6 +193,7 @@ public class BookService {
             }
 
             newBook.setUsername(username);
+            newBook.setBookDate(LocalDate.now());
 
             accommodation.getBooks().add(newBook);
 
@@ -255,35 +205,6 @@ public class BookService {
             Accommodation savedAccommodation = accommodationRepository.save(accommodation);
             System.out.println("MongoDB: Accommodation saved!");
 
-            if (isLogged) {
-                String formattedDateStart = DateFormatterUtil.formatWithDashes(startDate); // yyyy-MM-dd
-                String dateStartWithoutDashes = DateFormatterUtil.formatWithoutDashes(startDate); // yyyymmdd
-                String dateEndWithoutDashes = DateFormatterUtil.formatWithoutDashes(endDate); // yyyymmdd
-
-                String keyAcc = "username:" + username + ":accId:" + accommodationId + ":period:" + dateStartWithoutDashes + dateEndWithoutDashes;
-                String keyPeriod = "pendingbook:" + keyAcc;
-
-                try {
-                    // Prima setKey
-                    redisUtility.setKey(keyAcc, accommodationId.toHexString(), evaluateTTL(formattedDateStart));
-
-                    // Seconda setKey
-                    redisUtility.setKey(keyPeriod, dateStartWithoutDashes + dateEndWithoutDashes, evaluateTTL(formattedDateStart));
-
-                } catch (Exception redisException) {
-                    // Rollback in caso di errore su Redis
-                    // Elimina solo le chiavi già impostate (in un caso di rollback più chiaro)
-                    redisUtility.delete(keyAcc);
-                    redisUtility.delete(keyPeriod);
-
-                    accommodation.getBooks().remove(newBook);
-                    accommodation.getOccupiedDates().removeIf(period -> period.getStart().equals(startDate) && period.getEnd().equals(endDate));
-                    accommodationRepository.save(accommodation);
-
-                    throw new RuntimeException("Failed to write booking to Redis, rollback MongoDB changes: " + redisException.getMessage(), redisException);
-                }
-            }
-
             return savedAccommodation;
 
         } catch (Exception e) {
@@ -292,78 +213,68 @@ public class BookService {
     }
 
 
-
-
     // Delete a book with startDate of the book at least 2 days forward than the current date
     // SCHEME:
     // 1 -- Delete the book from MongoDB
     // 2 -- If 1) success delete the correspondent pending book from Redis
     // 3 -- If 1) not success abort
     // 4 -- If 1) success but 2) not success rollback 1)
+    @Transactional
     public boolean deleteBook(String username, ObjectId accommodationId, LocalDate startDate, LocalDate endDate) {
-        try {
-            Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
-                    .orElseThrow(() -> new RuntimeException("Accommodation not found"));
-
-            Book bookToDelete = accommodation.getBooks().stream()
-                    .filter(book -> book.getStartDate().equals(startDate) &&
-                            book.getEndDate().equals(endDate) &&
-                            book.getUsername().equals(username))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Booking not found"));
-
-            long daysUntilStart = ChronoUnit.DAYS.between(LocalDate.now(), bookToDelete.getStartDate());
-            if (daysUntilStart < 2) {
-                throw new IllegalArgumentException("Booking cannot be canceled as it exceeds the allowed cancellation period.");
-            }
-
-            // Backup della prenotazione per il rollback
-            Book backupBook = new Book(bookToDelete);
-
-            // Rimuoviamo la prenotazione dal database
-            accommodation.getOccupiedDates().removeIf(period -> period.getStart().equals(startDate) &&
-                    period.getEnd().equals(endDate));
-            accommodation.getBooks().remove(bookToDelete);
-            accommodationRepository.save(accommodation);
-
-            // Utilizzo di DateFormatterUtil per formattare le date
-            String dateStart = DateFormatterUtil.formatWithoutDashes(startDate);
-            String dateEnd = DateFormatterUtil.formatWithoutDashes(endDate);
-            String keyAcc = "username:" + username + ":accId:" + accommodationId + ":period:" + dateStart + dateEnd;
-            String keyPeriod = "pendingbook:" + keyAcc;
-
-            // Tentiamo di eliminare entrambe le chiavi Redis
-            boolean deletedKeyAcc = redisUtility.delete(keyAcc);
-            boolean deletedKeyPeriod = redisUtility.delete(keyPeriod);
-
-            // Se almeno una delete fallisce, facciamo rollback completo (DB + Redis)
-            if (!deletedKeyAcc || !deletedKeyPeriod) {
-                // Ripristino della prenotazione nel database
-                accommodation.getBooks().add(backupBook);
-                accommodation.getOccupiedDates().addAll(bookToDelete.getOccupiedDates());
-                accommodationRepository.save(accommodation);
-
-                // Ripristino delle chiavi Redis se necessario
-                String formattedStartDate = DateFormatterUtil.formatWithDashes(startDate); // yyyy-MM-dd per TTL
-                if (deletedKeyAcc) {
-                    redisUtility.setKey(keyAcc, accommodationId.toHexString(), evaluateTTL(formattedStartDate));
-                }
-                if (deletedKeyPeriod) {
-                    redisUtility.setKey(keyPeriod, dateStart + dateEnd, evaluateTTL(formattedStartDate));
-                }
-
-                throw new RuntimeException("Failed to delete booking from Redis, rollback executed.");
-            }
-
-            return true;
-
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Database error occurred while deleting the booking: " + e.getMessage(), e);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Validation error: " + e.getMessage(), e);
-        } catch (Exception e) {
-            throw new RuntimeException("Unexpected error occurred while deleting the booking: " + e.getMessage(), e);
+        // Trova l'utente in base allo username
+        RegisteredUser user = registeredUserRepository.findById(username).orElse(null);
+        if (user == null) {
+            return false; // Se l'utente non esiste, ritorna false
         }
+
+        // Trova la prenotazione da rimuovere dalla lista dei PendingBook
+        PendingBook pendingBookToRemove = null;
+        for (PendingBook pendingBook : user.getBooks()) {
+            if (pendingBook.getAccommodationId().equals(accommodationId) &&
+                    pendingBook.getStartDate().equals(startDate) &&
+                    pendingBook.getEndDate().equals(endDate)) {
+                pendingBookToRemove = pendingBook;
+                break;
+            }
+        }
+
+        if (pendingBookToRemove == null) {
+            return false; // Se la prenotazione non è stata trovata, ritorna false
+        }
+
+        // Rimuovi la PendingBook dalla lista dell'utente
+        user.getBooks().remove(pendingBookToRemove);
+        registeredUserRepository.save(user); // Salva le modifiche nel RegisteredUser
+
+        // Trova l'Accommodation
+        Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId).orElse(null);
+        if (accommodation == null) {
+            return false; // Se l'Accommodation non esiste, ritorna false
+        }
+
+        // Rimuovi la Book dalla lista di books in Accommodation
+        Book bookToRemove = null;
+        for (Book book : accommodation.getBooks()) {
+            if (book.getUsername().equals(username) &&
+                    book.getStartDate().equals(startDate) &&
+                    book.getEndDate().equals(endDate)) {
+                bookToRemove = book;
+                break;
+            }
+        }
+
+        if (bookToRemove != null) {
+            accommodation.getBooks().remove(bookToRemove);
+        }
+
+        // Rimuovi il periodo occupato dalle occupiedDates in Accommodation
+        accommodation.getOccupiedDates().removeIf(period ->
+                period.getStart().equals(startDate) && period.getEnd().equals(endDate));
+
+        // Salva le modifiche in Accommodation
+        accommodationRepository.save(accommodation);
+
+        return true; // Se tutto è andato a buon fine, ritorna true
     }
 
 

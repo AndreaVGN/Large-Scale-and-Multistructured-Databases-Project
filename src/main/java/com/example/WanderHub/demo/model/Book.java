@@ -20,6 +20,7 @@ public class Book {
     private String birthDate;
     private String[] guestFirstNames; // Array dei nomi degli ospiti
     private String[] guestLastNames; // Array dei cognomi degli ospiti
+    private LocalDate bookDate;
 
     public Book() {}
 
@@ -35,10 +36,12 @@ public class Book {
 
         this.guestFirstNames = other.guestFirstNames != null ? other.guestFirstNames.clone() : null;
         this.guestLastNames = other.guestLastNames != null ? other.guestLastNames.clone() : null;
+
+        this.bookDate = other.bookDate;
     }
 
     public Book(List<OccupiedPeriod> occupiedDates, String username, String email,
-                String birthPlace, String address, int addressNumber, String birthDate, String[] guestFirstNames, String[] guestLastNames) {
+                String birthPlace, String address, int addressNumber, String birthDate, String[] guestFirstNames, String[] guestLastNames, LocalDate bookDate) {
         this.occupiedDates = occupiedDates;
         this.username = username;
         this.email = email;
@@ -48,6 +51,7 @@ public class Book {
         this.birthDate = birthDate;
         this.guestFirstNames = guestFirstNames;
         this.guestLastNames = guestLastNames;
+        this.bookDate = bookDate;
     }
 
     public List<OccupiedPeriod> getOccupiedDates() {
@@ -146,6 +150,14 @@ public class Book {
         }
     }
 
+    public LocalDate getBookDate() {
+        return bookDate;
+    }
+
+    public void setBookDate(LocalDate bookDate) {
+        this.bookDate = bookDate;
+    }
+
     @Override
     public String toString() {
         return "Book{" +
@@ -158,6 +170,7 @@ public class Book {
                 ", birthDate='" + birthDate + '\'' +
                 ", guestFirstNames=" + Arrays.toString(guestFirstNames) +
                 ", guestLastNames=" + Arrays.toString(guestLastNames) +
+                ", bookDate=" + bookDate +
                 '}';
     }
 }

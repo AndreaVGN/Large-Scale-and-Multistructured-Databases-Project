@@ -103,16 +103,9 @@ public class ReviewService {
             String draftRatingKey = "review:accId:" + accommodationId + ":username" + username + ":rating";
 
 
+            redisUtility.setKeyWithTransaction(draftTextKey, text, draftRatingKey, rating, reviewTTL);
 
-            try {
-                redisUtility.setKey(draftTextKey, text, reviewTTL);
-                redisUtility.setKey(draftRatingKey, rating, reviewTTL);
-            }
-            catch (Exception redisException) {
-                redisUtility.delete(draftTextKey);
-                redisUtility.delete(draftRatingKey);
-                throw new RuntimeException("Error while adding draft review to accommodation");
-            }
+
 
 
         } catch (RuntimeException e) {

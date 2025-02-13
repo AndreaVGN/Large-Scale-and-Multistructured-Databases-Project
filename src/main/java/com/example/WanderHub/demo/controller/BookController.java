@@ -2,6 +2,7 @@ package com.example.WanderHub.demo.controller;
 
 import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.Book;
+import com.example.WanderHub.demo.model.PendingBook;
 import com.example.WanderHub.demo.service.AccommodationService;
 import com.example.WanderHub.demo.service.ArchivedBookService;
 import com.example.WanderHub.demo.service.BookService;
@@ -170,7 +171,7 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        List<PendingBooksDTO> pendingBookings = bookService.getPendingBookings(username);
+        List<PendingBook> pendingBookings = bookService.getPendingBookings(username);
 
         if (pendingBookings.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No pending books found for this username");
@@ -178,17 +179,7 @@ public class BookController {
 
         return ResponseEntity.ok(pendingBookings);
     }
-    @GetMapping("/{username}/{accommodationId}/{startDate}/pendingBook")
-    public ResponseEntity<?> getPendingBook(@PathVariable String username, @PathVariable String accommodationId, @PathVariable String startDate, HttpSession session) {
-        if (!SessionUtilility.isLogged(session, username)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
-        }
-        AccommodationDTO book = bookService.viewPendingBooking(username, accommodationId, startDate);
-        if (book == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Booking not found");
-        }
-        return ResponseEntity.ok(book);
-    }
+
 
     @DeleteMapping("/{username}/accommodation/{accommodationId}/Book")
     public ResponseEntity<String> deleteBook(

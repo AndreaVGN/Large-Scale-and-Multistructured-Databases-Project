@@ -203,9 +203,9 @@ public class ArchivedBook extends Book {
     public ArchivedBook(List<OccupiedPeriod> occupiedDates, String username, String email,
                         String birthPlace, String address, int addressNumber, String birthDate,
                         String[] guestFirstNames, String[] guestLastNames, String accommodationId,
-                        String city, String hostUsername, double costPerNight) {
+                        String city, String hostUsername, double costPerNight, LocalDate bookDate) {
         super(occupiedDates, username, email, birthPlace, address, addressNumber, birthDate,
-                guestFirstNames, guestLastNames);
+                guestFirstNames, guestLastNames, bookDate);
         this.accommodationId = accommodationId;
         this.city = city;
         this.hostUsername = hostUsername;
