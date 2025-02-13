@@ -70,17 +70,15 @@ public class BookService {
                 return username == null ? null : false;
             }
 
-            String valueToStore = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
-            //try {
-                //redisUtility.setKey(lockKey, valueToStore, lockTTL);
-                redisUtility.setKey("booking" + lockKey + ":user", valueToStore, lockTTL);
-            //}
-           // catch (Exception redisException){
-               // redisUtility.delete(lockKey);
-                //redisUtility.delete("booking" + lockKey + ":" + valueToStore);
-            //}
+            String userIdentifier = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
+                try {
+                    redisUtility.setKey("booking" + lockKey + ":user", userIdentifier, lockTTL);
+                } catch (Exception redisException) {
+                    redisUtility.delete(lockKey);
+                    throw new RuntimeException(redisException);
+                }
 
-            return username == null ? valueToStore : true;
+            return username == null ? userIdentifier : true;
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while locking the house: " + e.getMessage(), e);
         }
