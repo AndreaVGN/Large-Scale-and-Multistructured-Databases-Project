@@ -45,11 +45,9 @@ public class RedisUtility {
 
     public Set<String> getKeys(String pattern) {
 
-        if(pattern.startsWith("wanderhub:lock") || pattern.startsWith("wanderhub:booking")){
+        if(pattern.startsWith("lock") || pattern.startsWith("booking")){
             return redisTemplate.keys("wanderhub:" + pattern);
-        } else if (pattern.startsWith("wanderhub:username") || pattern.startsWith("wanderhub:pendingbook")) {
-            return redisTemplateNearest.keys("wanderhub:" + pattern);
-        } else if (pattern.startsWith("wanderhub:newAcc")) {
+        } else if (pattern.startsWith("newAcc")) {
             return redisTemplateMasterPreferred.keys("wanderhub:" + pattern);
         } else if (pattern.startsWith("wanderhub:sessions")) {
             return redisTemplate.keys("wanderhub:" + pattern);
@@ -80,13 +78,11 @@ public class RedisUtility {
 
     public String getValue(String key){
 
-        if(key.startsWith("wanderhub:lock") || key.startsWith("wanderhub:booking")){
+        if(key.startsWith("lock") || key.startsWith("booking")){
             return (String) redisTemplate.opsForValue().get("wanderhub:" + key);
-        } else if (key.startsWith("wanderhub:username") || key.startsWith("wanderhub:book")) {
-            return (String) redisTemplateNearest.opsForValue().get("wanderhub:" + key);
-        } else if (key.startsWith("wanderhub:newAcc")) {
+        } else if (key.startsWith("newAcc")) {
             return (String) redisTemplateMasterPreferred.opsForValue().get("wanderhub:" + key);
-        } else if (key.startsWith("wanderhub:sessions")) {
+        } else if (key.startsWith("sessions")) {
             return (String) redisTemplate.opsForValue().get("wanderhub:" + key);
         } else {
             return (String) redisTemplateReplica.opsForValue().get("wanderhub:" + key);
@@ -168,7 +164,7 @@ public class RedisUtility {
 
     public boolean isOverlappingBooking(ObjectId accommodationId, String newStart, String newEnd) {
 
-        Set<String> existingKeys = getKeys("wanderhub:lock:accId:" + accommodationId + ":*");
+        Set<String> existingKeys = getKeys("lock:accId:" + accommodationId + ":*");
 
         if (existingKeys != null) {
 
