@@ -39,53 +39,53 @@ public class RedisUtility {
 
     public void setKey(String key, String value, Long ttl) {
         // Scrive il valore con TTL usando RedisTemplate
-        redisTemplate.opsForValue().set("wanderhub:" + key, value, ttl, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
 
     }
 
     public Set<String> getKeys(String pattern) {
 
-        if(pattern.startsWith("lock") || pattern.startsWith("booking")){
-            return redisTemplate.keys("wanderhub:" + pattern);
-        } else if (pattern.startsWith("newAcc")) {
-            return redisTemplateMasterPreferred.keys("wanderhub:" + pattern);
+        if(pattern.startsWith("wanderhub:lock") || pattern.startsWith("wanderhub:booking")){
+            return redisTemplate.keys(pattern);
+        } else if (pattern.startsWith("wanderhub:newAcc")) {
+            return redisTemplateMasterPreferred.keys(pattern);
         } else if (pattern.startsWith("wanderhub:sessions")) {
-            return redisTemplate.keys("wanderhub:" + pattern);
+            return redisTemplate.keys(pattern);
         } else {
-            return redisTemplateReplica.keys("wanderhub:" + pattern);
+            return redisTemplateReplica.keys(pattern);
         }
 
     }
 
     public Boolean lock(String pattern, long TTL) {
 
-        return  redisTemplate.opsForValue().setIfAbsent("wanderhub:" + pattern, "locked", TTL, TimeUnit.SECONDS);
+        return  redisTemplate.opsForValue().setIfAbsent(pattern, "locked", TTL, TimeUnit.SECONDS);
 
     }
 
     public Boolean lockBook(String pattern, long TTL, LocalDate start, LocalDate end) {
 
-        return  redisTemplate.opsForValue().setIfAbsent("wanderhub:" + pattern, DateFormatterUtil.formatWithoutDashes(start) + DateFormatterUtil.formatWithoutDashes(end), TTL, TimeUnit.SECONDS);
+        return  redisTemplate.opsForValue().setIfAbsent(pattern, DateFormatterUtil.formatWithoutDashes(start) + DateFormatterUtil.formatWithoutDashes(end), TTL, TimeUnit.SECONDS);
 
     }
 
     public Boolean delete(String pattern) {
 
-        return redisTemplate.delete("wanderhub:" + pattern);
+        return redisTemplate.delete(pattern);
 
     }
 
 
     public String getValue(String key){
 
-        if(key.startsWith("lock") || key.startsWith("booking")){
-            return (String) redisTemplate.opsForValue().get("wanderhub:" + key);
-        } else if (key.startsWith("newAcc")) {
-            return (String) redisTemplateMasterPreferred.opsForValue().get("wanderhub:" + key);
-        } else if (key.startsWith("sessions")) {
-            return (String) redisTemplate.opsForValue().get("wanderhub:" + key);
+        if(key.startsWith("wanderhub:lock") || key.startsWith("wanderhub:booking")){
+            return (String) redisTemplate.opsForValue().get(key);
+        } else if (key.startsWith("wanderhub:newAcc")) {
+            return (String) redisTemplateMasterPreferred.opsForValue().get(key);
+        } else if (key.startsWith("wanderhub:sessions")) {
+            return (String) redisTemplate.opsForValue().get(key);
         } else {
-            return (String) redisTemplateReplica.opsForValue().get("wanderhub:" + key);
+            return (String) redisTemplateReplica.opsForValue().get(key);
         }
     }
 
@@ -102,16 +102,16 @@ public class RedisUtility {
 
                     // Aggiungi i valori alla transazione
                     ops.set(accommodationKey, username, TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":description", accommodation.getDescription(), TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":type", accommodation.getType(), TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":place", accommodation.getPlace(), TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":city", accommodation.getCity(), TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":address", accommodation.getAddress(), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":description", accommodation.getDescription(), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":type", accommodation.getType(), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":place", accommodation.getPlace(), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":city", accommodation.getCity(), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":address", accommodation.getAddress(), TTL, TimeUnit.SECONDS);
                     // ops.set(baseKey + ":hostUsername", accommodation.getHostUsername(), TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":latitude", String.valueOf(accommodation.getLatitude()), TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":longitude", String.valueOf(accommodation.getLongitude()), TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":maxGuestSize", String.valueOf(accommodation.getMaxGuestSize()), TTL, TimeUnit.SECONDS);
-                    ops.set("wanderhub:" + baseKey + ":costPerNight", String.valueOf(accommodation.getCostPerNight()), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":latitude", String.valueOf(accommodation.getLatitude()), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":longitude", String.valueOf(accommodation.getLongitude()), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":maxGuestSize", String.valueOf(accommodation.getMaxGuestSize()), TTL, TimeUnit.SECONDS);
+                    ops.set(baseKey + ":costPerNight", String.valueOf(accommodation.getCostPerNight()), TTL, TimeUnit.SECONDS);
 
                     // Gestisci le foto
                     String[] photos = accommodation.getPhotos();
@@ -139,15 +139,15 @@ public class RedisUtility {
 
     private void deleteAccommodationKeys(Accommodation accommodation, String accommodationKey, String baseKey, Long TTL) {
         redisTemplate.delete(accommodationKey);
-        redisTemplate.delete("wanderhub:" + baseKey + ":description");
-        redisTemplate.delete("wanderhub:" + baseKey + ":type");
-        redisTemplate.delete("wanderhub:" + baseKey + ":place");
-        redisTemplate.delete("wanderhub:" + baseKey + ":city");
-        redisTemplate.delete("wanderhub:" + baseKey + ":address");
-        redisTemplate.delete("wanderhub:" + baseKey + ":latitude");
-        redisTemplate.delete("wanderhub:" + baseKey + ":longitude");
-        redisTemplate.delete("wanderhub:" + baseKey + ":maxGuestSize");
-        redisTemplate.delete("wanderhub:" + baseKey + ":costPerNight");
+        redisTemplate.delete( baseKey + ":description");
+        redisTemplate.delete( baseKey + ":type");
+        redisTemplate.delete(baseKey + ":place");
+        redisTemplate.delete(baseKey + ":city");
+        redisTemplate.delete(baseKey + ":address");
+        redisTemplate.delete(baseKey + ":latitude");
+        redisTemplate.delete(baseKey + ":longitude");
+        redisTemplate.delete(baseKey + ":maxGuestSize");
+        redisTemplate.delete(baseKey + ":costPerNight");
 
         // Elimina foto
         String[] photos = accommodation.getPhotos();
@@ -164,7 +164,8 @@ public class RedisUtility {
 
     public boolean isOverlappingBooking(ObjectId accommodationId, String newStart, String newEnd) {
 
-        Set<String> existingKeys = getKeys("lock:accId:" + accommodationId + ":*");
+        Set<String> existingKeys = getKeys("wanderhub:lock:accId:" + accommodationId + ":*");
+        System.out.println(existingKeys);
 
         if (existingKeys != null) {
 

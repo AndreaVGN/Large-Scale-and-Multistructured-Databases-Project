@@ -54,10 +54,10 @@ public class ReviewService {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-            String draftTextKey = "review:accId:" + accommodationId + ":username:" + username + ":text";
+            String draftTextKey = "wanderhub:review:accId:" + accommodationId + ":username:" + username + ":text";
             String text = redisUtility.getValue(draftTextKey);
 
-            String draftRatingKey = "review:accId:" + accommodationId + ":username" + username + ":rating";
+            String draftRatingKey = "wanderhub:review:accId:" + accommodationId + ":username" + username + ":rating";
             String rating = redisUtility.getValue(draftRatingKey);
 
             if (text != null && rating != null && review.getReviewText() == null) {
@@ -99,8 +99,8 @@ public class ReviewService {
             String text = review.getReviewText();
             String rating = String.valueOf(review.getRating());
 
-            String draftTextKey = "review:accId:" + accommodationId + ":username:" + username + ":text";
-            String draftRatingKey = "review:accId:" + accommodationId + ":username" + username + ":rating";
+            String draftTextKey = "wanderhub:review:accId:" + accommodationId + ":username:" + username + ":text";
+            String draftRatingKey = "wanderhub:review:accId:" + accommodationId + ":username" + username + ":rating";
 
 
             redisUtility.setKeyWithTransaction(draftTextKey, text, draftRatingKey, rating, reviewTTL);

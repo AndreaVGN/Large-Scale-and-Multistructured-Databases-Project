@@ -64,7 +64,7 @@ public class BookService {
 
             String startFormatted = DateFormatterUtil.formatWithoutDashes(startDate);  // yyyymmdd
             String endFormatted = DateFormatterUtil.formatWithoutDashes(endDate);  // yyyymmdd
-            String lockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted;
+            String lockKey = "wanderhub:lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted;
 
             Boolean successLock = redisUtility.lockBook(lockKey, lockTTL, startDate, endDate);
 
@@ -79,7 +79,7 @@ public class BookService {
 
             String userIdentifier = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
                 try {
-                    redisUtility.setKey("booking" + lockKey + ":user", userIdentifier, lockTTL);
+                    redisUtility.setKey("wanderhub:booking" + "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user", userIdentifier, lockTTL);
                 } catch (Exception redisException) {
                     redisUtility.delete(lockKey);
                     throw new RuntimeException(redisException);
@@ -102,9 +102,9 @@ public class BookService {
             String startFormatted = DateFormatterUtil.formatWithoutDashes(startDate); // yyyymmdd
             String endFormatted = DateFormatterUtil.formatWithoutDashes(endDate); // yyyymmdd
 
-            String bookinglockKey = "bookinglock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
+            String bookinglockKey = "wanderhub:bookinglock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
             String username = redisUtility.getValue(bookinglockKey);
-            String lockKey = "lock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted;
+            String lockKey = "wanderhub:lock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted;
 
             // Verifica se la chiave è presente
             String storedValue = redisUtility.getValue(bookinglockKey);
@@ -179,7 +179,7 @@ public class BookService {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-            String lockKey = "bookinglock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
+            String lockKey = "wanderhub:bookinglock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
 
 
             if (accommodation.getHostUsername().equals(username)) {
