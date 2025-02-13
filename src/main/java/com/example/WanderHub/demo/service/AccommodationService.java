@@ -38,6 +38,7 @@ public class AccommodationService {
 
 
 
+
     // Insert new accommodation into Redis
     public void createAccommodation(Accommodation accommodation, String username) {
         try {

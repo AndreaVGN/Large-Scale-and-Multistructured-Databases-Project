@@ -63,6 +63,12 @@ public class RedisUtility {
 
     }
 
+    public Boolean lockBook(String pattern, long TTL, LocalDate start, LocalDate end) {
+
+        return  redisTemplate.opsForValue().setIfAbsent(pattern, DateFormatterUtil.formatWithoutDashes(start) + DateFormatterUtil.formatWithoutDashes(end), TTL, TimeUnit.SECONDS);
+
+    }
+
     public Boolean delete(String pattern) {
 
         return redisTemplate.delete(pattern);
@@ -112,7 +118,7 @@ public class RedisUtility {
 
     public boolean isOverlappingBooking(ObjectId accommodationId, String newStart, String newEnd) {
 
-        Set<String> existingKeys = getKeys("bookinglock:accId:" + accommodationId + ":*");
+        Set<String> existingKeys = getKeys("lock:accId:" + accommodationId + ":*");
 
         if (existingKeys != null) {
 

@@ -39,6 +39,7 @@ public class AccommodationController {
         return accommodationService.getAccommodationById(id);
    }
 
+
     @GetMapping("/availableAccommodations")
     public List<AccommodationDTO> findAccommodations(
             @RequestParam("city") String place,

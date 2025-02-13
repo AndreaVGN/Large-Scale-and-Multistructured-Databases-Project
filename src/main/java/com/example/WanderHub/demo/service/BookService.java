@@ -57,9 +57,9 @@ public class BookService {
             // Utilizzo di DateFormatterUtil per formattare la data senza trattini
             String startFormatted = DateFormatterUtil.formatWithoutDashes(startDate);  // yyyymmdd
             String endFormatted = DateFormatterUtil.formatWithoutDashes(endDate);  // yyyymmdd
-            String lockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
+            String lockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted;
 
-            Boolean successLock = redisUtility.lock(lockKey, lockTTL);
+            Boolean successLock = redisUtility.lockBook(lockKey, lockTTL, startDate, endDate);
 
             if (successLock == null || !successLock) {
                 return username == null ? null : false;
@@ -71,14 +71,14 @@ public class BookService {
             }
 
             String valueToStore = (username == null) ? String.valueOf(System.currentTimeMillis()) : username;
-            try {
-                redisUtility.setKey(lockKey, valueToStore, lockTTL);
-                redisUtility.setKey("booking" + lockKey + ":" + valueToStore, startFormatted + endFormatted, lockTTL);
-            }
-            catch (Exception redisException){
-                redisUtility.delete(lockKey);
-                redisUtility.delete("booking" + lockKey + ":" + valueToStore);
-            }
+            //try {
+                //redisUtility.setKey(lockKey, valueToStore, lockTTL);
+                redisUtility.setKey("booking" + lockKey + ":user", valueToStore, lockTTL);
+            //}
+           // catch (Exception redisException){
+               // redisUtility.delete(lockKey);
+                //redisUtility.delete("booking" + lockKey + ":" + valueToStore);
+            //}
 
             return username == null ? valueToStore : true;
         } catch (Exception e) {
@@ -97,26 +97,26 @@ public class BookService {
             String startFormatted = DateFormatterUtil.formatWithoutDashes(startDate); // yyyymmdd
             String endFormatted = DateFormatterUtil.formatWithoutDashes(endDate); // yyyymmdd
 
-            String lockKey = "lock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
-            String username = redisUtility.getValue(lockKey);
-            String bookingLockKey = "booking" + lockKey + ":" + username;
+            String bookinglockKey = "bookinglock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
+            String username = redisUtility.getValue(bookinglockKey);
+            String lockKey = "lock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted;
 
             // Verifica se la chiave è presente
-            String storedValue = redisUtility.getValue(lockKey);
+            String storedValue = redisUtility.getValue(bookinglockKey);
 
             // Se l'utente è quello che ha bloccato la casa, procediamo con il rilascio
             if (username != null && username.equals(userIdentifier)) {
                 // Proviamo a eliminare le chiavi dalla cache Redis
-                boolean lockKeyDel = redisUtility.delete(lockKey);
-                boolean bookingLockKeyDel = redisUtility.delete(bookingLockKey);
+                boolean lockKeyDel = redisUtility.delete(bookinglockKey);
+                boolean bookingLockKeyDel = redisUtility.delete(lockKey);
 
                 if (!lockKeyDel || !bookingLockKeyDel) {
                     // Se qualcosa va storto, dobbiamo fare un rollback
                     if (lockKeyDel) {
-                        redisUtility.setKey(lockKey, storedValue, lockTTL); // Rimuoviamo rollback se il lock è stato eliminato correttamente
+                        redisUtility.setKey(bookinglockKey, storedValue, lockTTL); // Rimuoviamo rollback se il lock è stato eliminato correttamente
                     }
                     if (bookingLockKeyDel) {
-                        redisUtility.setKey(bookingLockKey, startFormatted + endFormatted, lockTTL); // Rimuoviamo rollback per la chiave di prenotazione
+                        redisUtility.setKey(lockKey, startFormatted + endFormatted, lockTTL); // Rimuoviamo rollback per la chiave di prenotazione
                     }
                     throw new RuntimeException("Failed to delete booking from Redis, rollback executed.");
                 }
@@ -229,11 +229,12 @@ public class BookService {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-            String lockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
+            String lockKey = "bookinglock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
+
             if (accommodation.getHostUsername().equals(username)) {
                 redisUtility.delete(lockKey);
-                String userIdentifier = redisUtility.getValue(lockKey);
-                String bookingLockKey = "booking" + lockKey + ":" + userIdentifier;
+                //String userIdentifier = redisUtility.getValue(lockKey);
+                String bookingLockKey = "lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted;
                 redisUtility.delete(bookingLockKey);
                 throw new RuntimeException("Host cannot book their own accommodation.");
             }
