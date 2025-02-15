@@ -77,6 +77,18 @@ public class AccommodationService {
         }
     }
 
+    public Accommodation viewAccommodationById(ObjectId accommodationId) {
+        try {
+            return accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while retrieving accommodation: " + e.getMessage(), e);
+        }
+    }
+
 
     // Return the accommodations which fullfill the parameters
     public List<AccommodationDTO> findAvailableAccommodations(String place, int minGuests, String startDate, String endDate, int pageNumber) {

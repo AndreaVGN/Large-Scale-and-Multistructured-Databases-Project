@@ -38,19 +38,15 @@ public class AccommodationController {
 
         return accommodationService.getAccommodationById(id);
    }
-
     @GetMapping("/{username}/{id}")
     public ResponseEntity<?> viewAccommodationById(@PathVariable ObjectId id, @PathVariable String username, HttpSession session) {
         if (!SessionUtilility.isLogged(session, username)) {
-
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
         Accommodation accommodation = accommodationService.viewAccommodationById(id);
         return ResponseEntity.ok(accommodation);
     }
-
-
 
     @GetMapping("/availableAccommodations")
     public List<AccommodationDTO> findAccommodations(
