@@ -64,7 +64,7 @@ public class BookService {
 
             String startFormatted = DateFormatterUtil.formatWithoutDashes(startDate);  // yyyymmdd
             String endFormatted = DateFormatterUtil.formatWithoutDashes(endDate);  // yyyymmdd
-            String lockKey = "wanderhub:lock:accId:" + accommodationId + ":start:" + startFormatted + ":end:" + endFormatted;
+            String lockKey = "wanderhub:lock:accId:{" + accommodationId + "}:start:" + startFormatted + ":end:" + endFormatted;
 
             Boolean successLock = redisUtility.lockBook(lockKey, lockTTL, startDate, endDate);
 

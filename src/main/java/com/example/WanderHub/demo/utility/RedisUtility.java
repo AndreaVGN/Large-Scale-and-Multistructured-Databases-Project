@@ -1,6 +1,8 @@
 package com.example.WanderHub.demo.utility;
 
 import com.example.WanderHub.demo.model.Accommodation;
+import com.example.WanderHub.demo.model.Review;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,18 +25,9 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtility {
 
     @Autowired
-    @Qualifier("redisTemplateNearest")
     private RedisTemplate<String, Object> redisTemplate;
     private static final long lock_TTL = 1200;
-    @Qualifier("redisTemplateNearest")
-    @Autowired
-    private RedisTemplate redisTemplateNearest;
-    @Qualifier("redisTemplateMasterPreferred")
-    @Autowired
-    private RedisTemplate redisTemplateMasterPreferred;
-    @Qualifier("redisTemplateReplica")
-    @Autowired
-    private RedisTemplate redisTemplateReplica;
+
 
 
     public void setKey(String key, String value, Long ttl) {
@@ -45,15 +38,7 @@ public class RedisUtility {
 
     public Set<String> getKeys(String pattern) {
 
-        if(pattern.startsWith("wanderhub:lock") || pattern.startsWith("wanderhub:booking")){
             return redisTemplate.keys(pattern);
-        } else if (pattern.startsWith("wanderhub:newAcc")) {
-            return redisTemplateMasterPreferred.keys(pattern);
-        } else if (pattern.startsWith("wanderhub:sessions")) {
-            return redisTemplate.keys(pattern);
-        } else {
-            return redisTemplateReplica.keys(pattern);
-        }
 
     }
 
@@ -78,87 +63,25 @@ public class RedisUtility {
 
     public String getValue(String key){
 
-        if(key.startsWith("wanderhub:lock") || key.startsWith("wanderhub:booking")){
             return (String) redisTemplate.opsForValue().get(key);
-        } else if (key.startsWith("wanderhub:newAcc")) {
-            return (String) redisTemplateMasterPreferred.opsForValue().get(key);
-        } else if (key.startsWith("wanderhub:sessions")) {
-            return (String) redisTemplate.opsForValue().get(key);
-        } else {
-            return (String) redisTemplateReplica.opsForValue().get(key);
-        }
     }
 
     public void saveAccommodation(Accommodation accommodation, String accommodationKey, String username, String baseKey, Long TTL) {
         try {
-            redisTemplate.execute(new SessionCallback<Object>() {
-                @Override
-                public Object execute(RedisOperations operations) {
-                    // Avvia la transazione
-                    operations.multi();
+            // Ottieni ValueOperations
+            ObjectMapper objectMapper = new ObjectMapper();
 
-                    // Ottieni ValueOperations
-                    ValueOperations<String, Object> ops = operations.opsForValue();
+            // Serializza l'oggetto Accommodation in JSON
+            String json = objectMapper.writeValueAsString(accommodation);
 
-                    // Aggiungi i valori alla transazione
-                    ops.set(accommodationKey, username, TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":description", accommodation.getDescription(), TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":type", accommodation.getType(), TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":place", accommodation.getPlace(), TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":city", accommodation.getCity(), TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":address", accommodation.getAddress(), TTL, TimeUnit.SECONDS);
-                    // ops.set(baseKey + ":hostUsername", accommodation.getHostUsername(), TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":latitude", String.valueOf(accommodation.getLatitude()), TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":longitude", String.valueOf(accommodation.getLongitude()), TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":maxGuestSize", String.valueOf(accommodation.getMaxGuestSize()), TTL, TimeUnit.SECONDS);
-                    ops.set(baseKey + ":costPerNight", String.valueOf(accommodation.getCostPerNight()), TTL, TimeUnit.SECONDS);
+            // Salva in Redis
+            redisTemplate.opsForValue().set(baseKey, json);
 
-                    // Gestisci le foto
-                    String[] photos = accommodation.getPhotos();
-                    for (int i = 0; i < photos.length; i++) {
-                        ops.set(baseKey + ":photo:" + i, photos[i], TTL, TimeUnit.SECONDS);
-                    }
-
-                    // Gestisci le facilities
-                    Map<String, Integer> facilities = accommodation.getFacilities();
-                    for (Map.Entry<String, Integer> entry : facilities.entrySet()) {
-                        ops.set(baseKey + ":facility:" + entry.getKey(), String.valueOf(entry.getValue()), TTL, TimeUnit.SECONDS);
-                    }
-
-                    // Esegui la transazione (commit)
-                    return operations.exec(); // Tutte le operazioni vengono eseguite come una transazione
-                }
-            });
         } catch (Exception redisException) {
             // Rollback: elimina tutte le chiavi impostate
-            deleteAccommodationKeys(accommodation, accommodationKey, baseKey, TTL);
+            delete(accommodationKey);
             // Logga l'eccezione o lancia una RuntimeException
             throw new RuntimeException("Error while saving accommodation to Redis, rollback performed: " + redisException.getMessage(), redisException);
-        }
-    }
-
-    private void deleteAccommodationKeys(Accommodation accommodation, String accommodationKey, String baseKey, Long TTL) {
-        redisTemplate.delete(accommodationKey);
-        redisTemplate.delete( baseKey + ":description");
-        redisTemplate.delete( baseKey + ":type");
-        redisTemplate.delete(baseKey + ":place");
-        redisTemplate.delete(baseKey + ":city");
-        redisTemplate.delete(baseKey + ":address");
-        redisTemplate.delete(baseKey + ":latitude");
-        redisTemplate.delete(baseKey + ":longitude");
-        redisTemplate.delete(baseKey + ":maxGuestSize");
-        redisTemplate.delete(baseKey + ":costPerNight");
-
-        // Elimina foto
-        String[] photos = accommodation.getPhotos();
-        for (int i = 0; i < photos.length; i++) {
-            redisTemplate.delete(baseKey + ":photo:" + i);
-        }
-
-        // Elimina facilities
-        Map<String, Integer> facilities = accommodation.getFacilities();
-        for (Map.Entry<String, Integer> entry : facilities.entrySet()) {
-            redisTemplate.delete(baseKey + ":facility:" + entry.getKey());
         }
     }
 
@@ -190,7 +113,6 @@ public class RedisUtility {
         return false;
     }
 
-
     public static long evaluateTTL(String dataFutura) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -207,32 +129,21 @@ public class RedisUtility {
         return Math.max(0, futureTimestamp - currentTimestamp);
     }
 
-    public boolean setKeyWithTransaction(String draftTextKey, String text, String draftRatingKey, String rating, long reviewTTL) {
+   public void saveDraftReview(String baseKey, Review review, Long TTL){
         try {
-            // Esegui la transazione con SessionCallback
-            redisTemplate.execute(new SessionCallback<Object>() {
-                @Override
-                public Object execute(RedisOperations operations) {
-                    // Avvia la transazione
-                    operations.multi();
+            // Ottieni ValueOperations
+            ObjectMapper objectMapper = new ObjectMapper();
 
-                    // Esegui le operazioni di setKey dentro la transazione
-                    ValueOperations<String, Object> valueOps = operations.opsForValue();
-                    valueOps.set(draftTextKey, text, reviewTTL, TimeUnit.SECONDS);
-                    valueOps.set(draftRatingKey, rating, reviewTTL, TimeUnit.SECONDS);
+            // Serializza l'oggetto Accommodation in JSON
+            String json = objectMapper.writeValueAsString(review);
 
-                    // Esegui la transazione
-                    return operations.exec(); // Commit della transazione
-                }
-            });
-            return true;
-        } catch (Exception e) {
-            // Gestisci l'errore se qualcosa va storto
-            delete(draftTextKey);
-            delete(draftRatingKey);
-            return false;
+            // Salva in Redis
+            redisTemplate.opsForValue().set(baseKey, json, TTL);
         }
-    }
+        catch (Exception redisException) {
+            throw new RuntimeException("Error during draft review!");
+        }
+   }
 
 
 

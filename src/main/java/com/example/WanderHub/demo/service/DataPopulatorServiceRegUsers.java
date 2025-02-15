@@ -1,6 +1,7 @@
 
 package com.example.WanderHub.demo.service;
 
+import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.RegisteredUser;  // Modifica il nome del modello
 import com.example.WanderHub.demo.repository.RegisteredUserRepository;  // Modifica il nome del repository
 import jakarta.annotation.PostConstruct;
@@ -35,31 +36,8 @@ public class DataPopulatorServiceRegUsers {
                     new FileReader("C:/Users/andre/Downloads/popolamentoUsernamesFinale.json"),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, RegisteredUser.class));
 
-            System.out.println("Totale utenti letti dal file: " + users.size());
-
-            // Definisci il batch size (es. 5000 documenti per ogni batch)
-            int batchSize = 5000;
-            List<RegisteredUser> batch = new ArrayList<>();
-
-            for (int i = 0; i < users.size(); i++) {
-                try {
-                    RegisteredUser user = users.get(i);
-                    batch.add(user);  // Aggiungi l'utente al batch
-
-                    // Quando raggiungi la dimensione del batch, salvi i dati
-                    if (batch.size() >= batchSize || i == users.size() - 1) {
-                        registeredUserRepository.saveAll(batch);  // Salva il batch nel DB
-                        long count = registeredUserRepository.count();
-                        System.out.println("Documenti nel DB dopo il batch: " + count);
-                        batch.clear();  // Pulisce il batch
-                        System.out.println("Batch salvato: " + (i + 1) + " / " + users.size());
-                    }
-                } catch (Exception e) {
-                    // Logga e ignora i documenti malformattati
-                    System.out.println("Errore durante la deserializzazione del documento " + (i + 1));
-                    e.printStackTrace();  // Mostra dettagli dell'errore
-                }
-            }
+            // Salva i dati nel database
+            registeredUserRepository.saveAll(users);
 
             System.out.println("Popolamento dei dati completato nella collection RegisteredUser.");
         } catch (Exception e) {

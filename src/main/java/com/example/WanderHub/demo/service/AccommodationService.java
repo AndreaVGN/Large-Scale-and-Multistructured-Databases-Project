@@ -45,14 +45,14 @@ public class AccommodationService {
 
             Validator.validateAccommodation(accommodation);
 
-            String accommodationKey = "wanderhub:newAcc:user:" + username + ":hostUsername";
+            String accommodationKey = "wanderhub:newAcc:user:{" + username + "}:hostUsername";
             boolean success = redisUtility.lock(accommodationKey, accommodationTTL);
             if (!success) {
                 throw new RuntimeException("You cannot register more than 1 accommodation per day!");
             }
 
           //  redisUtility.setKey(accommodationKey,username,accommodationTTL);
-            redisUtility.saveAccommodation(accommodation, accommodationKey, username, "wanderhub:newAccDetails:user:" + username,accommodationTTL);
+            redisUtility.saveAccommodation(accommodation, accommodationKey, username, "wanderhub:{newAccDetails}:user:" + username,accommodationTTL);
 
         } catch (IllegalArgumentException e) {
             throw e;
@@ -174,6 +174,20 @@ public class AccommodationService {
             throw new RuntimeException("Error occurred while fetching average cost per night for city: " + city, e);
         }
     }
+
+    public Accommodation viewAccommodationById(ObjectId accommodationId) {
+        try {
+            return accommodationRepository.findByAccommodationId(accommodationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
+
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while retrieving accommodation: " + e.getMessage(), e);
+        }
+    }
+
 
 
 }

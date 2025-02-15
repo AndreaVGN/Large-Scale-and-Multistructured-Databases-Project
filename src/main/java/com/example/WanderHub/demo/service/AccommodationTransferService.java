@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
@@ -33,75 +34,40 @@ public class AccommodationTransferService {
     @Transactional
     public void insertAccommodationsToMongoAtMidnight() {
 
-        System.out.println("Start house transfer");
 
-        Set<String> keys = redisTemplate.keys("newAcc:*");
-        if (keys == null || keys.isEmpty()) {
-            return;
+        try {
+            System.out.println("Start house transfer");
+
+            Set<String> keys = redisTemplate.keys("wanderhub:newAccDetails:*");
+            if (keys == null || keys.isEmpty()) {
+                System.out.println("No new accommodations found in Redis.");
+                return;
+            }
+
+            List<Accommodation> accommodations = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            for (String key : keys) {
+                String json = redisUtility.getValue(key);
+                if (json == null) continue;
+
+                Accommodation accommodation = objectMapper.readValue(json, Accommodation.class);
+                accommodations.add(accommodation);
+            }
+
+            if (!accommodations.isEmpty()) {
+                accommodationRepository.saveAll(accommodations);
+                System.out.println("Accommodations successfully saved.");
+            } else {
+                System.out.println("No accommodation to save");
+            }
+
+            redisTemplate.delete(keys);
+
+            System.out.println("End house transfer");
+        } catch (Exception e) {
+            System.err.println("Error during accommodations transfer.");
+            e.printStackTrace();
         }
-
-        List<Accommodation> accommodations = new ArrayList<>();
-
-        for (String key : keys) {
-            String username = redisUtility.getValue(key);
-            if (username == null) {
-                continue;
-            }
-            Accommodation accommodation = new Accommodation();
-            String description = redisUtility.getValue("newAccDetails:user:" + username + ":description");
-            accommodation.setDescription((description));
-            String type = redisUtility.getValue("newAccDetails:user:" + username + ":type");
-            accommodation.setType(type);
-            String place = redisUtility.getValue("newAccDetails:user:" + username + ":place");
-            accommodation.setPlace(place);
-            String city = redisUtility.getValue("newAccDetails:user:" + username + ":city");
-            accommodation.setCity(city);
-            String address = redisUtility.getValue("newAccDetails:user:" + username + ":address");
-            accommodation.setAddress(address);
-            accommodation.setHostUsername(username);
-            double latitude = Double.parseDouble(redisUtility.getValue("newAccDetails:user:" + username + ":latitude"));
-            accommodation.setLatitude(latitude);
-            double longitude = Double.parseDouble(redisUtility.getValue("newAccDetails:user:" + username + ":longitude"));
-            accommodation.setLongitude(longitude);
-            int maxGuestSize = Integer.parseInt(redisUtility.getValue("newAccDetails:user:" + username + ":maxGuestSize"));
-            accommodation.setMaxGuestSize(maxGuestSize);
-            int costPerNight = Integer.parseInt(redisUtility.getValue("newAccDetails:user:" + username + ":costPerNight"));
-            accommodation.setCostPerNight(costPerNight);
-
-            Set<String> photoKeys = redisTemplate.keys("newAccDetails:user:" + username + ":photo:*");
-            if (photoKeys != null) {
-                List<String> photos = new ArrayList<>();
-                for (String photoKey : photoKeys) {
-                    String photo = (String) redisTemplate.opsForValue().get(photoKey);
-                    if (photo != null) {
-                        photos.add(photo);
-                    }
-                }
-                accommodation.setPhotos(photos.toArray(new String[0]));
-            }
-
-            Set<String> facilityKeys = redisTemplate.keys("newAccDetails:user:" + username +  ":facility:*");
-            if (facilityKeys != null) {
-                Map<String, Integer> facilities = new HashMap<>();
-                for (String facilityKey : facilityKeys) {
-                    String facilityName = facilityKey.split(":")[3]; // Estrai il nome della facility
-                    String value = (String) redisTemplate.opsForValue().get(facilityKey);
-                    if (value != null) {
-                        facilities.put(facilityName, Integer.parseInt(value));
-                    }
-                }
-                accommodation.setFacilities(facilities);
-            }
-
-            accommodations.add(accommodation);
-        }
-
-        accommodationRepository.saveAll(accommodations);
-
-        redisTemplate.delete(keys);
-        Set<String> keysNewAcc = redisTemplate.keys("newAccDetails:*");
-        redisTemplate.delete(keysNewAcc);
-
-        System.out.println("End house transfer");
     }
 }

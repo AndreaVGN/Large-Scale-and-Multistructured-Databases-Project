@@ -6,6 +6,7 @@ import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.ReviewRepository;
 import com.example.WanderHub.demo.utility.RedisUtility;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -54,15 +55,15 @@ public class ReviewService {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
-            String draftTextKey = "wanderhub:review:accId:" + accommodationId + ":username:" + username + ":text";
-            String text = redisUtility.getValue(draftTextKey);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = redisUtility.getValue("wanderhub:review:accId:" + accommodationId + ":username:" + username);
+            Review draftReview = objectMapper.readValue(json, Review.class);
+            String text = draftReview.getReviewText();
+            Double rate = draftReview.getRating();
 
-            String draftRatingKey = "wanderhub:review:accId:" + accommodationId + ":username" + username + ":rating";
-            String rating = redisUtility.getValue(draftRatingKey);
-
-            if (text != null && rating != null && review.getReviewText() == null) {
+            if (text != null && rate != null && review.getReviewText() == null) {
                 review.setReviewText(text);
-                review.setRating(Double.parseDouble(rating));
+                review.setRating(rate);
             }
 
             review.setDate(LocalDate.now());
@@ -75,8 +76,10 @@ public class ReviewService {
 
             accommodation.getReviews().add(review);
             return accommodationRepository.save(accommodation);
-        } catch (RuntimeException e) {
-            throw e;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to save review", e); // Rilancia l'errore
         }
     }
 
@@ -96,16 +99,8 @@ public class ReviewService {
                 throw new RuntimeException("User has not booked this accommodation within 3 days before");
             }
 
-            String text = review.getReviewText();
-            String rating = String.valueOf(review.getRating());
-
-            String draftTextKey = "wanderhub:review:accId:" + accommodationId + ":username:" + username + ":text";
-            String draftRatingKey = "wanderhub:review:accId:" + accommodationId + ":username" + username + ":rating";
-
-
-            redisUtility.setKeyWithTransaction(draftTextKey, text, draftRatingKey, rating, reviewTTL);
-
-
+            // Salva in Redis
+            redisUtility.saveDraftReview("wanderhub:review:accId:" + accommodationId + ":username:" + username, review, reviewTTL);
 
 
         } catch (RuntimeException e) {
