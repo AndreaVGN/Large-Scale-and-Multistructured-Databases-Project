@@ -45,14 +45,14 @@ public class AccommodationService {
 
             Validator.validateAccommodation(accommodation);
 
-            String accommodationKey = "wanderhub:newAcc:user:{" + username + "}:hostUsername";
+            /*String accommodationKey = "wanderhub:newAcc:user:{" + username + "}:hostUsername";
             boolean success = redisUtility.lock(accommodationKey, accommodationTTL);
             if (!success) {
                 throw new RuntimeException("You cannot register more than 1 accommodation per day!");
-            }
-
+            }*/
+            //accommodation.setHostUsername(username);
           //  redisUtility.setKey(accommodationKey,username,accommodationTTL);
-            redisUtility.saveAccommodation(accommodation, accommodationKey, username, "wanderhub:{newAccDetails}:user:" + username,accommodationTTL);
+            redisUtility.saveAccommodation(accommodation, "wanderhub:{newAccDetails}:user:" + username,accommodationTTL);
 
         } catch (IllegalArgumentException e) {
             throw e;

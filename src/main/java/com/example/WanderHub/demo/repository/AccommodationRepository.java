@@ -18,8 +18,10 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     @Query("{ '_id': ?0 }")
     Optional<Accommodation> findByAccommodationId(ObjectId _id);
 
-    @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
-            fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
+    @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': " +
+            "{ $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
+            fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1," +
+                    " 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
     List<Accommodation> findAvailableAccommodations(String city, int minGuests, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     @Query(value = "{ '_id': ?2, 'books': { '$elemMatch': { 'username': ?0, 'occupiedDates.start': ?1 } } }",

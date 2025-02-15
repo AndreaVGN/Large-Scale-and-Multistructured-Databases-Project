@@ -2,6 +2,7 @@ package com.example.WanderHub.demo.utility;
 
 import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Review;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,20 +67,18 @@ public class RedisUtility {
             return (String) redisTemplate.opsForValue().get(key);
     }
 
-    public void saveAccommodation(Accommodation accommodation, String accommodationKey, String username, String baseKey, Long TTL) {
+    public void saveAccommodation(Accommodation accommodation, String baseKey, Long TTL) {
         try {
-            // Ottieni ValueOperations
+
             ObjectMapper objectMapper = new ObjectMapper();
-
-            // Serializza l'oggetto Accommodation in JSON
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             String json = objectMapper.writeValueAsString(accommodation);
+            redisTemplate.opsForValue().set(baseKey, json,TTL, TimeUnit.SECONDS);
 
-            // Salva in Redis
-            redisTemplate.opsForValue().set(baseKey, json);
 
         } catch (Exception redisException) {
             // Rollback: elimina tutte le chiavi impostate
-            delete(accommodationKey);
+            //delete(accommodationKey);
             // Logga l'eccezione o lancia una RuntimeException
             throw new RuntimeException("Error while saving accommodation to Redis, rollback performed: " + redisException.getMessage(), redisException);
         }

@@ -24,12 +24,11 @@ public class BookToUserTransferService {
     @Autowired
     private RegisteredUserRepository registeredUserRepository;
 
-    //@Scheduled(cron = "0 0 3 * * ?") // Esegue ogni giorno alle 3:00 AM
+    @Scheduled(cron = "0 0 3 * * ?") // Esegue ogni giorno alle 3:00 AM
    // @PostConstruct
     public void transferBookingsToRegisteredUsers() {
         LocalDate yesterday = LocalDate.now(); //.minusDays(1);
 
-        // Recupera le accommodations con Book del giorno precedente
         List<Accommodation> accommodations = accommodationRepository.findByBooksBookDate(yesterday);
         System.out.println(accommodations);
 
@@ -39,19 +38,16 @@ public class BookToUserTransferService {
                 if (book.getBookDate().equals(yesterday)) {
                     String username = book.getUsername();
 
-                    // Trova l'utente
                     RegisteredUser user = registeredUserRepository.findById(username).orElse(null);
                     if (user != null) {
-                        // Crea un oggetto EmbeddedBooking con tutti i dati richiesti
+
                         PendingBook embeddedBooking = new PendingBook(
                                 accommodation.getAccommodationId(),
                                 book
                         );
 
-                        // Aggiungi alla lista delle prenotazioni dell'utente
                         user.getBooks().add(embeddedBooking);
 
-                        // Salva l'utente aggiornato
                         registeredUserRepository.save(user);
                     }
                 }
