@@ -6,7 +6,9 @@ import com.example.WanderHub.demo.model.Review;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.repository.ReviewRepository;
 import com.example.WanderHub.demo.utility.RedisUtility;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -35,19 +37,6 @@ public class ReviewService {
         return ReviewRepository.save(review);
     }
 
-    // Return the accommodation reviews selected by the correspondent host username
-    public List<ReviewDTO> viewAccommodationReviews(String hostUsername, int id) {
-        try {
-            return accommodationRepository.viewAccommodationReviews(hostUsername, id);
-        }
-        catch(DataAccessException e){
-            throw new RuntimeException("Error while retrieving accommodation from the database: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Error while retrieving accommodation: ", e);
-        }
-    }
-
     // Insert a new review to a specified accommodation: if a draft review were previously written it will be send as the review
     // Note: an username can write a review within 3 days after the finish of the book.
     public Accommodation addReviewToAccommodation(String username, String accommodationId, Review review) {
@@ -56,6 +45,8 @@ public class ReviewService {
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
 
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            objectMapper.registerModule(new JavaTimeModule());
             String json = redisUtility.getValue("wanderhub:review:accId:" + accommodationId + ":username:" + username);
             Review draftReview = objectMapper.readValue(json, Review.class);
             String text = draftReview.getReviewText();

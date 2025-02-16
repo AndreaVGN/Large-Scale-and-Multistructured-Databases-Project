@@ -104,7 +104,7 @@ public class BookService {
 
             String bookinglockKey = "wanderhub:bookinglock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted + ":user";
             String username = redisUtility.getValue(bookinglockKey);
-            String lockKey = "wanderhub:lock:accId:" + houseId + ":start:" + startFormatted + ":end:" + endFormatted;
+            String lockKey = "wanderhub:lock:accId:{" + houseId + "}:start:" + startFormatted + ":end:" + endFormatted;
 
             String storedValue = redisUtility.getValue(bookinglockKey);
 
@@ -119,7 +119,7 @@ public class BookService {
                     if (bookingLockKeyDel) {
                         redisUtility.setKey(lockKey, startFormatted + endFormatted, lockTTL);
                     }
-                    throw new RuntimeException("Failed to delete booking from Redis, rollback executed.");
+                    throw new RuntimeException("Failed to delete booking!");
                 }
                 return true;
             }
@@ -216,16 +216,14 @@ public class BookService {
             }
         }
 
-        if (pendingBookToRemove == null) {
-            return false;
+        if (pendingBookToRemove != null) {
+            user.getBooks().remove(pendingBookToRemove);
+            registeredUserRepository.save(user);
         }
-
-        user.getBooks().remove(pendingBookToRemove);
-        registeredUserRepository.save(user);
 
         Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId).orElse(null);
         if (accommodation == null) {
-            return false; // Se l'Accommodation non esiste, ritorna false
+            return false;
         }
 
         Book bookToRemove = null;

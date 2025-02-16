@@ -30,10 +30,11 @@ public class Validator {
             throw new IllegalArgumentException("Place, city, and address cannot be empty.");
         }
 
+        /*
         // Check if host username is not empty
         if (accommodation.getHostUsername() == null || accommodation.getHostUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("Host username cannot be empty.");
-        }
+        }*/
 
         // Check if latitude and longitude are not empty
         if (accommodation.getLatitude() < -90 || accommodation.getLatitude() > 90 ||
@@ -102,9 +103,10 @@ public class Validator {
         if (period.getStart() == null || period.getEnd() == null) {
             throw new IllegalArgumentException("Start and end dates cannot be null.");
         }
+        /*
         if (!period.getStart().isBefore(period.getEnd())) {
             throw new IllegalArgumentException("Start date must be before the end date.");
-        }
+        }*/
 
         // Validate that the required fields are not empty
         if (book.getUsername() == null || book.getUsername().isEmpty()) {

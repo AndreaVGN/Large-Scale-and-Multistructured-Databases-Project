@@ -29,24 +29,6 @@ public class ReviewController {
         return reviewService.createReview(review);
     }
 
-
-    @GetMapping("/{hostUsername}/{id}/AccommodationReviews")
-    public ResponseEntity<?> viewAccommodationReviews(@PathVariable String hostUsername, @PathVariable int id, HttpSession session) {
-        if (!SessionUtilility.isLogged(session, hostUsername)) {
-
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
-        }
-
-        List<ReviewDTO> reviews = reviewService.viewAccommodationReviews(hostUsername, id);
-
-        if (reviews.isEmpty()) {
-
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No reviews found for this host.");
-        }
-
-        return ResponseEntity.ok(reviews);
-    }
-
     @PostMapping("/{username}/{accommodationId}/newDraftReview")
     public ResponseEntity<?> writeDraftReview(@PathVariable String username, @PathVariable String accommodationId, @RequestBody Review review, HttpSession session) {
         if (!SessionUtilility.isLogged(session, username)) {

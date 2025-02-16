@@ -4,6 +4,7 @@ import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.model.Review;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -131,16 +132,26 @@ public class RedisUtility {
    public void saveDraftReview(String baseKey, Review review, Long TTL){
         try {
             // Ottieni ValueOperations
+            System.out.println(review.getReviewText());
+            System.out.println(review.getRating());
+
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            objectMapper.registerModule(new JavaTimeModule());
+            System.out.println("Valore di review: " + review);
+            System.out.println("Valore di review JSON: " + objectMapper.writeValueAsString(review));
 
             // Serializza l'oggetto Accommodation in JSON
             String json = objectMapper.writeValueAsString(review);
+            System.out.println(json);
 
             // Salva in Redis
-            redisTemplate.opsForValue().set(baseKey, json, TTL);
+            redisTemplate.opsForValue().set(baseKey, json, TTL, TimeUnit.SECONDS);
         }
         catch (Exception redisException) {
+            redisException.printStackTrace();
             throw new RuntimeException("Error during draft review!");
+
         }
    }
 
