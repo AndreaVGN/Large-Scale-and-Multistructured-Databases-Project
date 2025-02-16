@@ -48,7 +48,7 @@ public class ReviewController {
     }
 
     @PostMapping("/{username}/{accommodationId}/newDraftReview")
-    public ResponseEntity<?> writeDraftReview(@PathVariable String username, @PathVariable ObjectId accommodationId, @RequestBody Review review, HttpSession session) {
+    public ResponseEntity<?> writeDraftReview(@PathVariable String username, @PathVariable String accommodationId, @RequestBody Review review, HttpSession session) {
         if (!SessionUtilility.isLogged(session, username)) {
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
@@ -63,7 +63,7 @@ public class ReviewController {
     }
 
     @PutMapping("/{username}/{accommodationId}/newReview")
-    public ResponseEntity<?> writeReview(@PathVariable String username, @PathVariable ObjectId accommodationId, @RequestBody Review review, HttpSession session) {
+    public ResponseEntity<?> writeReview(@PathVariable String username, @PathVariable String accommodationId, @RequestBody Review review, HttpSession session) {
 
         if (!SessionUtilility.isLogged(session, username)) {
 

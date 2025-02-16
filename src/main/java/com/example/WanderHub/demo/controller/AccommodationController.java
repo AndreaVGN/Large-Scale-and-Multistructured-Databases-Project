@@ -2,10 +2,8 @@ package com.example.WanderHub.demo.controller;
 import com.example.WanderHub.demo.DTO.*;
 import com.example.WanderHub.demo.model.*;
 import com.example.WanderHub.demo.service.AccommodationService;
-
 import com.example.WanderHub.demo.utility.SessionUtilility;
 import jakarta.servlet.http.HttpSession;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,12 +32,12 @@ public class AccommodationController {
     }
 
     @GetMapping("/{id}")
-    public AccommodationDTO getAccommodationById(@PathVariable ObjectId id) {
+    public AccommodationDTO getAccommodationById(@PathVariable String id) {
 
         return accommodationService.getAccommodationById(id);
    }
     @GetMapping("/{username}/{id}")
-    public ResponseEntity<?> viewAccommodationById(@PathVariable ObjectId id, @PathVariable String username, HttpSession session) {
+    public ResponseEntity<?> viewAccommodationById(@PathVariable String id, @PathVariable String username, HttpSession session) {
         if (!SessionUtilility.isLogged(session, username)) {
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");

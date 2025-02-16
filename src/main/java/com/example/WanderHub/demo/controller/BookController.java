@@ -53,7 +53,7 @@ public class BookController {
     @PutMapping("/{username}/{accommodationId}/newBook")
     public ResponseEntity<?> addBookToAccommodationRegistered(
             @PathVariable String username,
-            @PathVariable ObjectId accommodationId,
+            @PathVariable String accommodationId,
             @RequestBody Book newBook,
             HttpSession session) {
 
@@ -77,7 +77,7 @@ public class BookController {
 
     @PutMapping("/{accommodationId}/newBook")
     public ResponseEntity<?> addBookToAccommodationUnregistered(
-            @PathVariable ObjectId accommodationId,
+            @PathVariable String accommodationId,
             @RequestBody Book newBook,
             HttpServletRequest request) {
 
@@ -107,7 +107,7 @@ public class BookController {
     }
 
     @PostMapping("/{accommodationId}/lock")
-    public ResponseEntity<String> lockHouseUnregistered(@PathVariable ObjectId accommodationId, @RequestParam String startDate, @RequestParam String endDate, HttpServletResponse response) {
+    public ResponseEntity<String> lockHouseUnregistered(@PathVariable String accommodationId, @RequestParam String startDate, @RequestParam String endDate, HttpServletResponse response) {
 
         String timestamp = (String) bookService.lockHouse(accommodationId, startDate, endDate, null);
 
@@ -127,7 +127,7 @@ public class BookController {
     }
 
     @PostMapping("/{username}/{accommodationId}/lock")
-    public ResponseEntity<String> lockHouseRegistered(@PathVariable ObjectId accommodationId, @PathVariable String username, @RequestParam String startDate, @RequestParam String endDate, HttpSession session) {
+    public ResponseEntity<String> lockHouseRegistered(@PathVariable String accommodationId, @PathVariable String username, @RequestParam String startDate, @RequestParam String endDate, HttpSession session) {
         if (!SessionUtilility.isLogged(session, username)) {
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
@@ -144,7 +144,7 @@ public class BookController {
 
     @DeleteMapping("/{accommodationId}/unlock")
     public ResponseEntity<String> unlockHouseUnregistered(
-            @PathVariable ObjectId accommodationId,
+            @PathVariable String accommodationId,
             @RequestParam String startDate,
             @RequestParam String endDate,
             @CookieValue(value = "bookingTimestamp", required = false) String timestampCookie) {
@@ -184,7 +184,7 @@ public class BookController {
     @DeleteMapping("/{username}/accommodation/{accommodationId}/Book")
     public ResponseEntity<String> deleteBook(
             @PathVariable String username,
-            @PathVariable ObjectId accommodationId,
+            @PathVariable String accommodationId,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate,
             HttpSession session
@@ -207,7 +207,7 @@ public class BookController {
 
     @DeleteMapping("/{username}/{accommodationId}/unlock")
     public ResponseEntity<String> unlockHouseRegistered(
-            @PathVariable ObjectId accommodationId,
+            @PathVariable String accommodationId,
             @PathVariable String username,
             @RequestParam String startDate,
             @RequestParam String endDate,

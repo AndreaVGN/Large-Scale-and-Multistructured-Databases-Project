@@ -50,7 +50,7 @@ public class ReviewService {
 
     // Insert a new review to a specified accommodation: if a draft review were previously written it will be send as the review
     // Note: an username can write a review within 3 days after the finish of the book.
-    public Accommodation addReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
+    public Accommodation addReviewToAccommodation(String username, String accommodationId, Review review) {
         try {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));
@@ -65,15 +65,12 @@ public class ReviewService {
                 review.setReviewText(text);
                 review.setRating(rate);
             }
-
             review.setDate(LocalDate.now());
             LocalDate date = review.getDate().minusDays(3);
             LocalDate today = LocalDate.now();
-
             if (!accommodationRepository.existsBookingForUser(accommodationId, username, date, today)) {
                 throw new RuntimeException("User has not booked this accommodation within 3 days before");
             }
-
             accommodation.getReviews().add(review);
             return accommodationRepository.save(accommodation);
 
@@ -86,7 +83,7 @@ public class ReviewService {
     // Insert a draft review in Redis
     // Note: an username can write a draft review within 3 days after the finish of the book.
     // The draft review lasts 6 hours in Redis.
-    public void addDraftReviewToAccommodation(String username, ObjectId accommodationId, Review review) {
+    public void addDraftReviewToAccommodation(String username, String accommodationId, Review review) {
         try {
               accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new RuntimeException("Accommodation not found"));

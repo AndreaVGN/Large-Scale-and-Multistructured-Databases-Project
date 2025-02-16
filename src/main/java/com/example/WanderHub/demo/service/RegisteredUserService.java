@@ -85,7 +85,6 @@ public class RegisteredUserService {
     public boolean authenticate(AuthRequestDTO loginRequest, HttpSession session) {
         try {
             Optional<RegisteredUser> userOptional = registeredUserRepository.findByUsername(loginRequest.getUsername());
-            System.out.println("Ciao sono qui");
 
             if (userOptional.isPresent()) {
                 RegisteredUser user = userOptional.get();

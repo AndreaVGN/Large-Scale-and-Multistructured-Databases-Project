@@ -4,18 +4,11 @@ import com.example.WanderHub.demo.model.Accommodation;
 import com.example.WanderHub.demo.repository.AccommodationRepository;
 import com.example.WanderHub.demo.utility.RedisUtility;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.annotation.PostConstruct;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
-
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -32,10 +25,9 @@ public class AccommodationTransferService {
     }
 
     // Insert the new accommodations from Redis to MongoDB (every nigth at 03:00)
-    //@Scheduled(cron = "0 0 3 * * ?") // Every night at 03:00
-    @PostConstruct
+    @Scheduled(cron = "0 0 3 * * ?") // Every night at 03:00
+    //@PostConstruct
     @Transactional
-
     public void insertAccommodationsToMongoAtMidnight() {
         try {
             System.out.println("Start house transfer");
@@ -49,11 +41,9 @@ public class AccommodationTransferService {
             List<Accommodation> accommodations = new ArrayList<>();
 
             for (String key : keys) {
-                // Usa redisTemplate per ottenere il valore direttamente
                 String json = (String) redisTemplate.opsForValue().get(key);
                 if (json == null) continue;
 
-                // Usando ObjectMapper solo per deserializzare
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
                 Accommodation accommodation = objectMapper.readValue(json, Accommodation.class);
@@ -68,7 +58,6 @@ public class AccommodationTransferService {
                 System.out.println("No accommodation to save");
             }
 
-            // Elimina le chiavi processate
             redisTemplate.delete(keys);
 
             System.out.println("End house transfer");

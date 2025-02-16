@@ -84,7 +84,7 @@ public class RedisUtility {
         }
     }
 
-    public boolean isOverlappingBooking(ObjectId accommodationId, String newStart, String newEnd) {
+    public boolean isOverlappingBooking(String accommodationId, String newStart, String newEnd) {
 
         Set<String> existingKeys = getKeys("wanderhub:lock:accId:" + accommodationId + ":*");
         System.out.println(existingKeys);

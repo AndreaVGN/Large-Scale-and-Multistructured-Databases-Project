@@ -28,16 +28,10 @@ public class AccommodationService {
     @Autowired
     private AccommodationRepository accommodationRepository;
 
-
-
-
     @Autowired
     private RedisUtility redisUtility;
 
     private static final long accommodationTTL = 86400;
-
-
-
 
     // Insert new accommodation into Redis
     public void createAccommodation(Accommodation accommodation, String username) {
@@ -45,13 +39,8 @@ public class AccommodationService {
 
             Validator.validateAccommodation(accommodation);
 
-            /*String accommodationKey = "wanderhub:newAcc:user:{" + username + "}:hostUsername";
-            boolean success = redisUtility.lock(accommodationKey, accommodationTTL);
-            if (!success) {
-                throw new RuntimeException("You cannot register more than 1 accommodation per day!");
-            }*/
-            //accommodation.setHostUsername(username);
-          //  redisUtility.setKey(accommodationKey,username,accommodationTTL);
+            accommodation.setHostUsername(username);
+
             redisUtility.saveAccommodation(accommodation, "wanderhub:{newAccDetails}:user:" + username,accommodationTTL);
 
         } catch (IllegalArgumentException e) {
@@ -64,7 +53,7 @@ public class AccommodationService {
     }
 
     // Return the correspondent accommodation if exists
-    public AccommodationDTO getAccommodationById(ObjectId accommodationId) {
+    public AccommodationDTO getAccommodationById(String accommodationId) {
         try {
             Accommodation accommodation = accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));
@@ -175,7 +164,7 @@ public class AccommodationService {
         }
     }
 
-    public Accommodation viewAccommodationById(ObjectId accommodationId) {
+    public Accommodation viewAccommodationById(String accommodationId) {
         try {
             return accommodationRepository.findByAccommodationId(accommodationId)
                     .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found with id: " + accommodationId));

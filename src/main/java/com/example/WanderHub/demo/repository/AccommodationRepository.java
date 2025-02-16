@@ -16,13 +16,32 @@ import java.util.List;
 @Repository
 public interface AccommodationRepository extends MongoRepository<Accommodation, Integer> {
     @Query("{ '_id': ?0 }")
-    Optional<Accommodation> findByAccommodationId(ObjectId _id);
+    Optional<Accommodation> findByAccommodationId(String _id);
 
-    @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': " +
-            "{ $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
-            fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1," +
-                    " 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
-    List<Accommodation> findAvailableAccommodations(String city, int minGuests, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    /*
+    @Query(value = "{ 'city': ?0, 'maxGuestSize': { $gte: ?1 }, 'occupiedDates': { $not: { $elemMatch: { $or: [ { 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } ] } } } }",
+            fields = "{ '_id': 1, 'description': 1, 'type': 1, 'city': 1, 'hostUsername': 1, 'costPerNight': 1, 'averageRate': 1, 'photos': { $slice: [0, 1] } }")
+    List<Accommodation> findAvailableAccommodations(String city, int minGuests, LocalDate startDate, LocalDate endDate, Pageable pageable);*/
+
+    @Query(value = "{ 'city': ?0, " +
+            "'maxGuestSize': { $gte: ?1 }, " +
+            "'occupiedDates': { $not: { $elemMatch: { $or: [ " +
+            "{ 'start': { $lte: ?3 }, 'end': { $gte: ?2 } } " +
+            "] } } } }",
+            fields = "{ '_id': 1, " +
+                    "'description': 1, " +
+                    "'type': 1, " +
+                    "'city': 1, " +
+                    "'hostUsername': 1, " +
+                    "'costPerNight': 1, " +
+                    "'averageRate': 1, " +
+                    "'photos': { $slice: [0, 1] } }")
+    List<Accommodation> findAvailableAccommodations(String city,
+                                                    int minGuests,
+                                                    LocalDate startDate,
+                                                    LocalDate endDate,
+                                                    Pageable pageable);
+
 
     @Query(value = "{ '_id': ?2, 'books': { '$elemMatch': { 'username': ?0, 'occupiedDates.start': ?1 } } }",
             fields = "{ '_id': 1, 'description': 1, 'books.$': 1 }")
@@ -69,7 +88,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
     List<AverageCostDTO> findAverageCostPerNightByCityAndGuests(String city);
 
     @Query(value = "{ '_id': ?0, 'books.occupiedDates': { $elemMatch: { 'start': { $lte: ?2 }, 'end': { $gte: ?1 } } } }", count = true)
-    int checkAvailability(ObjectId accommodationId, LocalDate startDate, LocalDate endDate);
+    int checkAvailability(String accommodationId, LocalDate startDate, LocalDate endDate);
 
 
 
@@ -92,7 +111,7 @@ public interface AccommodationRepository extends MongoRepository<Accommodation, 
 
 
     @Query(value = "{ '_id': ?0, 'books.username': ?1, 'books.occupiedDates.end': { $gte: ?2, $lte: ?3 } }", exists = true)
-    boolean existsBookingForUser(ObjectId accommodationId, String username, LocalDate maxEndDate, LocalDate today);
+    boolean existsBookingForUser(String accommodationId, String username, LocalDate maxEndDate, LocalDate today);
 
     @Query("{ 'books.bookDate' : { $lte: ?0 } }")
     List<Accommodation> findByBooksBookDate(LocalDate date);
