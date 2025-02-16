@@ -36,6 +36,8 @@ public interface ArchivedBookingRepository extends MongoRepository<ArchivedBook,
 
             "{ $group: { '_id': '$city', 'bookingCount': { $sum: 1 } } }",
 
+            "{ $project: { city: '$_id', bookingCount: 1} }",
+
             "{ $sort: { 'bookingCount': -1 } }",
 
             "{ $limit: 10 }"

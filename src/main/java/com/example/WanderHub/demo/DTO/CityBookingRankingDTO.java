@@ -20,4 +20,5 @@ public class CityBookingRankingDTO {
     public void setBookingCount(long bookingCount) {
         this.bookingCount = bookingCount;
     }
+
 }

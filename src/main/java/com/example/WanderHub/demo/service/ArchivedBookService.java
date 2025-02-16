@@ -19,6 +19,7 @@ public class ArchivedBookService {
         try {
             LocalDate lastYearStart = LocalDate.now().minusYears(1).withDayOfYear(1);
 
+
             return archivedBookRepository.findTopCitiesByBookings(lastYearStart);
 
         } catch (Exception e) {
