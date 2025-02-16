@@ -25,9 +25,9 @@ public class BookToUserTransferService {
     private RegisteredUserRepository registeredUserRepository;
 
     @Scheduled(cron = "0 0 3 * * ?") // Esegue ogni giorno alle 3:00 AM
-   // @PostConstruct
+    //@PostConstruct
     public void transferBookingsToRegisteredUsers() {
-        LocalDate yesterday = LocalDate.now(); //.minusDays(1);
+        LocalDate yesterday = LocalDate.now().minusDays(1);
 
         List<Accommodation> accommodations = accommodationRepository.findByBooksBookDate(yesterday);
         System.out.println(accommodations);
